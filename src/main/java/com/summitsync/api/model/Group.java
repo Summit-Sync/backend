@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -14,23 +15,23 @@ import java.util.List;
 @Table(name = "SS_Group")
 public class Group {
     @Id
-    @GeneratedValue
-    private long gId;
-    @OneToMany
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long groupId;
+    @OneToMany(fetch = FetchType.LAZY)
     private List<EventPeriod> period;
     private int numberOfParticipants;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Location location;
     private String notes;
-    private double pricePerParticipant;
-    private double totalPrice;
+    private BigDecimal pricePerParticipant;
+    private BigDecimal totalPrice;
     private int numberOfDates;
     private String description;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Contact contact;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Qualification> requiredQualifications;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private GroupTemplate template;
 
 }

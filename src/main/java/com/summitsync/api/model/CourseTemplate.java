@@ -1,6 +1,7 @@
 package com.summitsync.api.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,6 @@ public class CourseTemplate extends BaseTemplate {
     private int numberOfParticipants;
     private int numberOfWaitList;
     private int numberOfTrainers;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private CourseTemplatePrice price;
 }

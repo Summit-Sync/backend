@@ -1,12 +1,11 @@
 package com.summitsync.api.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Entity
 @NoArgsConstructor
@@ -15,8 +14,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "SS_CourseTemplatePrice")
 public class CourseTemplatePrice {
     @Id
-    @GeneratedValue
-    private long ctpId;
-    private double price;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long courseTemplateId;
+    private BigDecimal price;
     private String category;
 }

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -14,10 +15,10 @@ import java.util.List;
 @Table(name = "SS_CoursePrice")
 public class CoursePrice {
     @Id
-    @GeneratedValue
-    private long cprId;
-    @OneToMany
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long coursePriceId;
+    @OneToMany(fetch = FetchType.LAZY)
     private List<Course> course;
     private String category;
-    private double price;
+    private BigDecimal price;
 }

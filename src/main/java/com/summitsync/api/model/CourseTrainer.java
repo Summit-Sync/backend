@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 @Table(name = "SS_CourseTrainer")
 public class CourseTrainer {
     @Id
-    @GeneratedValue
-    private long ctrId;
-    @ManyToOne
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long courseTrainerId;
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trainer_tId")
     private Trainer trainer;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_cId")
     private Course course;
     private boolean approved;

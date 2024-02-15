@@ -13,11 +13,11 @@ import java.util.List;
 @Data
 public class BaseTemplate {
     @Id
-    @GeneratedValue
-    private long btId;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long baseTemplateId;
     private String acronym;
     private int numberOfDates;
     private String description;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Qualification> requiredQualifications;
 }

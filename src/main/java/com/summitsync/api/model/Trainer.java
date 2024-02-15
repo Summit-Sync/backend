@@ -14,9 +14,9 @@ import java.util.List;
 @Table(name = "SS_Trainer")
 public class Trainer {
     @Id
-    @GeneratedValue
-    private long tId;
-    private String text;
-    @ManyToMany
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long trainerId;
+    private String subjectId;
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Qualification> qualifications;
 }

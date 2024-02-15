@@ -14,13 +14,13 @@ import java.util.List;
 @Table(name = "SS_Qualification")
 public class Qualification {
     @Id
-    @GeneratedValue
-    private long qId;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long qualificationId;
     private String name;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Trainer> trainers;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Course> courses;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Group> groups;
 }

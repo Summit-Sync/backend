@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -14,24 +15,24 @@ import java.util.List;
 @Table(name = "SS_Course")
 public class Course {
     @Id
-    @GeneratedValue
-    private long cId;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long courseId;
     private int number;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Location location;
     private String notes;
     private boolean visible;
-    private double actualPrice; // in euros
+    private BigDecimal actualPrice; // in euros
     private int numberOfParticipants;
     private int numberOfWaitList;
     private int numberOfTrainers;
     private int numberOfDates;
     private String description;
     private String title;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Qualification> requiredQualifications;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Participant> participants;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private CourseTemplate template;
 }
