@@ -1,5 +1,6 @@
-package com.summitsync.api.model;
+package com.summitsync.api.grouptemplate;
 
+import com.summitsync.api.basetemplate.BaseTemplate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.summitsync.api.model;
+package com.summitsync.api.location;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

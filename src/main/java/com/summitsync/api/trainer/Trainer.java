@@ -1,5 +1,6 @@
-package com.summitsync.api.model;
+package com.summitsync.api.trainer;
 
+import com.summitsync.api.qualification.Qualification;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,17 +8,16 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@MappedSuperclass
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class BaseTemplate {
+@Table(name = "SS_Trainer")
+public class Trainer {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long baseTemplateId;
-    private String acronym;
-    private int numberOfDates;
-    private String description;
+    private long trainerId;
+    private String subjectId;
     @ManyToMany(fetch = FetchType.LAZY)
-    private List<Qualification> requiredQualifications;
+    private List<Qualification> qualifications;
 }
