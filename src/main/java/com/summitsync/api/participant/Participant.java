@@ -1,5 +1,7 @@
-package com.summitsync.api.model;
+package com.summitsync.api.participant;
 
+import com.summitsync.api.course.Course;
+import com.summitsync.api.participantstatus.ParticipantStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,5 +1,6 @@
-package com.summitsync.api.model;
+package com.summitsync.api.courseprice;
 
+import com.summitsync.api.course.Course;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

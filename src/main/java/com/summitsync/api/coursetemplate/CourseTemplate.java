@@ -1,5 +1,7 @@
-package com.summitsync.api.model;
+package com.summitsync.api.coursetemplate;
 
+import com.summitsync.api.basetemplate.BaseTemplate;
+import com.summitsync.api.coursetemplateprice.CourseTemplatePrice;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;

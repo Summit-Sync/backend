@@ -1,5 +1,10 @@
-package com.summitsync.api.model;
+package com.summitsync.api.group;
 
+import com.summitsync.api.contact.Contact;
+import com.summitsync.api.eventperiod.EventPeriod;
+import com.summitsync.api.grouptemplate.GroupTemplate;
+import com.summitsync.api.location.Location;
+import com.summitsync.api.qualification.Qualification;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

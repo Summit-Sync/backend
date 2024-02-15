@@ -1,4 +1,4 @@
-package com.summitsync.api.model;
+package com.summitsync.api.participantstatus;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,11 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Table(name = "SS_Contact")
-public class Contact {
+@Table(name = "SS_ParticipantStatus")
+public class ParticipantStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long contactId;
-    private String name;
-    private String email;
+    private long participantStatusId;
+    private String status;
 }

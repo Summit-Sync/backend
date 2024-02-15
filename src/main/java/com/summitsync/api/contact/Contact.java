@@ -1,21 +1,19 @@
-package com.summitsync.api.model;
+package com.summitsync.api.contact;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Table(name = "SS_CourseTemplatePrice")
-public class CourseTemplatePrice {
+@Table(name = "SS_Contact")
+public class Contact {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long courseTemplateId;
-    private BigDecimal price;
-    private String category;
+    private long contactId;
+    private String name;
+    private String email;
 }
