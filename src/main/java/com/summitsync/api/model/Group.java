@@ -26,6 +26,8 @@ public class Group {
     private double totalPrice;
     private int numberOfDates;
     private String description;
+    @OneToOne(cascade = CascadeType.ALL)
+    private Contact contact;
     @ManyToMany
     private List<Qualification> requiredQualifications;
     @ManyToOne
