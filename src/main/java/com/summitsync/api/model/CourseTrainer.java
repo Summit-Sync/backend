@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Table(name = "SS_CourseTrainer")
 public class CourseTrainer {
     @Id
     @GeneratedValue

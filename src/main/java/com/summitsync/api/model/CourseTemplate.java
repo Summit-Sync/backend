@@ -2,6 +2,7 @@ package com.summitsync.api.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Table(name = "SS_CourseTemplate")
 public class CourseTemplate extends BaseTemplate {
     private int numberOfParticipants;
     private int numberOfWaitList;

@@ -11,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Table(name = "SS_CoursePrice")
 public class CoursePrice {
     @Id
     @GeneratedValue
