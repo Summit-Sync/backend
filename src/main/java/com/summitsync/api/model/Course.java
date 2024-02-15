@@ -27,6 +27,7 @@ public class Course {
     private int numberOfTrainers;
     private int numberOfDates;
     private String description;
+    private String title;
     @ManyToMany
     private List<Qualification> requiredQualifications;
     @ManyToMany
