@@ -1,0 +1,37 @@
+package com.summitsync.api.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Table(name = "SS_Group")
+public class Group {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long groupId;
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<EventPeriod> period;
+    private int numberOfParticipants;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Location location;
+    private String notes;
+    private BigDecimal pricePerParticipant;
+    private BigDecimal totalPrice;
+    private int numberOfDates;
+    private String description;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Contact contact;
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<Qualification> requiredQualifications;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private GroupTemplate template;
+
+}
