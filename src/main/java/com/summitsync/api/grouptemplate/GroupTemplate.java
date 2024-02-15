@@ -1,9 +1,10 @@
 package com.summitsync.api.grouptemplate;
 
 import com.summitsync.api.basetemplate.BaseTemplate;
-import com.summitsync.api.eventperiod.EventPeriod;
 import com.summitsync.api.qualification.Qualification;
 import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
