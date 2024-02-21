@@ -14,4 +14,5 @@ public class GroupTemplateDTO {
     private BigDecimal pricePerTrainerPerHour;
     private String description;
     private List<Qualification> requiredQualification;
+    private long id;
 }

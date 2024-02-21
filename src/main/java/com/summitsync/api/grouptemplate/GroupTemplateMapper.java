@@ -9,6 +9,7 @@ public class GroupTemplateMapper {
         template.setPricePerTrainerPerHour(dto.getPricePerTrainerPerHour());
         template.setDescription(dto.getDescription());
         template.setRequiredQualifications(dto.getRequiredQualification());
+        template.setBaseTemplateId(dto.getId());
         return template;
     }
 
@@ -19,6 +20,7 @@ public class GroupTemplateMapper {
         dto.setPricePerTrainerPerHour(template.getPricePerTrainerPerHour());
         dto.setDescription(template.getDescription());
         dto.setRequiredQualification(template.getRequiredQualifications());
+        dto.setId(template.getBaseTemplateId());
         return dto;
     }
 
