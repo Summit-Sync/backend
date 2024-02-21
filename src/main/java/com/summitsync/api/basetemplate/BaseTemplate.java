@@ -23,4 +23,11 @@ public class BaseTemplate {
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Qualification> requiredQualifications;
     private BigDecimal durationInMinutes;
+
+    public BaseTemplate(String acronym, int numberOfDates, String description, List<Qualification> requiredQualifications) {
+        this.acronym = acronym;
+        this.numberOfDates = numberOfDates;
+        this.description = description;
+        this.requiredQualifications = requiredQualifications;
+    }
 }
