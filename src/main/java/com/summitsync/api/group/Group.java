@@ -38,5 +38,4 @@ public class Group {
     private List<Qualification> requiredQualifications;
     @ManyToOne(fetch = FetchType.LAZY)
     private GroupTemplate template;
-
 }
