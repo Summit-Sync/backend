@@ -12,4 +12,10 @@ public class GlobalExceptionHandler {
         var errorResponse = new ErrorResponse("handleCodeExchangeException", "failed to exchange code for access token: " + exception.getMessage());
         return new ResponseEntity<>(errorResponse, exception.getStatus());
     }
+
+    @ExceptionHandler(InvalidSessionException.class)
+    public ResponseEntity<?> handleInvalidSessionException() {
+        var errorResponse = new ErrorResponse("invalid_session", "The provided sessionID is invalid");
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 }
