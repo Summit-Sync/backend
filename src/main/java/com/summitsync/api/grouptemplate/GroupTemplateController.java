@@ -30,6 +30,17 @@ public class GroupTemplateController {
         return new ResponseEntity<>(this.mapper.mapTemplateToDto(template.get()), HttpStatus.OK);
     }
 
+    @PutMapping
+    private ResponseEntity<GroupTemplateDTO> updateTemplate(@RequestBody GroupTemplateDTO dto) {
+        Optional<GroupTemplate> template = repository.findById(dto.getId());
+        if (template.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        GroupTemplate newTemplate = mapper.mapDtoToTemplate(dto);
+        this.repository.save(newTemplate);
+        return new ResponseEntity<>(this.mapper.mapTemplateToDto(newTemplate), HttpStatus.OK);
+    }
+
     @GetMapping
     private ResponseEntity<GroupTemplateDTO> getTemplateById(@PathVariable long id) {
         Optional<GroupTemplate> template = this.repository.findById(id);
