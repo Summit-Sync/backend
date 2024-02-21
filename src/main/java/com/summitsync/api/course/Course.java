@@ -1,6 +1,7 @@
 package com.summitsync.api.course;
 
 import com.summitsync.api.coursetemplate.CourseTemplate;
+import com.summitsync.api.date.EventDate;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.participant.Participant;
 import com.summitsync.api.qualification.Qualification;
@@ -10,6 +11,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -26,11 +29,12 @@ public class Course {
     private Location location;
     private String notes;
     private boolean visible;
+    private boolean canceled;
     private BigDecimal actualPrice; // in euros
-    private int numberOfParticipants;
-    private int numberOfWaitList;
-    private int numberOfTrainers;
-    private int numberOfDates;
+    private Integer numberOfParticipants;
+    private Integer numberOfWaitList;
+    private Integer numberOfTrainers;
+    private Integer numberOfDates;
     private String description;
     private String title;
     @ManyToMany(fetch = FetchType.LAZY)
@@ -39,4 +43,6 @@ public class Course {
     private List<Participant> participants;
     @ManyToOne(fetch = FetchType.LAZY)
     private CourseTemplate template;
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<EventDate>dates;
 }
