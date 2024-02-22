@@ -27,7 +27,7 @@ public class BaseTemplate {
 
     public BaseTemplate(String acronym, String title, int numberOfDates, String description, List<Qualification> requiredQualifications) {
         this.acronym = acronym;
-        this.title=title;
+        this.title = title;
         this.numberOfDates = numberOfDates;
         this.description = description;
         this.requiredQualifications = requiredQualifications;

@@ -17,7 +17,7 @@ public class CourseTemplate extends BaseTemplate {
     private int numberOfParticipants;
     private int numberOfWaitList;
     private int numberOfTrainers;//>0
-    @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<CourseTemplatePrice> priceList;//>0
 
     public CourseTemplate(long baseTemplateId, String acronym, String title,int numberOfDates, String description, List<Qualification> requiredQualifications, int numberOfParticipants, int numberOfWaitList, int numberOfTrainers, List<CourseTemplatePrice> priceList) {
