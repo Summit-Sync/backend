@@ -21,7 +21,7 @@ public class BaseTemplate {
     private int numberOfDates;//check
     private String description;
     private int duration;
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<Qualification> requiredQualifications;
     private BigDecimal durationInMinutes;
 

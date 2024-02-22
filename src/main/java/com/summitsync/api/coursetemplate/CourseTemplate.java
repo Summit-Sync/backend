@@ -21,7 +21,7 @@ public class CourseTemplate extends BaseTemplate {
     private List<CourseTemplatePrice> priceList;//>0
 
     public CourseTemplate(long baseTemplateId, String acronym, String title,int numberOfDates, String description, List<Qualification> requiredQualifications, int numberOfParticipants, int numberOfWaitList, int numberOfTrainers, List<CourseTemplatePrice> priceList) {
-        super(baseTemplateId, acronym, title,numberOfDates, description, requiredQualifications);
+        super(acronym, title,numberOfDates, description, requiredQualifications);
         this.numberOfParticipants = numberOfParticipants;
         this.numberOfWaitList = numberOfWaitList;
         this.numberOfTrainers = numberOfTrainers;
