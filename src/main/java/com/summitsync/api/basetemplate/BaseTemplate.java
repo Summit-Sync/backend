@@ -1,11 +1,13 @@
 package com.summitsync.api.basetemplate;
 
+import com.summitsync.api.eventperiod.EventPeriod;
 import com.summitsync.api.qualification.Qualification;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @MappedSuperclass
@@ -22,4 +24,5 @@ public class BaseTemplate {
     private int duration;
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Qualification> requiredQualifications;
+    private BigDecimal durationInMinutes;
 }

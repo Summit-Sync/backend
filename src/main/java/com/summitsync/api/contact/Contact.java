@@ -14,6 +14,8 @@ public class Contact {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long contactId;
-    private String name;
+    private String fistName;
+    private String lastName;
     private String email;
+    private String telephone;
 }
