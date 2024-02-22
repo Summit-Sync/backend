@@ -6,10 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/coursetemplate")
@@ -29,6 +26,18 @@ public class CourseTemplateController {
         CourseTemplate data=service.createCourse(template);
         CourseTemplateDto createdCourse=courseTemplateMappingService.mapCourseTemplateToCourseTemplateDto(data);
         return new ResponseEntity<>(createdCourse,HttpStatus.CREATED);
+    }
+
+    @PutMapping
+    public ResponseEntity<CourseTemplateDto>updateCourseTemplate(@RequestBody PostCourseTemplateDto dto){
+        ResponseEntity<CourseTemplateDto> BAD_REQUEST = checkValidity(dto);
+        if (BAD_REQUEST != null){
+            return BAD_REQUEST;
+        }
+        CourseTemplate template=courseTemplateMappingService.mapPostCourseTemplateDtoToCourseTemplate(dto);
+        CourseTemplate data=service.updateCourse(template);
+        CourseTemplateDto updatedCourse=courseTemplateMappingService.mapCourseTemplateToCourseTemplateDto(data);
+        return new ResponseEntity<>(updatedCourse,HttpStatus.OK);
     }
 
     private ResponseEntity<CourseTemplateDto> checkValidity(PostCourseTemplateDto dto) {
