@@ -12,29 +12,34 @@ import java.util.Optional;
 
 @RestController("/api/v1/group")
 public class GroupController {
+
+    private final GroupRepository repository;
+    private final GroupMapper mapper;
     @Autowired
-    private GroupRepository repository;
-    private GroupMapper mapper;
+    public GroupController(GroupRepository repository) {
+        this.repository = repository;
+        this.mapper = new GroupMapper();
+    }
     @PostMapping
     private ResponseEntity<GroupDTO> createGroupFromTemplate(@RequestBody GroupTemplateDTO template, GroupDTO dto) {
         dto.setTemplate(template);
         Group group = mapper.mapGroupDTOToGroup(dto);
         repository.save(group);
-        return new ResponseEntity<>(mapper.mapGroupToGroupDto(group), HttpStatus.CREATED);
+        return new ResponseEntity<>(mapper.mapGroupToGroupDto(group), HttpStatus.OK);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     private ResponseEntity<GroupDTO> deleteGroup(@PathVariable long id) {
         Optional<Group> group = repository.findById(id);
         if (group.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         repository.deleteById(id);
-        return new ResponseEntity<>(this.mapper.mapGroupToGroupDto(group.get()), HttpStatus.OK);
+        return new ResponseEntity<>(this.mapper.mapGroupToGroupDto(group.get()), HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping
-    private ResponseEntity<GroupDTO> getGroup(@PathVariable long id) {
+    @GetMapping("/{id}")
+    private ResponseEntity<GroupDTO> getGroupById(@PathVariable long id) {
         Optional<Group> group = repository.findById(id);
         if (group.isEmpty()){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -42,14 +47,14 @@ public class GroupController {
         return new ResponseEntity<>(this.mapper.mapGroupToGroupDto(group.get()), HttpStatus.OK);
     }
 
-    @GetMapping
+    @GetMapping("/all")
     private ResponseEntity<List<GroupDTO>> getAllGroups() {
         List<Group> all = this.repository.findAll();
         List<GroupDTO> dtos = new ArrayList<>();
         for (Group group : all) {
             dtos.add(this.mapper.mapGroupToGroupDto(group));
         }
-        if (all.size() == 0) {
+        if (all.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(dtos, HttpStatus.OK);

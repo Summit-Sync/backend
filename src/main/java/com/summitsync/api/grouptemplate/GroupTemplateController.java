@@ -1,5 +1,7 @@
 package com.summitsync.api.grouptemplate;
 
+import com.summitsync.api.group.GroupMapper;
+import com.summitsync.api.group.GroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,52 +14,56 @@ import java.util.Optional;
 @RestController("/api/v1/grouptemplate")
 public class GroupTemplateController {
 
+    private final GroupTemplateRepository repository;
+    private final GroupTemplateMapper mapper;
     @Autowired
-    private GroupTemplateRepository repository;
-    private GroupTemplateMapper mapper;
+    public GroupTemplateController(GroupTemplateRepository repository) {
+        this.repository = repository;
+        this.mapper = new GroupTemplateMapper();
+    }
     @PostMapping
     private ResponseEntity<GroupTemplateDTO> createTemplate(@RequestBody GroupTemplateDTO dto) {
-        repository.save(this.mapper.mapDtoToTemplate(dto));
-        return new ResponseEntity<>(dto, HttpStatus.CREATED);
+        repository.save(this.mapper.mapGroupDtoToGroupTemplate(dto));
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     private ResponseEntity<GroupTemplateDTO> deleteTemplate(@PathVariable long id) {
         Optional<GroupTemplate> template = repository.findById(id);
         if (template.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         repository.deleteById(id);
-        return new ResponseEntity<>(this.mapper.mapTemplateToDto(template.get()), HttpStatus.OK);
+        return new ResponseEntity<>(this.mapper.mapGroupTemplateToGroupDto(template.get()), HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping
-    private ResponseEntity<GroupTemplateDTO> updateTemplate(@RequestBody GroupTemplateDTO dto) {
-        Optional<GroupTemplate> template = repository.findById(dto.getId());
+    @PutMapping("/{id}")
+    private ResponseEntity<GroupTemplateDTO> updateTemplate(@RequestBody GroupTemplateDTO dto, @PathVariable long id) {
+        Optional<GroupTemplate> template = repository.findById(id);
         if (template.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        GroupTemplate newTemplate = mapper.mapDtoToTemplate(dto);
+        GroupTemplate newTemplate = mapper.mapGroupDtoToGroupTemplate(dto);
         this.repository.save(newTemplate);
-        return new ResponseEntity<>(this.mapper.mapTemplateToDto(newTemplate), HttpStatus.OK);
+        return new ResponseEntity<>(this.mapper.mapGroupTemplateToGroupDto(newTemplate), HttpStatus.OK);
     }
 
-    @GetMapping
+    @GetMapping("/{id}")
     private ResponseEntity<GroupTemplateDTO> getTemplateById(@PathVariable long id) {
         Optional<GroupTemplate> template = this.repository.findById(id);
         if (template.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(this.mapper.mapTemplateToDto(template.get()), HttpStatus.OK);
+        return new ResponseEntity<>(this.mapper.mapGroupTemplateToGroupDto(template.get()), HttpStatus.OK);
     }
 
-    @GetMapping
+    @GetMapping("/all")
     private ResponseEntity<List<GroupTemplateDTO>> getAllTemplates() {
         List<GroupTemplate> all = this.repository.findAll();
         List<GroupTemplateDTO> dtos = new ArrayList<>();
         for (GroupTemplate template : all) {
-            dtos.add(this.mapper.mapTemplateToDto(template));
+            dtos.add(this.mapper.mapGroupTemplateToGroupDto(template));
         }
-        if (all.size() == 0) {
+        if (all.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(dtos, HttpStatus.OK);

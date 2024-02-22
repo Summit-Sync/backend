@@ -9,7 +9,7 @@ public class GroupMapper {
         GroupDTO dto = new GroupDTO();
         dto.setDescription(group.getDescription());
         dto.setNotes(group.getNotes());
-        dto.setTemplate(templateMapper.mapTemplateToDto(group.getTemplate()));
+        dto.setTemplate(templateMapper.mapGroupTemplateToGroupDto(group.getTemplate()));
         dto.setNumberOfParticipants(group.getNumberOfParticipants());
         dto.setPricePerParticipant(group.getPricePerParticipant());
         dto.setRequiredQualifications(group.getRequiredQualifications());
@@ -18,7 +18,7 @@ public class GroupMapper {
     }
     public Group mapGroupDTOToGroup(GroupDTO dto) {
         Group group = new Group();
-        GroupTemplate template = templateMapper.mapDtoToTemplate(dto.getTemplate());
+        GroupTemplate template = templateMapper.mapGroupDtoToGroupTemplate(dto.getTemplate());
         group.setDescription(dto.getDescription() == null ? template.getDescription() : dto.getDescription());
         group.setNotes(dto.getNotes());
         group.setNumberOfParticipants(dto.getNumberOfParticipants());
