@@ -16,12 +16,12 @@ import java.util.List;
 public class CourseTemplate extends BaseTemplate {
     private int numberOfParticipants;
     private int numberOfWaitList;
-    private int numberOfTrainers;
+    private int numberOfTrainers;//>0
     @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    private List<CourseTemplatePrice> priceList;
+    private List<CourseTemplatePrice> priceList;//>0
 
-    public CourseTemplate(long baseTemplateId, String acronym, int numberOfDates, String description, List<Qualification> requiredQualifications, int numberOfParticipants, int numberOfWaitList, int numberOfTrainers, List<CourseTemplatePrice> priceList) {
-        super(baseTemplateId, acronym, numberOfDates, description, requiredQualifications);
+    public CourseTemplate(long baseTemplateId, String acronym, String title,int numberOfDates, String description, List<Qualification> requiredQualifications, int numberOfParticipants, int numberOfWaitList, int numberOfTrainers, List<CourseTemplatePrice> priceList) {
+        super(baseTemplateId, acronym, title,numberOfDates, description, requiredQualifications);
         this.numberOfParticipants = numberOfParticipants;
         this.numberOfWaitList = numberOfWaitList;
         this.numberOfTrainers = numberOfTrainers;
@@ -32,8 +32,8 @@ public class CourseTemplate extends BaseTemplate {
         super();
     }
 
-    public CourseTemplate(String acronym, int numberOfDates, String description, List<Qualification> requiredQualifications, int numberOfParticipants, int numberOfWaitList, int numberOfTrainers, List<CourseTemplatePrice> priceList) {
-        super(acronym, numberOfDates, description, requiredQualifications);
+    public CourseTemplate(String acronym, String title,int numberOfDates, String description, List<Qualification> requiredQualifications, int numberOfParticipants, int numberOfWaitList, int numberOfTrainers, List<CourseTemplatePrice> priceList) {
+        super(acronym, title, numberOfDates, description, requiredQualifications);
         this.numberOfParticipants = numberOfParticipants;
         this.numberOfWaitList = numberOfWaitList;
         this.numberOfTrainers = numberOfTrainers;

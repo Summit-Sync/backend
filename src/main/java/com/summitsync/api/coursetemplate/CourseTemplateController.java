@@ -21,9 +21,38 @@ public class CourseTemplateController {
 
     @PostMapping
     public ResponseEntity<CourseTemplateDto>createCourseTemplate(@RequestBody PostCourseTemplateDto dto){
+        ResponseEntity<CourseTemplateDto> BAD_REQUEST = checkValidity(dto);
+        if (BAD_REQUEST != null){
+            return BAD_REQUEST;
+        }
         CourseTemplate template=courseTemplateMappingService.mapPostCourseTemplateDtoToCourseTemplate(dto);
         CourseTemplate data=service.createCourse(template);
         CourseTemplateDto createdCourse=courseTemplateMappingService.mapCourseTemplateToCourseTemplateDto(data);
         return new ResponseEntity<>(createdCourse,HttpStatus.CREATED);
+    }
+
+    private ResponseEntity<CourseTemplateDto> checkValidity(PostCourseTemplateDto dto) {
+        if(dto.getAcronym()==null||dto.getAcronym().isEmpty()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if(dto.getTitle()==null||dto.getTitle().isEmpty()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if(dto.getNumberOfParticipants()==0){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if(dto.getNumberOfDates()==0){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if(dto.getNumberOfTrainers()==0){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if(dto.getPriceList().size()==0){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if(dto.getDuration()==0) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return null;
     }
 }

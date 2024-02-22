@@ -17,6 +17,8 @@ import java.util.List;
 public class CourseTemplateDto {
     private long id;
     private String acronym;
+    private String title;
+    private int duration;
     private int numberOfDates;
     private String description;
     private List<Qualification>qualificationList;
