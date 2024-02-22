@@ -1,15 +1,12 @@
 package com.summitsync.api.bff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.summitsync.api.ExceptionHandler.CodeExchangeException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.summitsync.api.exceptionhandler.CodeExchangeException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;

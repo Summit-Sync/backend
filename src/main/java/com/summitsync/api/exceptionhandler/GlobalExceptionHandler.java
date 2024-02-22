@@ -1,4 +1,4 @@
-package com.summitsync.api.ExceptionHandler;
+package com.summitsync.api.exceptionhandler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,5 +17,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleInvalidSessionException() {
         var errorResponse = new ErrorResponse("invalid_session", "The provided sessionID is invalid");
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException exception) {
+        var errorResponse = new ErrorResponse("not_found", exception.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 }
