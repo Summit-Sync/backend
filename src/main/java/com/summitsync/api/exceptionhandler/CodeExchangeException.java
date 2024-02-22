@@ -1,4 +1,4 @@
-package com.summitsync.api.ExceptionHandler;
+package com.summitsync.api.exceptionhandler;
 
 import lombok.Getter;
 import lombok.Setter;
