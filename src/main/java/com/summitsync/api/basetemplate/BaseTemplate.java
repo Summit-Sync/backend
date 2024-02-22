@@ -33,4 +33,5 @@ public class BaseTemplate {
         this.requiredQualifications = requiredQualifications;
         this.duration=duration;
     }
+
 }
