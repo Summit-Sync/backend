@@ -37,6 +37,7 @@ public class Course {
     private Integer numberOfDates;
     private String description;
     private String title;
+    private Integer duration;
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Qualification> requiredQualifications;
     @ManyToMany(fetch = FetchType.LAZY)

@@ -19,6 +19,7 @@ public class BaseTemplate {
     private String acronym;
     private int numberOfDates;
     private String description;
+    private int duration;
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Qualification> requiredQualifications;
 }
