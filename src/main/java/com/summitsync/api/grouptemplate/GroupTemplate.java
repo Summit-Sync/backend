@@ -1,13 +1,15 @@
 package com.summitsync.api.grouptemplate;
 
 import com.summitsync.api.basetemplate.BaseTemplate;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.summitsync.api.eventperiod.EventPeriod;
+import com.summitsync.api.qualification.Qualification;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -17,4 +19,11 @@ import java.math.BigDecimal;
 public class GroupTemplate extends BaseTemplate {
     private BigDecimal pricePerTrainerPerHour;
     private int trainerKey;
+    private String title;
+    private String acronym;
+    private int numberOfDates;
+    private String description;
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<Qualification> requiredQualifications;
+    private BigDecimal durationInMinutes;
 }
