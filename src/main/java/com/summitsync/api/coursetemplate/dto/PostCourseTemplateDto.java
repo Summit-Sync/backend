@@ -14,6 +14,8 @@ import java.util.List;
 @Data
 public class PostCourseTemplateDto {
     private String acronym;
+    private String title;
+    private int duration;
     private int numberOfDates;
     private String description;
     private List<Qualification>qualificationList;

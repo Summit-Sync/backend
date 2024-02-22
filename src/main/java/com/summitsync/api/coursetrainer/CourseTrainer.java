@@ -1,6 +1,7 @@
 package com.summitsync.api.coursetrainer;
 
 import com.summitsync.api.course.Course;
+import com.summitsync.api.status.Status;
 import com.summitsync.api.trainer.Trainer;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,5 +23,5 @@ public class CourseTrainer {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_cId")
     private Course course;
-    private boolean approved;
+    private Status status;
 }

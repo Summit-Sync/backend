@@ -17,15 +17,17 @@ public class BaseTemplate {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long baseTemplateId;
     private String acronym;
-    private int numberOfDates;
+    private String title;//check
+    private int numberOfDates;//check
     private String description;
     private int duration;
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Qualification> requiredQualifications;
     private BigDecimal durationInMinutes;
 
-    public BaseTemplate(String acronym, int numberOfDates, String description, List<Qualification> requiredQualifications) {
+    public BaseTemplate(String acronym, String title, int numberOfDates, String description, List<Qualification> requiredQualifications) {
         this.acronym = acronym;
+        this.title=title;
         this.numberOfDates = numberOfDates;
         this.description = description;
         this.requiredQualifications = requiredQualifications;
