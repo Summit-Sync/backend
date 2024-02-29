@@ -25,11 +25,12 @@ public class BaseTemplate {
     private List<Qualification> requiredQualifications;
     private BigDecimal durationInMinutes;
 
-    public BaseTemplate(String acronym, String title, int numberOfDates, String description, List<Qualification> requiredQualifications) {
+    public BaseTemplate(String acronym, String title, int numberOfDates, String description, List<Qualification> requiredQualifications, int duration) {
         this.acronym = acronym;
         this.title = title;
         this.numberOfDates = numberOfDates;
         this.description = description;
         this.requiredQualifications = requiredQualifications;
+        this.duration=duration;
     }
 }

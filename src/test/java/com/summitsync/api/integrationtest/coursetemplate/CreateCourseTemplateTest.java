@@ -42,7 +42,8 @@ public class CreateCourseTemplateTest extends AbstractIntegrationTest {
                             "price":10,
                             "category":"Mitglied"
                         }
-                    ]
+                    ],
+                    "duration":100000
                 }
                 """;
         final var contentAsString=this.mockMvc.perform(post("/api/v1/coursetemplate")
@@ -74,7 +75,8 @@ public class CreateCourseTemplateTest extends AbstractIntegrationTest {
                             "price":10,
                             "category":"Mitglied"
                         }
-                    ]
+                    ],
+                    "duration":10000
                 }
                 """;
         final var contentAsString=this.mockMvc.perform(post("/api/v1/coursetemplate")

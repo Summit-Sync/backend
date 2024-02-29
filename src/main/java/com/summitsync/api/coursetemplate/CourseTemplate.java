@@ -20,8 +20,8 @@ public class CourseTemplate extends BaseTemplate {
     @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<CourseTemplatePrice> priceList;//>0
 
-    public CourseTemplate(long baseTemplateId, String acronym, String title,int numberOfDates, String description, List<Qualification> requiredQualifications, int numberOfParticipants, int numberOfWaitList, int numberOfTrainers, List<CourseTemplatePrice> priceList) {
-        super(acronym, title,numberOfDates, description, requiredQualifications);
+    public CourseTemplate(long baseTemplateId, String acronym, String title,int numberOfDates, String description, List<Qualification> requiredQualifications, int numberOfParticipants, int numberOfWaitList, int numberOfTrainers, List<CourseTemplatePrice> priceList, int duration) {
+        super(acronym, title,numberOfDates, description, requiredQualifications, duration);
         this.numberOfParticipants = numberOfParticipants;
         this.numberOfWaitList = numberOfWaitList;
         this.numberOfTrainers = numberOfTrainers;
@@ -32,8 +32,8 @@ public class CourseTemplate extends BaseTemplate {
         super();
     }
 
-    public CourseTemplate(String acronym, String title,int numberOfDates, String description, List<Qualification> requiredQualifications, int numberOfParticipants, int numberOfWaitList, int numberOfTrainers, List<CourseTemplatePrice> priceList) {
-        super(acronym, title, numberOfDates, description, requiredQualifications);
+    public CourseTemplate(String acronym, String title,int numberOfDates, String description, List<Qualification> requiredQualifications, int numberOfParticipants, int numberOfWaitList, int numberOfTrainers, List<CourseTemplatePrice> priceList, int duration) {
+        super(acronym, title, numberOfDates, description, requiredQualifications, duration);
         this.numberOfParticipants = numberOfParticipants;
         this.numberOfWaitList = numberOfWaitList;
         this.numberOfTrainers = numberOfTrainers;
