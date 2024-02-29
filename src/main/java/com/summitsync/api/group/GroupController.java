@@ -21,15 +21,17 @@ public class GroupController {
         this.repository = repository;
         this.mapper = new GroupMapper();
     }
-    @PostMapping("/new")
-    private ResponseEntity<GroupDTO> createGroupFromTemplate(@RequestBody GroupTemplateDTO template, GroupDTO dto) {
+    @PostMapping
+    private ResponseEntity<GroupDTO> createGroupFromTemplate(@RequestBody CreateWrapperDTO wrapper) {
+        var dto = wrapper.getGroup();
+        var template = wrapper.getTemplate();
         dto.setTemplate(template);
         Group group = mapper.mapGroupDTOToGroup(dto);
         repository.save(group);
         return new ResponseEntity<>(mapper.mapGroupToGroupDto(group), HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     private ResponseEntity<GroupDTO> deleteGroup(@PathVariable long id) {
         Optional<Group> group = repository.findById(id);
         if (group.isEmpty()) {
@@ -39,7 +41,7 @@ public class GroupController {
         return new ResponseEntity<>(this.mapper.mapGroupToGroupDto(group.get()), HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/get/{id}")
+    @GetMapping("/{id}")
     private ResponseEntity<GroupDTO> getGroupById(@PathVariable long id) {
         Optional<Group> group = repository.findById(id);
         if (group.isEmpty()){
@@ -48,7 +50,7 @@ public class GroupController {
         return new ResponseEntity<>(this.mapper.mapGroupToGroupDto(group.get()), HttpStatus.OK);
     }
 
-    @GetMapping("/all")
+    @GetMapping
     private ResponseEntity<List<GroupDTO>> getAllGroups() {
         List<Group> all = this.repository.findAll();
         List<GroupDTO> dtos = new ArrayList<>();
@@ -61,7 +63,7 @@ public class GroupController {
         return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     private ResponseEntity<GroupDTO> updateGroup(@RequestBody GroupDTO dto, @PathVariable long id) {
         Optional<Group> group = repository.findById(id);
         if (group.isEmpty()) {

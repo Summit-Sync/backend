@@ -22,12 +22,12 @@ public class GroupTemplateController {
         this.repository = repository;
         this.mapper = new GroupTemplateMapper();
     }
-    @PostMapping("/new")
+    @PostMapping
     private ResponseEntity<GroupTemplateDTO> createTemplate(@RequestBody GroupTemplateDTO dto) {
         repository.save(this.mapper.mapGroupDtoToGroupTemplate(dto));
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     private ResponseEntity<GroupTemplateDTO> deleteTemplate(@PathVariable long id) {
         Optional<GroupTemplate> template = repository.findById(id);
         if (template.isEmpty()) {
@@ -37,7 +37,7 @@ public class GroupTemplateController {
         return new ResponseEntity<>(this.mapper.mapGroupTemplateToGroupDto(template.get()), HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     private ResponseEntity<GroupTemplateDTO> updateTemplate(@RequestBody GroupTemplateDTO dto, @PathVariable long id) {
         Optional<GroupTemplate> template = repository.findById(id);
         if (template.isEmpty()) {
@@ -48,7 +48,7 @@ public class GroupTemplateController {
         return new ResponseEntity<>(this.mapper.mapGroupTemplateToGroupDto(newTemplate), HttpStatus.OK);
     }
 
-    @GetMapping("/get/{id}")
+    @GetMapping("/{id}")
     private ResponseEntity<GroupTemplateDTO> getTemplateById(@PathVariable long id) {
         Optional<GroupTemplate> template = this.repository.findById(id);
         if (template.isEmpty()) {
@@ -57,7 +57,7 @@ public class GroupTemplateController {
         return new ResponseEntity<>(this.mapper.mapGroupTemplateToGroupDto(template.get()), HttpStatus.OK);
     }
 
-    @GetMapping("/all")
+    @GetMapping
     private ResponseEntity<List<GroupTemplateDTO>> getAllTemplates() {
         List<GroupTemplate> all = this.repository.findAll();
         List<GroupTemplateDTO> dtos = new ArrayList<>();
