@@ -2,6 +2,7 @@ package com.summitsync.api.coursetemplate;
 
 import com.summitsync.api.coursetemplate.dto.CourseTemplateDto;
 import com.summitsync.api.coursetemplate.dto.PostCourseTemplateDto;
+import com.summitsync.api.coursetemplate.dto.UpdateCourseTemplateDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -18,29 +19,29 @@ public class CourseTemplateController {
 
     @PostMapping
     public ResponseEntity<CourseTemplateDto>createCourseTemplate(@RequestBody PostCourseTemplateDto dto){
-        ResponseEntity<CourseTemplateDto> BAD_REQUEST = checkValidity(dto);
+        CourseTemplate template=courseTemplateMappingService.mapPostCourseTemplateDtoToCourseTemplate(dto);
+        ResponseEntity<CourseTemplateDto> BAD_REQUEST = checkValidity(template);
         if (BAD_REQUEST != null){
             return BAD_REQUEST;
         }
-        CourseTemplate template=courseTemplateMappingService.mapPostCourseTemplateDtoToCourseTemplate(dto);
         CourseTemplate data=service.createCourse(template);
         CourseTemplateDto createdCourse=courseTemplateMappingService.mapCourseTemplateToCourseTemplateDto(data);
         return new ResponseEntity<>(createdCourse,HttpStatus.CREATED);
     }
 
-    @PutMapping
-    public ResponseEntity<CourseTemplateDto>updateCourseTemplate(@RequestBody PostCourseTemplateDto dto){
-        ResponseEntity<CourseTemplateDto> BAD_REQUEST = checkValidity(dto);
+    @PutMapping("/{id}")
+    public ResponseEntity<CourseTemplateDto>updateCourseTemplate(@RequestBody UpdateCourseTemplateDto dto, @PathVariable final Long id){
+        CourseTemplate template=courseTemplateMappingService.mapUpdateCourseTemplateDtoToCourseTemplate(dto);
+        ResponseEntity<CourseTemplateDto> BAD_REQUEST = checkValidity(template);
         if (BAD_REQUEST != null){
             return BAD_REQUEST;
         }
-        CourseTemplate template=courseTemplateMappingService.mapPostCourseTemplateDtoToCourseTemplate(dto);
-        CourseTemplate data=service.updateCourse(template);
+        CourseTemplate data=service.updateCourse(template,id);
         CourseTemplateDto updatedCourse=courseTemplateMappingService.mapCourseTemplateToCourseTemplateDto(data);
         return new ResponseEntity<>(updatedCourse,HttpStatus.OK);
     }
 
-    private ResponseEntity<CourseTemplateDto> checkValidity(PostCourseTemplateDto dto) {
+    private ResponseEntity<CourseTemplateDto> checkValidity(CourseTemplate dto) {
         if(dto.getAcronym()==null||dto.getAcronym().isEmpty()){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

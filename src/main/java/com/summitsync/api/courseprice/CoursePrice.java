@@ -3,6 +3,7 @@ package com.summitsync.api.courseprice;
 import com.summitsync.api.course.Course;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @Table(name = "SS_CoursePrice")
+@Builder
 public class CoursePrice {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

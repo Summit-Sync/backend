@@ -2,6 +2,7 @@ package com.summitsync.api.coursetemplate;
 
 import com.summitsync.api.coursetemplate.dto.CourseTemplateDto;
 import com.summitsync.api.coursetemplate.dto.PostCourseTemplateDto;
+import com.summitsync.api.coursetemplate.dto.UpdateCourseTemplateDto;
 import com.summitsync.api.qualification.Qualification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,7 @@ import java.util.List;
 public class CourseTemplateMappingService {
 
     public CourseTemplate mapPostCourseTemplateDtoToCourseTemplate(PostCourseTemplateDto dto){
-        return new CourseTemplate(dto.getAcronym(), dto.getTitle(),dto.getNumberOfDates(),dto.getDescription(),dto.getQualificationList(),dto.getNumberOfParticipants(), dto.getNumberOfWaitList(), dto.getNumberOfTrainers(),dto.getPriceList());
+        return new CourseTemplate(dto.getAcronym(), dto.getTitle(),dto.getNumberOfDates(),dto.getDescription(),dto.getQualificationList(),dto.getNumberOfParticipants(), dto.getNumberOfWaitList(), dto.getNumberOfTrainers(),dto.getPriceList(),dto.getDuration());
     }
 
     public CourseTemplateDto mapCourseTemplateToCourseTemplateDto(CourseTemplate data){
@@ -30,6 +31,10 @@ public class CourseTemplateMappingService {
                 .numberOfDates(data.getNumberOfDates())
                 .qualificationList(data.getRequiredQualifications())
                 .build();
+    }
+
+    public CourseTemplate mapUpdateCourseTemplateDtoToCourseTemplate(UpdateCourseTemplateDto dto){
+        return new CourseTemplate(dto.getId(),dto.getAcronym(), dto.getTitle(),dto.getNumberOfDates(),dto.getDescription(),dto.getQualificationList(),dto.getNumberOfParticipants(), dto.getNumberOfWaitList(), dto.getNumberOfTrainers(),dto.getPriceList(), dto.getDuration());
     }
 
 }
