@@ -9,5 +9,4 @@ public class SummitSyncApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SummitSyncApplication.class, args);
 	}
-
 }

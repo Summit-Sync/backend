@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.context.annotation.Primary;
 
 import java.time.LocalDateTime;
 
@@ -20,5 +19,4 @@ public class EventDate {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long eventDateId;
     private LocalDateTime date;
-
 }

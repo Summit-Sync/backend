@@ -22,7 +22,9 @@ public class GroupController {
         this.mapper = new GroupMapper();
     }
     @PostMapping("/new")
-    private ResponseEntity<GroupDTO> createGroupFromTemplate(@RequestBody GroupTemplateDTO template, GroupDTO dto) {
+    private ResponseEntity<GroupDTO> createGroupFromTemplate(@RequestBody CreateWrapperDTO wrapper) {
+        var dto = wrapper.getGroup();
+        var template = wrapper.getTemplate();
         dto.setTemplate(template);
         Group group = mapper.mapGroupDTOToGroup(dto);
         repository.save(group);

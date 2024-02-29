@@ -1,5 +1,4 @@
 package com.summitsync.api.basetemplate;
-
 import com.summitsync.api.eventperiod.EventPeriod;
 import com.summitsync.api.qualification.Qualification;
 import jakarta.persistence.*;
@@ -19,9 +18,19 @@ public class BaseTemplate {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long baseTemplateId;
     private String acronym;
-    private int numberOfDates;
+    private String title;//check
+    private int numberOfDates;//check
     private String description;
-    @ManyToMany(fetch = FetchType.LAZY)
+    private int duration;
+    @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<Qualification> requiredQualifications;
     private BigDecimal durationInMinutes;
+
+    public BaseTemplate(String acronym, String title, int numberOfDates, String description, List<Qualification> requiredQualifications) {
+        this.acronym = acronym;
+        this.title = title;
+        this.numberOfDates = numberOfDates;
+        this.description = description;
+        this.requiredQualifications = requiredQualifications;
+    }
 }
