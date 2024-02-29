@@ -15,5 +15,4 @@ public class GroupDTO {
     private BigDecimal pricePerParticipant;
     private Integer numberOfParticipants;
     private String description;
-    private long id;
 }

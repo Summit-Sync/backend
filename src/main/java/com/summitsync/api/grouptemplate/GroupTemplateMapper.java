@@ -1,5 +1,8 @@
 package com.summitsync.api.grouptemplate;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class GroupTemplateMapper {
 
     public GroupTemplate mapGroupDtoToGroupTemplate(GroupTemplateDTO dto) {
