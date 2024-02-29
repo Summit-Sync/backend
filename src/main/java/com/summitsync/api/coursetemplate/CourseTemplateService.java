@@ -51,4 +51,8 @@ public class CourseTemplateService {
         }
         repository.deleteById(id);
     }
+
+    public List<CourseTemplate> findAll(){
+        return repository.findAll();
+    }
 }

@@ -4,10 +4,12 @@ import com.summitsync.api.coursetemplate.dto.CourseTemplateDto;
 import com.summitsync.api.coursetemplate.dto.PostCourseTemplateDto;
 import com.summitsync.api.coursetemplate.dto.UpdateCourseTemplateDto;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/coursetemplate")
@@ -45,6 +47,16 @@ public class CourseTemplateController {
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void deleteCourseTemplate(@PathVariable Long id){
         service.deleteById(id);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CourseTemplateDto>>getAllCourseTemplates(){
+        List<CourseTemplate>data=service.findAll();
+        List<CourseTemplateDto>response=new ArrayList<>();
+        for(CourseTemplate courseTemplate:data){
+            response.add(courseTemplateMappingService.mapCourseTemplateToCourseTemplateDto(courseTemplate));
+        }
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
     private ResponseEntity<CourseTemplateDto> checkValidity(CourseTemplate dto) {
