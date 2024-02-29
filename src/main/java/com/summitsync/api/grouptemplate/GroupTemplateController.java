@@ -2,6 +2,7 @@ package com.summitsync.api.grouptemplate;
 
 import com.summitsync.api.group.GroupMapper;
 import com.summitsync.api.group.GroupRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,15 +14,11 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/grouptemplate")
+@RequiredArgsConstructor
 public class GroupTemplateController {
 
     private final GroupTemplateRepository repository;
     private final GroupTemplateMapper mapper;
-    @Autowired
-    public GroupTemplateController(GroupTemplateRepository repository) {
-        this.repository = repository;
-        this.mapper = new GroupTemplateMapper();
-    }
     @PostMapping
     private ResponseEntity<GroupTemplateDTO> createTemplate(@RequestBody GroupTemplateDTO dto) {
         repository.save(this.mapper.mapGroupDtoToGroupTemplate(dto));

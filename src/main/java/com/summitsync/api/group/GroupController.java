@@ -1,6 +1,7 @@
 package com.summitsync.api.group;
 
 import com.summitsync.api.grouptemplate.GroupTemplateDTO;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,15 +13,12 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/group")
+@RequiredArgsConstructor
 public class GroupController {
 
     private final GroupRepository repository;
     private final GroupMapper mapper;
-    @Autowired
-    public GroupController(GroupRepository repository) {
-        this.repository = repository;
-        this.mapper = new GroupMapper();
-    }
+
     @PostMapping
     private ResponseEntity<GroupDTO> createGroupFromTemplate(@RequestBody CreateWrapperDTO wrapper) {
         var dto = wrapper.getGroup();
