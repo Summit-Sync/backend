@@ -12,7 +12,6 @@ import java.util.List;
 
 @Data
 public class CourseDTO {
-    private long id;
     private CourseTemplate template;
     private String description;
     private String title;

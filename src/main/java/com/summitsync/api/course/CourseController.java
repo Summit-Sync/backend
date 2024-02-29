@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@RestController("/api/v1/course")
+@RestController
+@RequestMapping("/api/v1/course")
 public class CourseController {
     private final CourseRepository repository;
     private final CourseMapper mapper;
@@ -23,7 +24,7 @@ public class CourseController {
         this.mapper = new CourseMapper();
     }
 
-    @PostMapping
+    @PostMapping("/new")
     private ResponseEntity<CourseDTO> createCourseFromTemplate(@RequestBody CourseTemplate template, CourseDTO dto) {
         dto.setTemplate(template);
         Course course = mapper.mapCourseDTOToCourse(dto);
@@ -31,7 +32,7 @@ public class CourseController {
         return new ResponseEntity<>(mapper.mapCourseToCourseDTO(course), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     private ResponseEntity<CourseDTO> getCourseById(@PathVariable long id) {
         Optional<Course> course = repository.findById(id);
         if (course.isEmpty()) {
@@ -53,7 +54,7 @@ public class CourseController {
         return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     private ResponseEntity<CourseDTO> deleteById(@PathVariable long id) {
         Optional<Course> course = repository.findById(id);
         if (course.isEmpty()) {
@@ -63,9 +64,9 @@ public class CourseController {
         return new ResponseEntity<>(this.mapper.mapCourseToCourseDTO(course.get()), HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping
-    private ResponseEntity<CourseDTO> updateCourse(@RequestBody CourseDTO dto) {
-        Optional<Course> course = repository.findById(dto.getId());
+    @PutMapping("/update/{id}")
+    private ResponseEntity<CourseDTO> updateCourse(@RequestBody CourseDTO dto, @PathVariable long id) {
+        Optional<Course> course = repository.findById(id);
         if (course.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

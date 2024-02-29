@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@RestController("/api/v1/group")
+@RestController
+@RequestMapping("/api/v1/group")
 public class GroupController {
 
     private final GroupRepository repository;
@@ -20,7 +21,7 @@ public class GroupController {
         this.repository = repository;
         this.mapper = new GroupMapper();
     }
-    @PostMapping
+    @PostMapping("/new")
     private ResponseEntity<GroupDTO> createGroupFromTemplate(@RequestBody GroupTemplateDTO template, GroupDTO dto) {
         dto.setTemplate(template);
         Group group = mapper.mapGroupDTOToGroup(dto);
@@ -28,7 +29,7 @@ public class GroupController {
         return new ResponseEntity<>(mapper.mapGroupToGroupDto(group), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     private ResponseEntity<GroupDTO> deleteGroup(@PathVariable long id) {
         Optional<Group> group = repository.findById(id);
         if (group.isEmpty()) {
@@ -38,7 +39,7 @@ public class GroupController {
         return new ResponseEntity<>(this.mapper.mapGroupToGroupDto(group.get()), HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     private ResponseEntity<GroupDTO> getGroupById(@PathVariable long id) {
         Optional<Group> group = repository.findById(id);
         if (group.isEmpty()){
@@ -60,9 +61,9 @@ public class GroupController {
         return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 
-    @PutMapping
-    private ResponseEntity<GroupDTO> updateGroup(@RequestBody GroupDTO dto) {
-        Optional<Group> group = repository.findById(dto.getId());
+    @PutMapping("/update/{id}")
+    private ResponseEntity<GroupDTO> updateGroup(@RequestBody GroupDTO dto, @PathVariable long id) {
+        Optional<Group> group = repository.findById(id);
         if (group.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
