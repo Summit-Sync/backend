@@ -15,6 +15,7 @@ public class CourseMapper {
         course.setNumberOfTrainers(dto.getTemplate().getNumberOfTrainers());
         course.setNumberOfWaitList(dto.getTemplate().getNumberOfWaitList());
         course.setParticipants(dto.getParticipants());
+        course.setCourseId(dto.getId());
         return course;
     }
 
@@ -30,6 +31,7 @@ public class CourseMapper {
         dto.setTitle(course.getTitle());
         dto.setRequiredQualifications(course.getRequiredQualifications());
         dto.setNotes(course.getNotes());
+        dto.setId(course.getCourseId());
         return dto;
     }
 }
