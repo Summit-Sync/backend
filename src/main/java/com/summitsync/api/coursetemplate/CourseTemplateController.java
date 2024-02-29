@@ -41,6 +41,12 @@ public class CourseTemplateController {
         return new ResponseEntity<>(updatedCourse,HttpStatus.OK);
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    public void deleteCourseTemplate(@PathVariable Long id){
+        service.deleteById(id);
+    }
+
     private ResponseEntity<CourseTemplateDto> checkValidity(CourseTemplate dto) {
         if(dto.getAcronym()==null||dto.getAcronym().isEmpty()){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
