@@ -24,7 +24,7 @@ public class CourseController {
         this.mapper = new CourseMapper();
     }
 
-    @PostMapping("/new")
+    @PostMapping
     private ResponseEntity<CourseDTO> createCourseFromTemplate(@RequestBody CourseTemplate template, CourseDTO dto) {
         dto.setTemplate(template);
         Course course = mapper.mapCourseDTOToCourse(dto);
@@ -32,7 +32,7 @@ public class CourseController {
         return new ResponseEntity<>(mapper.mapCourseToCourseDTO(course), HttpStatus.OK);
     }
 
-    @GetMapping("/get/{id}")
+    @GetMapping("/{id}")
     private ResponseEntity<CourseDTO> getCourseById(@PathVariable long id) {
         Optional<Course> course = repository.findById(id);
         if (course.isEmpty()) {
@@ -41,7 +41,7 @@ public class CourseController {
         return new ResponseEntity<>(this.mapper.mapCourseToCourseDTO(course.get()), HttpStatus.OK);
     }
 
-    @GetMapping("/all")
+    @GetMapping
     private ResponseEntity<List<CourseDTO>> getAllCourses() {
         List<Course> all = this.repository.findAll();
         List<CourseDTO> dtos = new ArrayList<>();
@@ -54,7 +54,7 @@ public class CourseController {
         return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     private ResponseEntity<CourseDTO> deleteById(@PathVariable long id) {
         Optional<Course> course = repository.findById(id);
         if (course.isEmpty()) {
@@ -64,7 +64,7 @@ public class CourseController {
         return new ResponseEntity<>(this.mapper.mapCourseToCourseDTO(course.get()), HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     private ResponseEntity<CourseDTO> updateCourse(@RequestBody CourseDTO dto, @PathVariable long id) {
         Optional<Course> course = repository.findById(id);
         if (course.isEmpty()) {
