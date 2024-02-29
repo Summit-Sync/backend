@@ -3,6 +3,7 @@ package com.summitsync.api.course;
 import com.summitsync.api.coursetemplate.CourseTemplate;
 import com.summitsync.api.group.Group;
 import com.summitsync.api.group.GroupDTO;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,15 +15,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/course")
+@RequiredArgsConstructor
 public class CourseController {
     private final CourseRepository repository;
     private final CourseMapper mapper;
-
-    @Autowired
-    public CourseController(CourseRepository repository) {
-        this.repository = repository;
-        this.mapper = new CourseMapper();
-    }
 
     @PostMapping
     private ResponseEntity<CourseDTO> createCourseFromTemplate(@RequestBody CourseTemplate template, CourseDTO dto) {
