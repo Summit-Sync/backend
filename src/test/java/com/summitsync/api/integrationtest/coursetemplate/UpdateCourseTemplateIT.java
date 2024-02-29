@@ -5,6 +5,7 @@ import com.summitsync.api.coursetemplate.CourseTemplateRepository;
 import com.summitsync.api.coursetemplateprice.CourseTemplatePrice;
 import com.summitsync.api.integrationtest.testcontainers.AbstractIntegrationTest;
 import com.summitsync.api.qualification.Qualification;
+import com.summitsync.api.qualification.QualificationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -24,9 +25,12 @@ public class UpdateCourseTemplateIT extends AbstractIntegrationTest {
 
     @Autowired
     private CourseTemplateRepository repository;
+    @Autowired
+    private QualificationRepository qualificationRepository;
 
     @BeforeEach
     public void setUp() throws Exception{
+        qualificationRepository.save(Qualification.builder().name("Erste Hilfe Kurs").build());
         repository.save(new CourseTemplate("EK", "Test",2,"test",List.of(Qualification.builder().name("Erste Hilfe Kurs").build())
                 ,20, 5, 2,List.of(CourseTemplatePrice.builder().price(BigDecimal.TEN).category("Mitglied").build()), 1000));
     }
@@ -43,7 +47,7 @@ public class UpdateCourseTemplateIT extends AbstractIntegrationTest {
                     "description":"test",
                     "qualificationList":[
                         {
-                            "id":1,
+                            "qualificationId":1,
                             "name":"Erste Hilfe Kurs"
                         }
                     ],
