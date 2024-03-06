@@ -1,4 +1,5 @@
 package com.summitsync.api.basetemplate;
+import com.summitsync.api.eventperiod.EventPeriod;
 import com.summitsync.api.qualification.Qualification;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

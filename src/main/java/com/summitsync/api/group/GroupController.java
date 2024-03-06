@@ -2,9 +2,7 @@ package com.summitsync.api.group;
 
 import com.summitsync.api.group.dto.GroupGetDTO;
 import com.summitsync.api.group.dto.GroupPostDTO;
-import com.summitsync.api.grouptemplate.GroupTemplate;
 import com.summitsync.api.grouptemplate.GroupTemplateMapper;
-import com.summitsync.api.grouptemplate.dto.GroupTemplateGetDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,27 +21,27 @@ public class GroupController {
     private final GroupTemplateMapper templateMapper;
 
     @PostMapping
-    private ResponseEntity<GroupGetDTO> createGroupFromTemplate(@RequestBody CreateWrapperDTO wrapper) {
-        Group group = service.createFromTemplate(templateMapper.mapGroupGetDtoToGroupTemplate(wrapper.getTemplate()), mapper.mapGroupGetDTOToGroup(wrapper.getGroup()));
+    public ResponseEntity<GroupGetDTO> createGroupFromTemplate(@RequestBody CreateGroupWrapperDTO wrapper) {
+        Group group = service.createFromTemplate(templateMapper.mapGroupTemplateGetDtoToGroupTemplate(wrapper.getTemplate()), mapper.mapGroupGetDTOToGroup(wrapper.getGroup()));
         return new ResponseEntity<>(mapper.mapGroupToGroupGetDto(group), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    private ResponseEntity<GroupGetDTO> deleteGroup(@PathVariable long id) {
+    public ResponseEntity<GroupGetDTO> deleteGroup(@PathVariable long id) {
         Group group = service.deleteById(id);
         GroupGetDTO dto = mapper.mapGroupToGroupGetDto(group);
         return new ResponseEntity<>(dto, HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/{id}")
-    private ResponseEntity<GroupGetDTO> getGroupById(@PathVariable long id) {
+    public ResponseEntity<GroupGetDTO> getGroupById(@PathVariable long id) {
         Group group = service.get(id);
         GroupGetDTO response = mapper.mapGroupToGroupGetDto(group);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping
-    private ResponseEntity<List<GroupGetDTO>> getAllGroups() {
+    public ResponseEntity<List<GroupGetDTO>> getAllGroups() {
         List<Group> all = this.service.getAll();
         List<GroupGetDTO> DTOs = new ArrayList<>();
         for (Group group : all) {
@@ -53,7 +51,7 @@ public class GroupController {
     }
 
     @PutMapping("/{id}")
-    private ResponseEntity<GroupGetDTO> updateGroup(@RequestBody GroupPostDTO dto, @PathVariable long id) {
+    public ResponseEntity<GroupGetDTO> updateGroup(@RequestBody GroupPostDTO dto, @PathVariable long id) {
         Group groupToUpdate = mapper.mapGroupPostDTOToGroup(dto);
         groupToUpdate.setGroupId(id);
         Group dbGroup = service.update(groupToUpdate);

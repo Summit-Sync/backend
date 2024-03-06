@@ -4,9 +4,7 @@ import com.summitsync.api.group.dto.GroupGetDTO;
 import com.summitsync.api.group.dto.GroupPostDTO;
 import com.summitsync.api.grouptemplate.GroupTemplate;
 import com.summitsync.api.grouptemplate.GroupTemplateMapper;
-import com.summitsync.api.grouptemplate.dto.GroupTemplateGetDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,7 +23,7 @@ public class GroupMapper {
     }
     public Group mapGroupPostDTOToGroup(GroupPostDTO dto) {
         Group group = new Group();
-        GroupTemplate template = templateMapper.mapGroupGetDtoToGroupTemplate(dto.getTemplate());
+        GroupTemplate template = templateMapper.mapGroupTemplateGetDtoToGroupTemplate(dto.getTemplate());
         group.setDescription(dto.getDescription() == null ? template.getDescription() : dto.getDescription());
         group.setNotes(dto.getNotes());
         group.setNumberOfParticipants(dto.getNumberOfParticipants());
@@ -37,7 +35,7 @@ public class GroupMapper {
 
     public Group mapGroupGetDTOToGroup(GroupGetDTO dto) {
         Group group = new Group();
-        GroupTemplate template = templateMapper.mapGroupGetDtoToGroupTemplate(dto.getTemplate());
+        GroupTemplate template = templateMapper.mapGroupTemplateGetDtoToGroupTemplate(dto.getTemplate());
         group.setDescription(dto.getDescription() == null ? template.getDescription() : dto.getDescription());
         group.setNotes(dto.getNotes());
         group.setNumberOfParticipants(dto.getNumberOfParticipants());

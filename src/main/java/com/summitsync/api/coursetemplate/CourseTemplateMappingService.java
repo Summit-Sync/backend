@@ -49,4 +49,13 @@ public class CourseTemplateMappingService {
         return new CourseTemplate(dto.getId(),dto.getAcronym(), dto.getTitle(),dto.getNumberOfDates(),dto.getDescription(),qualificationList,dto.getNumberOfParticipants(), dto.getNumberOfWaitList(), dto.getNumberOfTrainers(),dto.getPriceList(), dto.getDuration());
     }
 
+    public CourseTemplate mapGetCourseTemplateDtoToCourseTemplate(CourseTemplateDto dto) {
+        List<Qualification>qualificationList=new ArrayList<>();
+        for(Qualification qualification : dto.getQualificationList()){
+            qualificationList.add(qualificationService.findById(qualification.getQualificationId()));
+        }
+        CourseTemplate newTemplate = new CourseTemplate(dto.getAcronym(), dto.getTitle(),dto.getNumberOfDates(),dto.getDescription(),qualificationList,dto.getNumberOfParticipants(), dto.getNumberOfWaitList(), dto.getNumberOfTrainers(),dto.getPriceList(),dto.getDuration());
+        newTemplate.setBaseTemplateId(dto.getId());
+        return newTemplate;
+    }
 }

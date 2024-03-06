@@ -43,6 +43,7 @@ public class Course {
     private String description;
     private String title;
     private Integer duration;
+    private BigDecimal actualPrice;
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Qualification> requiredQualifications;
     @ManyToMany(fetch = FetchType.LAZY)

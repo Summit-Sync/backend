@@ -1,6 +1,10 @@
 package com.summitsync.api.course;
 
+import com.summitsync.api.course.dto.CourseGetDTO;
 import com.summitsync.api.coursetemplate.CourseTemplate;
+import com.summitsync.api.coursetemplate.CourseTemplateMappingService;
+import com.summitsync.api.group.Group;
+import com.summitsync.api.group.dto.GroupGetDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,57 +18,45 @@ import java.util.Optional;
 @RequestMapping("/api/v1/course")
 @RequiredArgsConstructor
 public class CourseController {
-    private final CourseRepository repository;
+    private final CourseService service;
     private final CourseMapper mapper;
+    private final CourseTemplateMappingService templateMapper;
 
     @PostMapping
-    private ResponseEntity<CourseDTO> createCourseFromTemplate(@RequestBody CourseTemplate template, CourseDTO dto) {
-        dto.setTemplate(template);
-        Course course = mapper.mapCourseDTOToCourse(dto);
-        repository.save(course);
-        return new ResponseEntity<>(mapper.mapCourseToCourseDTO(course), HttpStatus.OK);
+    public ResponseEntity<CourseGetDTO> createCourseFromTemplate(@RequestBody CreateCourseWrapperDTO wrapper) {
+        Course course = service.createFromTemplate(templateMapper.mapGetCourseTemplateDtoToCourseTemplate(wrapper.getTemplate()), mapper.mapCourseGetDTOToCourse(wrapper.getCourse()));
+        return new ResponseEntity<>(mapper.mapCourseToCourseGetDTO(course), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    private ResponseEntity<CourseDTO> getCourseById(@PathVariable long id) {
-        Optional<Course> course = repository.findById(id);
-        if (course.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(this.mapper.mapCourseToCourseDTO(course.get()), HttpStatus.OK);
+    public ResponseEntity<CourseGetDTO> getCourseById(@PathVariable long id) {
+        Course course = service.get(id);
+        CourseGetDTO response = mapper.mapCourseToCourseGetDTO(course);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping
-    private ResponseEntity<List<CourseDTO>> getAllCourses() {
-        List<Course> all = this.repository.findAll();
-        List<CourseDTO> dtos = new ArrayList<>();
+    public ResponseEntity<List<CourseGetDTO>> getAllCourses() {
+        List<Course> all = this.service.getAll();
+        List<CourseGetDTO> DTOs = new ArrayList<>();
         for (Course course : all) {
-            dtos.add(this.mapper.mapCourseToCourseDTO(course));
+            DTOs.add(this.mapper.mapCourseToCourseGetDTO(course));
         }
-        if (all.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(dtos, HttpStatus.OK);
+        return new ResponseEntity<>(DTOs, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    private ResponseEntity<CourseDTO> deleteById(@PathVariable long id) {
-        Optional<Course> course = repository.findById(id);
-        if (course.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        repository.deleteById(id);
-        return new ResponseEntity<>(this.mapper.mapCourseToCourseDTO(course.get()), HttpStatus.NO_CONTENT);
+    public ResponseEntity<CourseGetDTO> deleteById(@PathVariable long id) {
+        Course course = service.deleteById(id);
+        CourseGetDTO dto = mapper.mapCourseToCourseGetDTO(course);
+        return new ResponseEntity<>(dto, HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}")
-    private ResponseEntity<CourseDTO> updateCourse(@RequestBody CourseDTO dto, @PathVariable long id) {
-        Optional<Course> course = repository.findById(id);
-        if (course.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        Course newCourse = mapper.mapCourseDTOToCourse(dto);
-        this.repository.save(newCourse);
-        return new ResponseEntity<>(this.mapper.mapCourseToCourseDTO(newCourse), HttpStatus.OK);
+    public ResponseEntity<CourseGetDTO> updateCourse(@RequestBody CourseGetDTO dto, @PathVariable long id) {
+        Course courseToUpdate = mapper.mapCourseGetDTOToCourse(dto);
+        Course dbCourse = service.update(courseToUpdate, id);
+        CourseGetDTO response = mapper.mapCourseToCourseGetDTO(dbCourse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

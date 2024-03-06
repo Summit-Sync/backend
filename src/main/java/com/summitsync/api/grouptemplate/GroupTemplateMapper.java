@@ -28,7 +28,7 @@ public class GroupTemplateMapper {
         return dto;
     }
 
-    public GroupTemplate mapGroupGetDtoToGroupTemplate(GroupTemplateGetDTO dto) {
+    public GroupTemplate mapGroupTemplateGetDtoToGroupTemplate(GroupTemplateGetDTO dto) {
         GroupTemplate template = new GroupTemplate();
         template.setBaseTemplateId(dto.getId());
         template.setTrainerKey(dto.getTrainerKey());

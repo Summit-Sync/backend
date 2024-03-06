@@ -1,4 +1,4 @@
-package com.summitsync.api.course;
+package com.summitsync.api.course.dto;
 
 import com.summitsync.api.coursetemplate.CourseTemplate;
 import com.summitsync.api.date.EventDate;
@@ -11,7 +11,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Data
-public class CourseDTO {
+public class CourseGetDTO {
+    private long id;
     private CourseTemplate template;
     private String description;
     private String title;
