@@ -28,4 +28,14 @@ public class GroupTemplateMapper {
         return dto;
     }
 
+    public GroupTemplate mapGroupGetDtoToGroupTemplate(GroupTemplateGetDTO dto) {
+        GroupTemplate template = new GroupTemplate();
+        template.setBaseTemplateId(dto.getId());
+        template.setTrainerKey(dto.getTrainerKey());
+        template.setAcronym(dto.getAcronym());
+        template.setPricePerTrainerPerHour(dto.getPricePerTrainerPerHour());
+        template.setDescription(dto.getDescription());
+        template.setRequiredQualifications(dto.getRequiredQualification());
+        return template;
+    }
 }

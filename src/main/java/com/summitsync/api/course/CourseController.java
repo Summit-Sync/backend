@@ -1,10 +1,7 @@
 package com.summitsync.api.course;
 
 import com.summitsync.api.coursetemplate.CourseTemplate;
-import com.summitsync.api.group.Group;
-import com.summitsync.api.group.GroupDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
