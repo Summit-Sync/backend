@@ -12,9 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
-import static jdk.nio.zipfs.ZipFileAttributeView.AttrID.group;
 
 @RestController
 @RequestMapping("/api/v1/group")
