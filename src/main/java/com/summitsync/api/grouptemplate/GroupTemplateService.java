@@ -24,7 +24,7 @@ public class GroupTemplateService {
         Optional<GroupTemplate> data = findById(template.getBaseTemplateId());
         if (data.isEmpty()) {
             log.info("GroupTemplate with id {} does not exist", template.getBaseTemplateId());
-            throw new RuntimeException("GroupTemplate with id" + template.getBaseTemplateId() + " does not exist");
+            throw new RuntimeException("GroupTemplate with id " + template.getBaseTemplateId() + " does not exist");
         }
         GroupTemplate dbTemplate = data.get();
         dbTemplate.setAcronym(template.getAcronym());
@@ -62,7 +62,7 @@ public class GroupTemplateService {
         Optional<GroupTemplate> data = findById(id);
         if (data.isEmpty()) {
             log.info("GroupTemplate with id {} does not exist", id);
-            throw new RuntimeException("GroupTemplate with id" + id + " does not exist");
+            throw new RuntimeException("GroupTemplate with id " + id + " does not exist");
         }
         return data.get();
     }

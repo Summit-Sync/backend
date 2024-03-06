@@ -1,5 +1,10 @@
 package com.summitsync.api.group;
 
+import com.summitsync.api.group.dto.GroupGetDTO;
+import com.summitsync.api.group.dto.GroupPostDTO;
+import com.summitsync.api.grouptemplate.GroupTemplate;
+import com.summitsync.api.grouptemplate.GroupTemplateMapper;
+import com.summitsync.api.grouptemplate.dto.GroupTemplateGetDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,64 +14,53 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static jdk.nio.zipfs.ZipFileAttributeView.AttrID.group;
+
 @RestController
 @RequestMapping("/api/v1/group")
 @RequiredArgsConstructor
 public class GroupController {
 
-    private final GroupRepository repository;
+    private final GroupService service;
     private final GroupMapper mapper;
+    private final GroupTemplateMapper templateMapper;
 
     @PostMapping
-    private ResponseEntity<GroupDTO> createGroupFromTemplate(@RequestBody CreateWrapperDTO wrapper) {
-        var dto = wrapper.getGroup();
-        var template = wrapper.getTemplate();
-        dto.setTemplate(template);
-        Group group = mapper.mapGroupDTOToGroup(dto);
-        repository.save(group);
-        return new ResponseEntity<>(mapper.mapGroupToGroupDto(group), HttpStatus.OK);
+    private ResponseEntity<GroupGetDTO> createGroupFromTemplate(@RequestBody CreateWrapperDTO wrapper) {
+        Group group = service.createFromTemplate(templateMapper.mapGroupGetDtoToGroupTemplate(wrapper.getTemplate()), mapper.mapGroupGetDTOToGroup(wrapper.getGroup()));
+        return new ResponseEntity<>(mapper.mapGroupToGroupGetDto(group), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    private ResponseEntity<GroupDTO> deleteGroup(@PathVariable long id) {
-        Optional<Group> group = repository.findById(id);
-        if (group.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        repository.deleteById(id);
-        return new ResponseEntity<>(this.mapper.mapGroupToGroupDto(group.get()), HttpStatus.NO_CONTENT);
+    private ResponseEntity<GroupGetDTO> deleteGroup(@PathVariable long id) {
+        Group group = service.deleteById(id);
+        GroupGetDTO dto = mapper.mapGroupToGroupGetDto(group);
+        return new ResponseEntity<>(dto, HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/{id}")
-    private ResponseEntity<GroupDTO> getGroupById(@PathVariable long id) {
-        Optional<Group> group = repository.findById(id);
-        if (group.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(this.mapper.mapGroupToGroupDto(group.get()), HttpStatus.OK);
+    private ResponseEntity<GroupGetDTO> getGroupById(@PathVariable long id) {
+        Group group = service.get(id);
+        GroupGetDTO response = mapper.mapGroupToGroupGetDto(group);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping
-    private ResponseEntity<List<GroupDTO>> getAllGroups() {
-        List<Group> all = this.repository.findAll();
-        List<GroupDTO> dtos = new ArrayList<>();
+    private ResponseEntity<List<GroupGetDTO>> getAllGroups() {
+        List<Group> all = this.service.getAll();
+        List<GroupGetDTO> DTOs = new ArrayList<>();
         for (Group group : all) {
-            dtos.add(this.mapper.mapGroupToGroupDto(group));
+            DTOs.add(this.mapper.mapGroupToGroupGetDto(group));
         }
-        if (all.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(dtos, HttpStatus.OK);
+        return new ResponseEntity<>(DTOs, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    private ResponseEntity<GroupDTO> updateGroup(@RequestBody GroupDTO dto, @PathVariable long id) {
-        Optional<Group> group = repository.findById(id);
-        if (group.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        Group newGroup = mapper.mapGroupDTOToGroup(dto);
-        this.repository.save(newGroup);
-        return new ResponseEntity<>(this.mapper.mapGroupToGroupDto(newGroup), HttpStatus.OK);
+    private ResponseEntity<GroupGetDTO> updateGroup(@RequestBody GroupPostDTO dto, @PathVariable long id) {
+        Group groupToUpdate = mapper.mapGroupPostDTOToGroup(dto);
+        groupToUpdate.setGroupId(id);
+        Group dbGroup = service.update(groupToUpdate);
+        GroupGetDTO response = mapper.mapGroupToGroupGetDto(dbGroup);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
