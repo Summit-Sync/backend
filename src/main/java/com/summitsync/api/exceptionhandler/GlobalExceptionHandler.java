@@ -24,4 +24,10 @@ public class GlobalExceptionHandler {
         var errorResponse = new ErrorResponse("not_found", exception.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(KeycloakApiException.class)
+    public ResponseEntity<?> handleKeycloakApiException(KeycloakApiException keycloakApiException) {
+        var errorResponse = new ErrorResponse("keycloak", keycloakApiException.getMessage());
+        return new ResponseEntity<>(errorResponse, keycloakApiException.getStatus());
+    }
 }
