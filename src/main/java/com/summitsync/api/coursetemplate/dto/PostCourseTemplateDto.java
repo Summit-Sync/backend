@@ -23,4 +23,5 @@ public class PostCourseTemplateDto {
     private int numberOfWaitList;
     private int numberOfTrainers;
     private List<CourseTemplatePrice>priceList;
+    private float numberOfHoursPerDate;
 }

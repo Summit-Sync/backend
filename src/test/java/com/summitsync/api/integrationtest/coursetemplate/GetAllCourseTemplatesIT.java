@@ -33,9 +33,9 @@ public class GetAllCourseTemplatesIT extends AbstractIntegrationTest {
     public void setUp() throws Exception{
         qualificationRepository.save(Qualification.builder().name("Erste Hilfe Kurs").build());
         repository.save(new CourseTemplate("EK", "Test",2,"test", List.of(Qualification.builder().name("Erste Hilfe Kurs").build())
-                ,20, 5, 2,List.of(CourseTemplatePrice.builder().price(BigDecimal.TEN).category("Mitglied").build()), 1000));
+                ,20, 5, 2,List.of(CourseTemplatePrice.builder().price(BigDecimal.TEN).category("Mitglied").build()), 1000, 1.5f));
         repository.save(new CourseTemplate("FK", "Test1",2,"test", List.of(Qualification.builder().name("Erste Hilfe Kurs").build())
-                ,20, 5, 2,List.of(CourseTemplatePrice.builder().price(BigDecimal.TEN).category("Mitglied").build()), 1000));
+                ,20, 5, 2,List.of(CourseTemplatePrice.builder().price(BigDecimal.TEN).category("Mitglied").build()), 1000, 1.5f));
 
     }
 

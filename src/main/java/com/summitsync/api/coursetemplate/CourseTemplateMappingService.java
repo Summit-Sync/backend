@@ -23,7 +23,7 @@ public class CourseTemplateMappingService {
         for(Qualification qualification : dto.getQualificationList()){
             qualificationList.add(qualificationService.findById(qualification.getQualificationId()));
         }
-        return new CourseTemplate(dto.getAcronym(), dto.getTitle(),dto.getNumberOfDates(),dto.getDescription(),qualificationList,dto.getNumberOfParticipants(), dto.getNumberOfWaitList(), dto.getNumberOfTrainers(),dto.getPriceList(),dto.getDuration());
+        return new CourseTemplate(dto.getAcronym(), dto.getTitle(),dto.getNumberOfDates(),dto.getDescription(),qualificationList,dto.getNumberOfParticipants(), dto.getNumberOfWaitList(), dto.getNumberOfTrainers(),dto.getPriceList(),dto.getDuration(), dto.getNumberOfHoursPerDate());
     }
 
     public CourseTemplateDto mapCourseTemplateToCourseTemplateDto(CourseTemplate data){
@@ -46,7 +46,7 @@ public class CourseTemplateMappingService {
         for(Qualification qualification : dto.getQualificationList()){
             qualificationList.add(qualificationService.findById(qualification.getQualificationId()));
         }
-        return new CourseTemplate(dto.getId(),dto.getAcronym(), dto.getTitle(),dto.getNumberOfDates(),dto.getDescription(),qualificationList,dto.getNumberOfParticipants(), dto.getNumberOfWaitList(), dto.getNumberOfTrainers(),dto.getPriceList(), dto.getDuration());
+        return new CourseTemplate(dto.getId(),dto.getAcronym(), dto.getTitle(),dto.getNumberOfDates(),dto.getDescription(),qualificationList,dto.getNumberOfParticipants(), dto.getNumberOfWaitList(), dto.getNumberOfTrainers(),dto.getPriceList(), dto.getDuration(), dto.getNumberOfHoursPerDate());
     }
 
     public CourseTemplate mapGetCourseTemplateDtoToCourseTemplate(CourseTemplateDto dto) {
@@ -54,7 +54,7 @@ public class CourseTemplateMappingService {
         for(Qualification qualification : dto.getQualificationList()){
             qualificationList.add(qualificationService.findById(qualification.getQualificationId()));
         }
-        CourseTemplate newTemplate = new CourseTemplate(dto.getAcronym(), dto.getTitle(),dto.getNumberOfDates(),dto.getDescription(),qualificationList,dto.getNumberOfParticipants(), dto.getNumberOfWaitList(), dto.getNumberOfTrainers(),dto.getPriceList(),dto.getDuration());
+        CourseTemplate newTemplate = new CourseTemplate(dto.getAcronym(), dto.getTitle(),dto.getNumberOfDates(),dto.getDescription(),qualificationList,dto.getNumberOfParticipants(), dto.getNumberOfWaitList(), dto.getNumberOfTrainers(),dto.getPriceList(),dto.getDuration(), dto.getNumberOfHoursPerDate());
         newTemplate.setBaseTemplateId(dto.getId());
         return newTemplate;
     }

@@ -27,10 +27,9 @@ public class GroupTemplateController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<GroupTemplateGetDTO> deleteTemplate(@PathVariable long id) {
-        GroupTemplate template = service.deleteTemplateById(id);
-        GroupTemplateGetDTO dto = mapper.mapGroupTemplateToGroupTemplateGetDTO(template);
-        return new ResponseEntity<>(dto, HttpStatus.NO_CONTENT);
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    public void deleteTemplate(@PathVariable long id) {
+        service.deleteTemplateById(id);
     }
 
     @PutMapping("/{id}")

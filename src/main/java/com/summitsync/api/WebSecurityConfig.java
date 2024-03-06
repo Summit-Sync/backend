@@ -27,7 +27,7 @@ public class WebSecurityConfig {
                         requests
                                 .requestMatchers("/auth/**").permitAll()
                                 .requestMatchers("/api/admin/**").hasRole("admin")
-                                .requestMatchers("/api/**").authenticated()
+                                .requestMatchers("/api/**").permitAll()
                                 .anyRequest().permitAll())
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(jwt ->
                         jwt.jwtAuthenticationConverter(new JwtAuthenticationConverterRoles())
