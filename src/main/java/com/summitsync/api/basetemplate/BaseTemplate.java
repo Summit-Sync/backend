@@ -25,14 +25,16 @@ public class BaseTemplate {
     @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<Qualification> requiredQualifications;
     private BigDecimal durationInMinutes;
+    private Float numberOfHoursPerDate;
 
-    public BaseTemplate(String acronym, String title, int numberOfDates, String description, List<Qualification> requiredQualifications, int duration) {
+    public BaseTemplate(String acronym, String title, int numberOfDates, String description, List<Qualification> requiredQualifications, int duration, Float numberOfHoursPerDate) {
         this.acronym = acronym;
         this.title = title;
         this.numberOfDates = numberOfDates;
         this.description = description;
         this.requiredQualifications = requiredQualifications;
         this.duration=duration;
+        this.numberOfHoursPerDate = numberOfHoursPerDate;
     }
 
 }
