@@ -20,21 +20,21 @@ public class GroupTemplateController {
     private final GroupTemplateService service;
     private final GroupTemplateMapper mapper;
     @PostMapping
-    private ResponseEntity<GroupTemplateGetDTO> createTemplate(@RequestBody GroupTemplatePostDTO dto) {
+    public ResponseEntity<GroupTemplateGetDTO> createTemplate(@RequestBody GroupTemplatePostDTO dto) {
         GroupTemplate templateToCreate = mapper.mapGroupPostDtoToGroupTemplate(dto);
         GroupTemplate createdTemplate = service.createTemplate(templateToCreate);
         GroupTemplateGetDTO response = mapper.mapGroupTemplateToGroupTemplateGetDTO(createdTemplate);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @DeleteMapping("/{id}")
-    private ResponseEntity<GroupTemplateGetDTO> deleteTemplate(@PathVariable long id) {
+    public ResponseEntity<GroupTemplateGetDTO> deleteTemplate(@PathVariable long id) {
         GroupTemplate template = service.deleteTemplateById(id);
         GroupTemplateGetDTO dto = mapper.mapGroupTemplateToGroupTemplateGetDTO(template);
         return new ResponseEntity<>(dto, HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}")
-    private ResponseEntity<GroupTemplateGetDTO> updateTemplate(@RequestBody GroupTemplatePostDTO dto, @PathVariable long id) {
+    public ResponseEntity<GroupTemplateGetDTO> updateTemplate(@RequestBody GroupTemplatePostDTO dto, @PathVariable long id) {
         GroupTemplate templateToUpdate = mapper.mapGroupPostDtoToGroupTemplate(dto);
         templateToUpdate.setBaseTemplateId(id);
         GroupTemplate dbTemplate = service.updateTemplate(templateToUpdate);
@@ -43,14 +43,14 @@ public class GroupTemplateController {
     }
 
     @GetMapping("/{id}")
-    private ResponseEntity<GroupTemplateGetDTO> getTemplateById(@PathVariable long id) {
+    public ResponseEntity<GroupTemplateGetDTO> getTemplateById(@PathVariable long id) {
         GroupTemplate template = service.get(id);
         GroupTemplateGetDTO response = mapper.mapGroupTemplateToGroupTemplateGetDTO(template);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping
-    private ResponseEntity<List<GroupTemplateGetDTO>> getAllTemplates() {
+    public ResponseEntity<List<GroupTemplateGetDTO>> getAllTemplates() {
         List<GroupTemplate> all = this.service.getAll();
         List<GroupTemplateGetDTO> DTOs = new ArrayList<>();
         for (GroupTemplate template : all) {
