@@ -1,6 +1,6 @@
 package com.summitsync.api.group;
 
-import com.summitsync.api.grouptemplate.GroupTemplateDTO;
+import com.summitsync.api.grouptemplate.dto.GroupTemplatePostDTO;
 import com.summitsync.api.qualification.Qualification;
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 public class GroupDTO {
-    private GroupTemplateDTO template;
+    private GroupTemplatePostDTO template;
     private String notes;
     private List<Qualification> requiredQualifications;
     private BigDecimal pricePerParticipant;

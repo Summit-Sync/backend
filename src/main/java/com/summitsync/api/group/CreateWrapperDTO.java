@@ -1,10 +1,10 @@
 package com.summitsync.api.group;
 
-import com.summitsync.api.grouptemplate.GroupTemplateDTO;
+import com.summitsync.api.grouptemplate.dto.GroupTemplatePostDTO;
 import lombok.Data;
 
 @Data
 public class CreateWrapperDTO {
-    private GroupTemplateDTO template;
+    private GroupTemplatePostDTO template;
     private GroupDTO group;
 }

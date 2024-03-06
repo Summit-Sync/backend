@@ -1,9 +1,9 @@
 package com.summitsync.api.grouptemplate;
 
-import com.summitsync.api.group.GroupMapper;
-import com.summitsync.api.group.GroupRepository;
+import com.summitsync.api.group.Group;
+import com.summitsync.api.grouptemplate.dto.GroupTemplateGetDTO;
+import com.summitsync.api.grouptemplate.dto.GroupTemplatePostDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,53 +17,45 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class GroupTemplateController {
 
-    private final GroupTemplateRepository repository;
+    private final GroupTemplateService service;
     private final GroupTemplateMapper mapper;
     @PostMapping
-    private ResponseEntity<GroupTemplateDTO> createTemplate(@RequestBody GroupTemplateDTO dto) {
-        repository.save(this.mapper.mapGroupDtoToGroupTemplate(dto));
-        return new ResponseEntity<>(dto, HttpStatus.OK);
+    private ResponseEntity<GroupTemplateGetDTO> createTemplate(@RequestBody GroupTemplatePostDTO dto) {
+        GroupTemplate templateToCreate = mapper.mapGroupPostDtoToGroupTemplate(dto);
+        GroupTemplate createdTemplate = service.createTemplate(templateToCreate);
+        GroupTemplateGetDTO response = mapper.mapGroupTemplateToGroupTemplateGetDTO(createdTemplate);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @DeleteMapping("/{id}")
-    private ResponseEntity<GroupTemplateDTO> deleteTemplate(@PathVariable long id) {
-        Optional<GroupTemplate> template = repository.findById(id);
-        if (template.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        repository.deleteById(id);
-        return new ResponseEntity<>(this.mapper.mapGroupTemplateToGroupDto(template.get()), HttpStatus.NO_CONTENT);
+    private ResponseEntity<GroupTemplateGetDTO> deleteTemplate(@PathVariable long id) {
+        GroupTemplate template = service.deleteTemplateById(id);
+        GroupTemplateGetDTO dto = mapper.mapGroupTemplateToGroupTemplateGetDTO(template);
+        return new ResponseEntity<>(dto, HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}")
-    private ResponseEntity<GroupTemplateDTO> updateTemplate(@RequestBody GroupTemplateDTO dto, @PathVariable long id) {
-        Optional<GroupTemplate> template = repository.findById(id);
-        if (template.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        GroupTemplate newTemplate = mapper.mapGroupDtoToGroupTemplate(dto);
-        this.repository.save(newTemplate);
-        return new ResponseEntity<>(this.mapper.mapGroupTemplateToGroupDto(newTemplate), HttpStatus.OK);
+    private ResponseEntity<GroupTemplateGetDTO> updateTemplate(@RequestBody GroupTemplatePostDTO dto, @PathVariable long id) {
+        GroupTemplate templateToUpdate = mapper.mapGroupPostDtoToGroupTemplate(dto);
+        templateToUpdate.setBaseTemplateId(id);
+        GroupTemplate dbTemplate = service.updateTemplate(templateToUpdate);
+        GroupTemplateGetDTO response = mapper.mapGroupTemplateToGroupTemplateGetDTO(dbTemplate);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    private ResponseEntity<GroupTemplateDTO> getTemplateById(@PathVariable long id) {
-        Optional<GroupTemplate> template = this.repository.findById(id);
-        if (template.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(this.mapper.mapGroupTemplateToGroupDto(template.get()), HttpStatus.OK);
+    private ResponseEntity<GroupTemplateGetDTO> getTemplateById(@PathVariable long id) {
+        GroupTemplate template = service.get(id);
+        GroupTemplateGetDTO response = mapper.mapGroupTemplateToGroupTemplateGetDTO(template);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping
-    private ResponseEntity<List<GroupTemplateDTO>> getAllTemplates() {
-        List<GroupTemplate> all = this.repository.findAll();
-        List<GroupTemplateDTO> dtos = new ArrayList<>();
+    private ResponseEntity<List<GroupTemplateGetDTO>> getAllTemplates() {
+        List<GroupTemplate> all = this.service.getAll();
+        List<GroupTemplateGetDTO> DTOs = new ArrayList<>();
         for (GroupTemplate template : all) {
-            dtos.add(this.mapper.mapGroupTemplateToGroupDto(template));
+            DTOs.add(this.mapper.mapGroupTemplateToGroupTemplateGetDTO(template));
         }
-        if (all.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(dtos, HttpStatus.OK);
+        return new ResponseEntity<>(DTOs, HttpStatus.OK);
     }
 }
