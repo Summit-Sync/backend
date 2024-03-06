@@ -1,11 +1,13 @@
 package com.summitsync.api.grouptemplate;
 
+import com.summitsync.api.grouptemplate.dto.GroupTemplateGetDTO;
+import com.summitsync.api.grouptemplate.dto.GroupTemplatePostDTO;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GroupTemplateMapper {
 
-    public GroupTemplate mapGroupDtoToGroupTemplate(GroupTemplateDTO dto) {
+    public GroupTemplate mapGroupPostDtoToGroupTemplate(GroupTemplatePostDTO dto) {
         GroupTemplate template = new GroupTemplate();
         template.setTrainerKey(dto.getTrainerKey());
         template.setAcronym(dto.getAcronym());
@@ -15,8 +17,9 @@ public class GroupTemplateMapper {
         return template;
     }
 
-    public GroupTemplateDTO mapGroupTemplateToGroupDto(GroupTemplate template) {
-        GroupTemplateDTO dto = new GroupTemplateDTO();
+    public GroupTemplateGetDTO mapGroupTemplateToGroupTemplateGetDTO(GroupTemplate template) {
+        GroupTemplateGetDTO dto = new GroupTemplateGetDTO();
+        dto.setId(template.getBaseTemplateId());
         dto.setTrainerKey(template.getTrainerKey());
         dto.setAcronym(template.getAcronym());
         dto.setPricePerTrainerPerHour(template.getPricePerTrainerPerHour());
