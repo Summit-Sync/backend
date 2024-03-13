@@ -19,8 +19,8 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '21'
-          distribution: corretto
+          distribution: microsoft
 
       - name: Build and Test with Gradle
         run: |
-          gradle build
+          ./gradlew build
