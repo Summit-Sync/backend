@@ -1,6 +1,7 @@
 package com.summitsync.api.course;
 
 import com.summitsync.api.course.dto.CourseGetDTO;
+import com.summitsync.api.course.dto.CoursePostDTO;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,5 +38,22 @@ public class CourseMapper {
         dto.setNotes(course.getNotes());
         dto.setId(course.getCourseId());
         return dto;
+    }
+
+    public Course mapCoursePostDTOToCourse(CoursePostDTO dto) {
+        Course course = new Course();
+        course.setRequiredQualifications(dto.getRequiredQualifications());
+        course.setDescription(dto.getDescription());
+        course.setTitle(dto.getTitle());
+        course.setNotes(dto.getNotes());
+        course.setDates(dto.getDates());
+        course.setActualPrice(dto.getActualPrice());
+        course.setLocation(dto.getLocation());
+        course.setNumberOfDates(dto.getTemplate().getNumberOfDates());
+        course.setNumberOfParticipants(dto.getTemplate().getNumberOfParticipants());
+        course.setNumberOfTrainers(dto.getTemplate().getNumberOfTrainers());
+        course.setLengthOfWaitList(dto.getTemplate().getNumberOfWaitList());
+        course.setParticipants(dto.getParticipants());
+        return course;
     }
 }

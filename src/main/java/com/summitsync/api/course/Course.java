@@ -7,15 +7,12 @@ import com.summitsync.api.date.EventDate;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.participant.Participant;
 import com.summitsync.api.qualification.Qualification;
-import com.summitsync.api.trainer.Trainer;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity

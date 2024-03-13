@@ -18,25 +18,24 @@ public class GroupController {
 
     private final GroupService service;
     private final GroupMapper mapper;
-    private final GroupTemplateMapper templateMapper;
 
     @PostMapping
     public ResponseEntity<GroupGetDTO> createGroupFromTemplate(@RequestBody CreateGroupWrapperDTO wrapper) {
-        Group group = service.createFromTemplate(templateMapper.mapGroupTemplateGetDtoToGroupTemplate(wrapper.getTemplate()), mapper.mapGroupGetDTOToGroup(wrapper.getGroup()));
-        return new ResponseEntity<>(mapper.mapGroupToGroupGetDto(group), HttpStatus.OK);
+        Group group = this.service.createFromTemplate(wrapper.getTemplateId(), this.mapper.mapGroupGetDTOToGroup(wrapper.getGroup()));
+        return new ResponseEntity<>(this.mapper.mapGroupToGroupGetDto(group), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<GroupGetDTO> deleteGroup(@PathVariable long id) {
-        Group group = service.deleteById(id);
-        GroupGetDTO dto = mapper.mapGroupToGroupGetDto(group);
+        Group group = this.service.deleteById(id);
+        GroupGetDTO dto = this.mapper.mapGroupToGroupGetDto(group);
         return new ResponseEntity<>(dto, HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GroupGetDTO> getGroupById(@PathVariable long id) {
-        Group group = service.get(id);
-        GroupGetDTO response = mapper.mapGroupToGroupGetDto(group);
+        Group group = this.service.get(id);
+        GroupGetDTO response = this.mapper.mapGroupToGroupGetDto(group);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -52,10 +51,10 @@ public class GroupController {
 
     @PutMapping("/{id}")
     public ResponseEntity<GroupGetDTO> updateGroup(@RequestBody GroupPostDTO dto, @PathVariable long id) {
-        Group groupToUpdate = mapper.mapGroupPostDTOToGroup(dto);
+        Group groupToUpdate = this.mapper.mapGroupPostDTOToGroup(dto);
         groupToUpdate.setGroupId(id);
-        Group dbGroup = service.update(groupToUpdate);
-        GroupGetDTO response = mapper.mapGroupToGroupGetDto(dbGroup);
+        Group dbGroup = this.service.update(groupToUpdate);
+        GroupGetDTO response = this.mapper.mapGroupToGroupGetDto(dbGroup);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

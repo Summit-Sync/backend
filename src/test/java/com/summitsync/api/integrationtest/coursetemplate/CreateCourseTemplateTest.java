@@ -32,9 +32,9 @@ public class CreateCourseTemplateTest extends AbstractIntegrationTest {
 
     @BeforeEach
     public void setUp() throws Exception{
-        qualificationRepository.save(Qualification.builder().name("Erste Hilfe Kurs").build());
-        repository.save(new CourseTemplate("EK", "Test",2,"test", List.of(Qualification.builder().name("Erste Hilfe Kurs").build())
-                ,20, 5, 2,List.of(CourseTemplatePrice.builder().price(BigDecimal.TEN).category("Mitglied").build()), 1000, 1.5f));
+        this.qualificationRepository.save(Qualification.builder().name("Erste Hilfe Kurs").build());
+        this.repository.save(new CourseTemplate("EK", "Test",2,"test", List.of(Qualification.builder().name("Erste Hilfe Kurs").build())
+                ,20, 5, 2,List.of(CourseTemplatePrice.builder().price(BigDecimal.TEN).category("Mitglied").build()), 1000, 90));
     }
     @Test
     public void createCourseTemplateHappyPath() throws Exception{
@@ -67,7 +67,8 @@ public class CreateCourseTemplateTest extends AbstractIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("id",greaterThanOrEqualTo(1)));
+                .andExpect(jsonPath("id",greaterThanOrEqualTo(1)))
+                .andExpect(jsonPath("acronym").value("EK"));
     }
 
     @Test

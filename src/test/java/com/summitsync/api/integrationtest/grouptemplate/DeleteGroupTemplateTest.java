@@ -1,8 +1,5 @@
 package com.summitsync.api.integrationtest.grouptemplate;
 
-import com.summitsync.api.coursetemplate.CourseTemplate;
-import com.summitsync.api.coursetemplate.CourseTemplateRepository;
-import com.summitsync.api.coursetemplateprice.CourseTemplatePrice;
 import com.summitsync.api.grouptemplate.GroupTemplate;
 import com.summitsync.api.grouptemplate.GroupTemplateRepository;
 import com.summitsync.api.integrationtest.testcontainers.AbstractIntegrationTest;
@@ -28,9 +25,9 @@ public class DeleteGroupTemplateTest extends AbstractIntegrationTest {
 
     @BeforeEach
     public void setUp() throws Exception{
-        qualificationRepository.save(Qualification.builder().name("Erste Hilfe Kurs").build());
+        this.qualificationRepository.save(Qualification.builder().name("Erste Hilfe Kurs").build());
         var qualifications = List.of(Qualification.builder().name("Erste Hilfe Kurs").build());
-        repository.save(new GroupTemplate(new BigDecimal("1.5"), 2, "test title", 5, "test description", qualifications, new BigDecimal("12.5")));
+        this.repository.save(new GroupTemplate(new BigDecimal("1.5"), 2, "test title", 5, "test description", qualifications, new BigDecimal("12.5")));
     }
 
     @Test

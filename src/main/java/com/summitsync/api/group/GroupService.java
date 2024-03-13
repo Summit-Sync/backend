@@ -1,6 +1,7 @@
 package com.summitsync.api.group;
 
 import com.summitsync.api.grouptemplate.GroupTemplate;
+import com.summitsync.api.grouptemplate.GroupTemplateService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -15,15 +16,17 @@ import java.util.Optional;
 public class GroupService {
     private final GroupRepository repository;
     private final Logger log = LoggerFactory.getLogger(GroupService.class);
+    private final GroupTemplateService templateService;
 
-    public Group create(Group group) { return repository.save(group); }
+    public Group create(Group group) { return this.repository.save(group); }
 
-    public Group createFromTemplate(GroupTemplate template, Group group) {
+    public Group createFromTemplate(long templateId, Group group) {
+        GroupTemplate template = this.templateService.get(templateId);
         group.setTemplate(template);
         return create(group);
     }
     public Group update(Group group) {
-        Optional<Group> data = findById(group.getGroupId());
+        Optional<Group> data = this.findById(group.getGroupId());
         if (data.isEmpty()) {
             log.info("Group with id {} does not exist", group.getGroupId());
             throw new RuntimeException("Group with id " + group.getGroupId() + " does not exist");
@@ -40,15 +43,15 @@ public class GroupService {
         dbGroup.setRequiredQualifications(group.getRequiredQualifications());
         dbGroup.setTemplate(group.getTemplate());
         dbGroup.setTotalPrice(group.getTotalPrice());
-        return repository.save(dbGroup);
+        return this.repository.save(dbGroup);
     }
 
     private void delete(Group group) {
-        repository.delete(group);
+        this.repository.delete(group);
     }
 
     public Group deleteById(long id) {
-        Optional<Group> data = findById(id);
+        Optional<Group> data = this.findById(id);
         if (data.isEmpty()) {
             log.info("Group with id {} does not exist", id);
             throw new RuntimeException("Group with id" + id + " does not exist");
@@ -59,11 +62,11 @@ public class GroupService {
     }
 
     private Optional<Group> findById(long id) {
-        return repository.findById(id);
+        return this.repository.findById(id);
     }
 
     public Group get(long id) {
-        Optional<Group> data = findById(id);
+        Optional<Group> data = this.findById(id);
         if (data.isEmpty()) {
             log.info("Group with id {} does not exist", id);
             throw new RuntimeException("Group with id " + id + " does not exist");
@@ -72,7 +75,7 @@ public class GroupService {
     }
 
     public List<Group> getAll() {
-        List<Group> all = repository.findAll();
+        List<Group> all = this.repository.findAll();
         if (all.isEmpty()) {
             log.info("GroupList is empty");
         }

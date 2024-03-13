@@ -15,9 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,11 +29,11 @@ public class GetAllCourseTemplatesIT extends AbstractIntegrationTest {
 
     @BeforeEach
     public void setUp() throws Exception{
-        qualificationRepository.save(Qualification.builder().name("Erste Hilfe Kurs").build());
-        repository.save(new CourseTemplate("EK", "Test",2,"test", List.of(Qualification.builder().name("Erste Hilfe Kurs").build())
-                ,20, 5, 2,List.of(CourseTemplatePrice.builder().price(BigDecimal.TEN).category("Mitglied").build()), 1000, 1.5f));
-        repository.save(new CourseTemplate("FK", "Test1",2,"test", List.of(Qualification.builder().name("Erste Hilfe Kurs").build())
-                ,20, 5, 2,List.of(CourseTemplatePrice.builder().price(BigDecimal.TEN).category("Mitglied").build()), 1000, 1.5f));
+        this.qualificationRepository.save(Qualification.builder().name("Erste Hilfe Kurs").build());
+        this.repository.save(new CourseTemplate("EK", "Test",2,"test", List.of(Qualification.builder().name("Erste Hilfe Kurs").build())
+                ,20, 5, 2,List.of(CourseTemplatePrice.builder().price(BigDecimal.TEN).category("Mitglied").build()), 1000, 90));
+        this.repository.save(new CourseTemplate("FK", "Test1",2,"test", List.of(Qualification.builder().name("Erste Hilfe Kurs").build())
+                ,20, 5, 2,List.of(CourseTemplatePrice.builder().price(BigDecimal.TEN).category("Mitglied").build()), 1000, 90));
 
     }
 

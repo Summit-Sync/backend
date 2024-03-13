@@ -1,6 +1,5 @@
 package com.summitsync.api.grouptemplate;
 
-import com.summitsync.api.grouptemplate.dto.GroupTemplatePostDTO;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +16,11 @@ public class GroupTemplateService {
     private final Logger log = LoggerFactory.getLogger(GroupTemplateService.class);
 
     public GroupTemplate createTemplate(GroupTemplate template) {
-        return repository.save(template);
+        return this.repository.save(template);
     }
 
     public GroupTemplate updateTemplate(GroupTemplate template) {
-        Optional<GroupTemplate> data = findById(template.getBaseTemplateId());
+        Optional<GroupTemplate> data = this.findById(template.getBaseTemplateId());
         if (data.isEmpty()) {
             log.info("GroupTemplate with id {} does not exist", template.getBaseTemplateId());
             throw new RuntimeException("GroupTemplate with id " + template.getBaseTemplateId() + " does not exist");
@@ -36,15 +35,15 @@ public class GroupTemplateService {
         dbTemplate.setPricePerTrainerPerHour(template.getPricePerTrainerPerHour());
         dbTemplate.setRequiredQualifications(template.getRequiredQualifications());
         dbTemplate.setTrainerKey(template.getTrainerKey());
-        return repository.save(dbTemplate);
+        return this.repository.save(dbTemplate);
     }
 
     private void deleteTemplate(GroupTemplate template) {
-        repository.delete(template);
+        this.repository.delete(template);
     }
 
     public GroupTemplate deleteTemplateById(long id) {
-        Optional<GroupTemplate> data = findById(id);
+        Optional<GroupTemplate> data = this.findById(id);
         if (data.isEmpty()) {
             log.info("GroupTemplate with id {} does not exist", id);
             throw new RuntimeException("GroupTemplate with id" + id + " does not exist");
@@ -55,11 +54,11 @@ public class GroupTemplateService {
     }
 
     private Optional<GroupTemplate> findById(long id) {
-        return repository.findById(id);
+        return this.repository.findById(id);
     }
 
     public GroupTemplate get(long id) {
-        Optional<GroupTemplate> data = findById(id);
+        Optional<GroupTemplate> data = this.findById(id);
         if (data.isEmpty()) {
             log.info("GroupTemplate with id {} does not exist", id);
             throw new RuntimeException("GroupTemplate with id " + id + " does not exist");
@@ -68,7 +67,7 @@ public class GroupTemplateService {
     }
 
     public List<GroupTemplate> getAll() {
-        List<GroupTemplate> all = repository.findAll();
+        List<GroupTemplate> all = this.repository.findAll();
         if (all.isEmpty()) {
             log.info("GroupTemplateList is empty");
         }

@@ -1,8 +1,5 @@
 package com.summitsync.api.integrationtest.grouptemplate;
 
-import com.summitsync.api.coursetemplate.CourseTemplate;
-import com.summitsync.api.coursetemplate.CourseTemplateRepository;
-import com.summitsync.api.coursetemplateprice.CourseTemplatePrice;
 import com.summitsync.api.grouptemplate.GroupTemplateRepository;
 import com.summitsync.api.integrationtest.testcontainers.AbstractIntegrationTest;
 import com.summitsync.api.qualification.Qualification;
@@ -13,27 +10,20 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
-
-import java.math.BigDecimal;
-import java.util.List;
-
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.Matchers.is;
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class CreateGroupTemplateTest extends AbstractIntegrationTest {
 
     @Autowired
-    private GroupTemplateRepository repository;
-    @Autowired
     private QualificationRepository qualificationRepository;
 
     @BeforeEach
     public void setUp() throws Exception{
-        qualificationRepository.save(Qualification.builder().name("Erste Hilfe Kurs").build());
+        this.qualificationRepository.save(Qualification.builder().name("Erste Hilfe Kurs").build());
     }
     @Test
     public void createGroupTemplateHappyPath() throws Exception{
@@ -56,7 +46,8 @@ public class CreateGroupTemplateTest extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("id",greaterThanOrEqualTo(1)));
-
+                .andExpect(jsonPath("id",greaterThanOrEqualTo(1)))
+                .andExpect(jsonPath("acronym").value("GK"))
+                .andExpect(jsonPath("title").value("test"));
     }
 }

@@ -12,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateCourseTemplateDto {
-    private long id;
     private String acronym;
     private String title;
     private int duration;
@@ -23,5 +22,5 @@ public class UpdateCourseTemplateDto {
     private int numberOfWaitList;
     private int numberOfTrainers;
     private List<CourseTemplatePrice>priceList;
-    private float numberOfHoursPerDate;
+    private int numberOfMinutesPerDate;
 }

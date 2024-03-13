@@ -29,8 +29,8 @@ public class UpdateGroupTemplateTest extends AbstractIntegrationTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        qualificationRepository.save(Qualification.builder().name("Erste Hilfe Kurs").build());
-        repository.save(new GroupTemplate(new BigDecimal("1.5"), 2, "test title", 5, "test description", List.of(Qualification.builder().name("Erste Hilfe Kurs").build()), new BigDecimal("12.5")));
+        this.qualificationRepository.save(Qualification.builder().name("Erste Hilfe Kurs").build());
+        this.repository.save(new GroupTemplate(new BigDecimal("1.5"), 2, "test title", 5, "test description", List.of(Qualification.builder().name("Erste Hilfe Kurs").build()), new BigDecimal("12.5")));
     }
 
     @Test

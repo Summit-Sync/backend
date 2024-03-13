@@ -3,7 +3,6 @@ package com.summitsync.api.coursetemplate.dto;
 import com.summitsync.api.coursetemplateprice.CourseTemplatePrice;
 import com.summitsync.api.qualification.Qualification;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -23,5 +22,5 @@ public class PostCourseTemplateDto {
     private int numberOfWaitList;
     private int numberOfTrainers;
     private List<CourseTemplatePrice>priceList;
-    private float numberOfHoursPerDate;
+    private int numberOfMinutesPerDate;
 }

@@ -26,5 +26,5 @@ public class CourseTemplateDto {
     private int numberOfWaitList;
     private int numberOfTrainers;
     private List<CourseTemplatePrice> priceList;
-    private float numberOfHoursPerDate;
+    private int numberOfMinutesPerDate;
 }

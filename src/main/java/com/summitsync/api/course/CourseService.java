@@ -1,7 +1,7 @@
 package com.summitsync.api.course;
 
 import com.summitsync.api.coursetemplate.CourseTemplate;
-import com.summitsync.api.coursetemplate.CourseTemplateRepository;
+import com.summitsync.api.coursetemplate.CourseTemplateService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -16,16 +16,18 @@ public class CourseService {
 
     private final Logger log = LoggerFactory.getLogger(CourseService.class);
     private final CourseRepository repository;
+    private final CourseTemplateService templateService;
 
-    public Course create(Course course) { return repository.save(course); }
+    public Course create(Course course) { return this.repository.save(course); }
 
-    public Course createFromTemplate(CourseTemplate template, Course course) {
+    public Course createFromTemplate(long templateId, Course course) {
+        CourseTemplate template = this.templateService.get(templateId);
         course.setTemplate(template);
         return create(course);
     }
 
     public Course update(Course course, Long id) {
-        Optional<Course> data = findById(id);
+        Optional<Course> data = this.findById(id);
         if(data.isEmpty()) {
             log.info("Course with id {} does not exist", id);
             throw new RuntimeException("Course with id " + id + " does not exist");
@@ -50,29 +52,29 @@ public class CourseService {
         dbCourse.setParticipants(course.getParticipants());
         dbCourse.setRequiredQualifications(course.getRequiredQualifications());
         dbCourse.setNumberOfTrainers(course.getNumberOfTrainers());
-        return repository.save(dbCourse);
+        return this.repository.save(dbCourse);
     }
 
     public Course deleteById(long id) {
-        if (findById(id).isEmpty()) {
+        if (this.findById(id).isEmpty()) {
             log.info("Course with id {} does not exist", id);
             throw new RuntimeException("Course with id " + id + " does not exist");
         }
-        Course course = findById(id).get();
-        repository.deleteById(id);
+        Course course = this.findById(id).get();
+        this.repository.deleteById(id);
         return course;
     }
 
     public Course get(long id) {
-        if (findById(id).isEmpty()) {
+        if (this.findById(id).isEmpty()) {
             log.info("Course with id {} does not exist", id);
             throw new RuntimeException("Course with id " + id + " does not exist");
         }
-        return findById(id).get();
+        return this.findById(id).get();
     }
 
     public List<Course> getAll() {
-        List<Course> all = repository.findAll();
+        List<Course> all = this.repository.findAll();
         if (all.isEmpty()) {
             log.info("CourseList is empty");
         }
@@ -80,6 +82,6 @@ public class CourseService {
     }
 
     private Optional<Course> findById(Long id) {
-        return repository.findById(id);
+        return this.repository.findById(id);
     }
 }
