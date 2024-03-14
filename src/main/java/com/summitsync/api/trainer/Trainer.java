@@ -6,7 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -19,5 +22,5 @@ public class Trainer {
     private long trainerId;
     private String subjectId;
     @ManyToMany(fetch = FetchType.LAZY)
-    private List<Qualification> qualifications;
+    private Set<Qualification> qualifications = new HashSet<>();
 }

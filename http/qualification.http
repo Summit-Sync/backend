@@ -1,0 +1,8 @@
+### create a qualification
+POST http://localhost:8080/api/v1/qualification
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+{
+  "name": "Zweite Hilfe"
+}

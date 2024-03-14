@@ -1,0 +1,49 @@
+@trainerName = ttrainer99912345
+@trainerId = 1
+
+### Create trainer
+POST http://localhost:8080/api/v1/trainer
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+{
+  "username": "{{trainerName}}",
+  "firstName": "Tim",
+  "lastName": "Trainer",
+  "password": "123",
+  "phone": "012345678",
+  "email": "ttrainer+{{trainerName}}@climbing.sky"
+}
+
+### Update a trainer
+PUT http://localhost:8080/api/v1/trainer/{{trainerId}}
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+{
+  "username": "{{trainerName}}",
+  "firstName": "Tim (updated)",
+  "lastName": "Trainer (updated)",
+  "password": "123",
+  "phone": "012345678",
+  "email": "ttrainer+{{trainerName}}@climbing.sky"
+}
+
+### Delete a Trainer
+DELETE http://localhost:8080/api/v1/trainer/{{trainerId}}
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### Get trainer with id
+GET http://localhost:8080/api/v1/trainer/{{trainerId}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### Add qualification to trainer
+@qualificationId =1
+POST http://localhost:8080/api/v1/trainer/{{trainerId}}/qualification/{{qualificationId}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### Delete qualification from trainer
+DELETE http://localhost:8080/api/v1/trainer/{{trainerId}}/qualification/{{qualificationId}}
+Authorization: Bearer {{$auth.token("auth-id")}}
