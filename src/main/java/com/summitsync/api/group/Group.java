@@ -24,7 +24,7 @@ public class Group {
     private long groupId;
     @OneToMany(fetch = FetchType.LAZY)
     private List<EventPeriod> period;
-    private int numberOfParticipants;
+    private Integer numberOfParticipants;
     @ManyToOne(fetch = FetchType.LAZY)
     private Location location;
     private String notes;

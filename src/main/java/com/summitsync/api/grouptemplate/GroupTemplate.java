@@ -21,7 +21,6 @@ public class GroupTemplate extends BaseTemplate {
     private BigDecimal pricePerTrainerPerHour;
     private int trainerKey;
     private String title;
-    private String acronym;
     private int numberOfDates;
     private String description;
     @ManyToMany(fetch = FetchType.LAZY)
