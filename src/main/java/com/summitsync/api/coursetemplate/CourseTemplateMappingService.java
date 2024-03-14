@@ -6,7 +6,6 @@ import com.summitsync.api.coursetemplate.dto.UpdateCourseTemplateDto;
 import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.qualification.QualificationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,11 +18,11 @@ public class CourseTemplateMappingService {
     private final QualificationService qualificationService;
 
     public CourseTemplate mapPostCourseTemplateDtoToCourseTemplate(PostCourseTemplateDto dto){
-        List<Qualification>qualificationList=new ArrayList<>();
+        List<Qualification>qualificationList = new ArrayList<>();
         for(Qualification qualification : dto.getQualificationList()){
-            qualificationList.add(qualificationService.findById(qualification.getQualificationId()));
+            qualificationList.add(this.qualificationService.findById(qualification.getQualificationId()));
         }
-        return new CourseTemplate(dto.getAcronym(), dto.getTitle(),dto.getNumberOfDates(),dto.getDescription(),qualificationList,dto.getNumberOfParticipants(), dto.getNumberOfWaitList(), dto.getNumberOfTrainers(),dto.getPriceList(),dto.getDuration());
+        return new CourseTemplate(dto.getAcronym(), dto.getTitle(),dto.getNumberOfDates(),dto.getDescription(),qualificationList,dto.getNumberOfParticipants(), dto.getNumberOfWaitList(), dto.getNumberOfTrainers(),dto.getPriceList(),dto.getDuration(), dto.getNumberOfMinutesPerDate());
     }
 
     public CourseTemplateDto mapCourseTemplateToCourseTemplateDto(CourseTemplate data){
@@ -42,11 +41,20 @@ public class CourseTemplateMappingService {
     }
 
     public CourseTemplate mapUpdateCourseTemplateDtoToCourseTemplate(UpdateCourseTemplateDto dto){
-        List<Qualification>qualificationList=new ArrayList<>();
+        List<Qualification>qualificationList = new ArrayList<>();
         for(Qualification qualification : dto.getQualificationList()){
-            qualificationList.add(qualificationService.findById(qualification.getQualificationId()));
+            qualificationList.add(this.qualificationService.findById(qualification.getQualificationId()));
         }
-        return new CourseTemplate(dto.getId(),dto.getAcronym(), dto.getTitle(),dto.getNumberOfDates(),dto.getDescription(),qualificationList,dto.getNumberOfParticipants(), dto.getNumberOfWaitList(), dto.getNumberOfTrainers(),dto.getPriceList(), dto.getDuration());
+        return new CourseTemplate(dto.getAcronym(), dto.getTitle(),dto.getNumberOfDates(),dto.getDescription(),qualificationList,dto.getNumberOfParticipants(), dto.getNumberOfWaitList(), dto.getNumberOfTrainers(),dto.getPriceList(), dto.getDuration(), dto.getNumberOfMinutesPerDate());
     }
 
+    public CourseTemplate mapGetCourseTemplateDtoToCourseTemplate(CourseTemplateDto dto) {
+        List<Qualification>qualificationList = new ArrayList<>();
+        for(Qualification qualification : dto.getQualificationList()){
+            qualificationList.add(this.qualificationService.findById(qualification.getQualificationId()));
+        }
+        CourseTemplate newTemplate = new CourseTemplate(dto.getAcronym(), dto.getTitle(),dto.getNumberOfDates(),dto.getDescription(),qualificationList,dto.getNumberOfParticipants(), dto.getNumberOfWaitList(), dto.getNumberOfTrainers(),dto.getPriceList(),dto.getDuration(), dto.getNumberOfMinutesPerDate());
+        newTemplate.setBaseTemplateId(dto.getId());
+        return newTemplate;
+    }
 }
