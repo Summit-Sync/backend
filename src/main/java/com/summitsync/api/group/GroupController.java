@@ -21,7 +21,7 @@ public class GroupController {
 
     @PostMapping
     public ResponseEntity<GroupGetDTO> createGroupFromTemplate(@RequestBody CreateGroupWrapperDTO wrapper) {
-        Group group = this.service.createFromTemplate(wrapper.getTemplateId(), this.mapper.mapGroupGetDTOToGroup(wrapper.getGroup()));
+        Group group = this.service.createFromTemplate(wrapper.getTemplateId(), this.mapper.mapGroupPostDTOToGroup(wrapper.getGroup()));
         return new ResponseEntity<>(this.mapper.mapGroupToGroupGetDto(group), HttpStatus.OK);
     }
 

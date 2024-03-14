@@ -6,6 +6,7 @@ import com.summitsync.api.qualification.Qualification;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -15,13 +16,13 @@ public class CourseTemplate extends BaseTemplate {
     private int numberOfWaitList;
     private int numberOfTrainers;//>0
     @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    private List<CourseTemplatePrice> priceList;//>0
+    private Set<CourseTemplatePrice> priceList;//>0
 
     public CourseTemplate() {
         super();
     }
 
-    public CourseTemplate(String acronym, String title,int numberOfDates, String description, List<Qualification> requiredQualifications, int numberOfParticipants, int numberOfWaitList, int numberOfTrainers, List<CourseTemplatePrice> priceList, int duration, int numberOfMinutesPerDate) {
+    public CourseTemplate(String acronym, String title,int numberOfDates, String description, Set<Qualification> requiredQualifications, int numberOfParticipants, int numberOfWaitList, int numberOfTrainers, Set<CourseTemplatePrice> priceList, int duration, int numberOfMinutesPerDate) {
         super(acronym, title, numberOfDates, description, requiredQualifications, duration, numberOfMinutesPerDate);
         this.numberOfParticipants = numberOfParticipants;
         this.numberOfWaitList = numberOfWaitList;

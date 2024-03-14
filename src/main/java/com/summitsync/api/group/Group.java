@@ -1,6 +1,7 @@
 package com.summitsync.api.group;
 
 import com.summitsync.api.contact.Contact;
+import com.summitsync.api.date.EventDate;
 import com.summitsync.api.eventperiod.EventPeriod;
 import com.summitsync.api.grouptemplate.GroupTemplate;
 import com.summitsync.api.location.Location;
@@ -23,7 +24,7 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long groupId;
     @OneToMany(fetch = FetchType.LAZY)
-    private List<EventPeriod> period;
+    private List<EventDate> period;
     private Integer numberOfParticipants;
     @ManyToOne(fetch = FetchType.LAZY)
     private Location location;

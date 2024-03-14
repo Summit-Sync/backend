@@ -63,7 +63,7 @@ public class CreateCourseTemplateTest extends AbstractIntegrationTest {
                     "duration":100000
                 }
                 """;
-        final var contentAsString=this.mockMvc.perform(post("/api/v1/coursetemplate")
+        final var contentAsString=this.mockMvc.perform(post("/api/v1/template/course")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content))
                 .andExpect(status().is2xxSuccessful())
@@ -97,7 +97,7 @@ public class CreateCourseTemplateTest extends AbstractIntegrationTest {
                     "duration":10000
                 }
                 """;
-        final var contentAsString=this.mockMvc.perform(post("/api/v1/coursetemplate")
+        this.mockMvc.perform(post("/api/v1/template/course")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andExpect(status().is4xxClientError());

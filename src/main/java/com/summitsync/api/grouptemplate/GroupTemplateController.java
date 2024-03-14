@@ -2,6 +2,7 @@ package com.summitsync.api.grouptemplate;
 
 import com.summitsync.api.grouptemplate.dto.GroupTemplateGetDTO;
 import com.summitsync.api.grouptemplate.dto.GroupTemplatePostDTO;
+import com.summitsync.api.qualification.QualificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,50 +10,61 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/grouptemplate")
+@RequestMapping("/api/v1/template/group")
 @RequiredArgsConstructor
 public class GroupTemplateController {
 
-    private final GroupTemplateService service;
-    private final GroupTemplateMapper mapper;
+    private final GroupTemplateService groupTemplateService;
+    private final GroupTemplateMapper groupTemplateMapper;
+    private final QualificationService qualificationService;
     @PostMapping
-    public ResponseEntity<GroupTemplateGetDTO> createTemplate(@RequestBody GroupTemplatePostDTO dto) {
-        GroupTemplate templateToCreate = this.mapper.mapGroupPostDtoToGroupTemplate(dto);
-        GroupTemplate createdTemplate = this.service.createTemplate(templateToCreate);
-        GroupTemplateGetDTO response = this.mapper.mapGroupTemplateToGroupTemplateGetDTO(createdTemplate);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    public GroupTemplateGetDTO createGroupTemplate(@RequestBody GroupTemplatePostDTO dto) {
+        GroupTemplate templateToCreate = this.groupTemplateMapper.mapGroupPostDtoToGroupTemplate(dto);
+        GroupTemplate createdTemplate = this.groupTemplateService.createTemplate(templateToCreate);
+
+        return this.groupTemplateMapper.mapGroupTemplateToGroupTemplateGetDTO(createdTemplate);
     }
     @DeleteMapping("/{id}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void deleteTemplate(@PathVariable long id) {
-        this.service.deleteTemplateById(id);
+        var groupTemplate = this.groupTemplateService.findById(id);
+        this.groupTemplateService.deleteTemplate(groupTemplate);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GroupTemplateGetDTO> updateTemplate(@RequestBody GroupTemplatePostDTO dto, @PathVariable long id) {
-        GroupTemplate templateToUpdate = this.mapper.mapGroupPostDtoToGroupTemplate(dto);
+    public GroupTemplateGetDTO updateTemplate(@RequestBody GroupTemplatePostDTO dto, @PathVariable long id) {
+        GroupTemplate templateToUpdate = this.groupTemplateMapper.mapGroupPostDtoToGroupTemplate(dto);
         templateToUpdate.setBaseTemplateId(id);
-        GroupTemplate dbTemplate = this.service.updateTemplate(templateToUpdate);
-        GroupTemplateGetDTO response = this.mapper.mapGroupTemplateToGroupTemplateGetDTO(dbTemplate);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        GroupTemplate dbTemplate = this.groupTemplateService.updateTemplate(templateToUpdate);
+        return this.groupTemplateMapper.mapGroupTemplateToGroupTemplateGetDTO(dbTemplate);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GroupTemplateGetDTO> getTemplateById(@PathVariable long id) {
-        GroupTemplate template = this.service.get(id);
-        GroupTemplateGetDTO response = this.mapper.mapGroupTemplateToGroupTemplateGetDTO(template);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    public GroupTemplateGetDTO getTemplateById(@PathVariable long id) {
+        GroupTemplate template = this.groupTemplateService.findById(id);
+        return this.groupTemplateMapper.mapGroupTemplateToGroupTemplateGetDTO(template);
     }
 
     @GetMapping
-    public ResponseEntity<List<GroupTemplateGetDTO>> getAllTemplates() {
-        List<GroupTemplate> all = this.service.getAll();
-        List<GroupTemplateGetDTO> DTOs = new ArrayList<>();
-        for (GroupTemplate template : all) {
-            DTOs.add(this.mapper.mapGroupTemplateToGroupTemplateGetDTO(template));
-        }
-        return new ResponseEntity<>(DTOs, HttpStatus.OK);
+    public Set<GroupTemplateGetDTO> getAllTemplates() {
+        List<GroupTemplate> all = this.groupTemplateService.getAll();
+        return all
+                .stream()
+                .map(this.groupTemplateMapper::mapGroupTemplateToGroupTemplateGetDTO)
+                .collect(Collectors.toSet());
+    }
+
+    @PutMapping("/{id}/qualfication/{qualificationId}")
+    public GroupTemplateGetDTO addQualificationToGetTemplate(@PathVariable long id, @PathVariable long qualificationId) {
+        var groupTemplate = this.groupTemplateService.findById(id);
+        var qualification = this.qualificationService.findById(qualificationId);
+
+        var updatedGroupTemplate = this.groupTemplateService.addQualificationToGroupTemplate(groupTemplate, qualification);
+
+        return this.groupTemplateMapper.mapGroupTemplateToGroupTemplateGetDTO(updatedGroupTemplate);
     }
 }

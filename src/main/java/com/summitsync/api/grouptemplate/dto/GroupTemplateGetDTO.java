@@ -1,13 +1,13 @@
 package com.summitsync.api.grouptemplate.dto;
 
-import com.summitsync.api.qualification.Qualification;
+import com.summitsync.api.qualification.dto.QualificationDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -20,5 +20,5 @@ public class GroupTemplateGetDTO {
     private int trainerKey;
     private BigDecimal pricePerTrainerPerHour;
     private String description;
-    private List<Qualification> requiredQualification;
+    private Set<QualificationDto> requiredQualification;
 }

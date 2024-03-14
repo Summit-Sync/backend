@@ -21,7 +21,7 @@ public class CourseService {
     public Course create(Course course) { return this.repository.save(course); }
 
     public Course createFromTemplate(long templateId, Course course) {
-        CourseTemplate template = this.templateService.get(templateId);
+        CourseTemplate template = this.templateService.findById(templateId);
         course.setTemplate(template);
         return create(course);
     }

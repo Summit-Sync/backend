@@ -1,5 +1,8 @@
 package com.summitsync.api.coursetemplate;
 
+import com.summitsync.api.course.Course;
+import com.summitsync.api.coursetemplateprice.CourseTemplatePrice;
+import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
 import com.summitsync.api.qualification.Qualification;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -7,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 @Service
@@ -20,28 +24,27 @@ public class CourseTemplateService {
         return this.repository.save(newTemplate);
     }
     public CourseTemplate updateCourse(CourseTemplate updatedTemplate, Long id){
-        Optional<CourseTemplate>data = this.findById(id);
-        if(data.isEmpty()){
-            log.info("CourseTemplate with id {} does not exist",id);
-            throw new RuntimeException("CourseTemplate with id "+id+" does not exist");
-        }
-        CourseTemplate template = data.get();
-        template.setNumberOfParticipants(updatedTemplate.getNumberOfParticipants());
-        template.setPriceList(updatedTemplate.getPriceList());
-        template.setNumberOfTrainers(updatedTemplate.getNumberOfTrainers());
-        template.setNumberOfWaitList(updatedTemplate.getNumberOfWaitList());
-        template.setAcronym(updatedTemplate.getAcronym());
-        template.setDescription(updatedTemplate.getDescription());
-        template.setNumberOfDates(updatedTemplate.getNumberOfDates());
-        template.setTitle(updatedTemplate.getTitle());
-        template.setDuration(updatedTemplate.getDuration());
-        List<Qualification>qualificationList=new ArrayList<>();
-        //TODO add qualifications to List
-        template.setRequiredQualifications(qualificationList);
-        return this.repository.save(template);
+        var courseTemplate = this.findById(id);
+
+        courseTemplate.setNumberOfParticipants(updatedTemplate.getNumberOfParticipants());
+        courseTemplate.setNumberOfTrainers(updatedTemplate.getNumberOfTrainers());
+        courseTemplate.setNumberOfWaitList(updatedTemplate.getNumberOfWaitList());
+        courseTemplate.setAcronym(updatedTemplate.getAcronym());
+        courseTemplate.setDescription(updatedTemplate.getDescription());
+        courseTemplate.setNumberOfDates(updatedTemplate.getNumberOfDates());
+        courseTemplate.setTitle(updatedTemplate.getTitle());
+        courseTemplate.setDuration(updatedTemplate.getDuration());
+
+        return this.repository.save(courseTemplate);
     }
-    public Optional<CourseTemplate>findById(long id){
-        return this.repository.findById(id);
+    public CourseTemplate findById(long id){
+        var courseTemplate = this.repository.findById(id);
+
+        if (courseTemplate.isEmpty()) {
+            throw new ResourceNotFoundException("CourseTemplate on id " + id + "not found");
+        }
+
+        return courseTemplate.get();
     }
 
     public void deleteById(Long id){
@@ -52,16 +55,23 @@ public class CourseTemplateService {
         this.repository.deleteById(id);
     }
 
-    public CourseTemplate get(long id) {
-        Optional<CourseTemplate>data = this.findById(id);
-        if(data.isEmpty()){
-            log.info("CourseTemplate with id {} does not exist",id);
-            throw new RuntimeException("CourseTemplate with id "+id+" does not exist");
-        }
-        return data.get();
-    }
-
     public List<CourseTemplate> findAll(){
         return this.repository.findAll();
+    }
+
+    public CourseTemplate addQualificationToCourseTemplate(CourseTemplate courseTemplate, Qualification qualification) {
+        var qualifications = courseTemplate.getRequiredQualifications();
+        qualifications.add(qualification);
+
+        courseTemplate.setRequiredQualifications(qualifications);
+        return this.repository.save(courseTemplate);
+    }
+
+    public CourseTemplate addPriceToCourseTemplate(CourseTemplate courseTemplate, CourseTemplatePrice courseTemplatePrice) {
+        var priceList = courseTemplate.getPriceList();
+        priceList.add(courseTemplatePrice);
+
+        courseTemplate.setPriceList(priceList);
+        return this.repository.save(courseTemplate);
     }
 }
