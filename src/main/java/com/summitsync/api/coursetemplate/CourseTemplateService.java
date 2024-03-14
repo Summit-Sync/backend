@@ -13,19 +13,19 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CourseTemplateService {
 
-    private final Logger log= LoggerFactory.getLogger(CourseTemplateService.class);
+    private final Logger log = LoggerFactory.getLogger(CourseTemplateService.class);
     private final CourseTemplateRepository repository;
 
     public CourseTemplate createCourse(CourseTemplate newTemplate){
-        return repository.save(newTemplate);
+        return this.repository.save(newTemplate);
     }
     public CourseTemplate updateCourse(CourseTemplate updatedTemplate, Long id){
-        Optional<CourseTemplate>data=findById(id);
+        Optional<CourseTemplate>data = this.findById(id);
         if(data.isEmpty()){
             log.info("CourseTemplate with id {} does not exist",id);
             throw new RuntimeException("CourseTemplate with id "+id+" does not exist");
         }
-        CourseTemplate template=data.get();
+        CourseTemplate template = data.get();
         template.setNumberOfParticipants(updatedTemplate.getNumberOfParticipants());
         template.setPriceList(updatedTemplate.getPriceList());
         template.setNumberOfTrainers(updatedTemplate.getNumberOfTrainers());
@@ -38,21 +38,30 @@ public class CourseTemplateService {
         List<Qualification>qualificationList=new ArrayList<>();
         //TODO add qualifications to List
         template.setRequiredQualifications(qualificationList);
-        return repository.save(template);
+        return this.repository.save(template);
     }
     public Optional<CourseTemplate>findById(long id){
-        return repository.findById(id);
+        return this.repository.findById(id);
     }
 
     public void deleteById(Long id){
-        if(repository.findById(id).isEmpty()){
+        if(this.repository.findById(id).isEmpty()){
             log.info("CourseTemplate with id {} does not exist",id);
             throw new RuntimeException("CourseTemplate with id "+id+" does not exist");
         }
-        repository.deleteById(id);
+        this.repository.deleteById(id);
+    }
+
+    public CourseTemplate get(long id) {
+        Optional<CourseTemplate>data = this.findById(id);
+        if(data.isEmpty()){
+            log.info("CourseTemplate with id {} does not exist",id);
+            throw new RuntimeException("CourseTemplate with id "+id+" does not exist");
+        }
+        return data.get();
     }
 
     public List<CourseTemplate> findAll(){
-        return repository.findAll();
+        return this.repository.findAll();
     }
 }
