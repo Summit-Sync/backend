@@ -47,5 +47,4 @@ public class QualificationService {
 
         return this.saveQualification(savedQualification);
     }
-
 }
