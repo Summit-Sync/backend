@@ -19,7 +19,7 @@ import java.util.List;
 public class CourseTemplatePrice {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long courseTemplateId;
+    private long courseTemplatePriceId;
     private BigDecimal price;
     private String category;
 }

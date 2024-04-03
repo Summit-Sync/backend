@@ -5,7 +5,6 @@ import com.summitsync.api.coursetemplateprice.CourseTemplatePrice;
 import com.summitsync.api.qualification.Qualification;
 import jakarta.persistence.*;
 import lombok.Data;
-import java.util.List;
 import java.util.Set;
 
 @Entity

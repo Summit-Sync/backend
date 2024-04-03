@@ -67,33 +67,41 @@ public class CourseTemplateController {
     }
 
     @PostMapping("/{courseTemplateId}/qualification/{qualificationId}")
-    public CourseTemplateDto addQualificationToCourse(@PathVariable long courseTemplateId, @PathVariable long qualificationId) {
+    public CourseTemplateDto addQualificationToCourseTemplate(@PathVariable long courseTemplateId, @PathVariable long qualificationId) {
         var courseTemplate = this.service.findById(courseTemplateId);
         var qualification = this.qualificationService.findById(qualificationId);
-        // TODO: don't return optional from service
         var updatedCourseTemplate = this.service.addQualificationToCourseTemplate(courseTemplate, qualification);
 
         return this.courseTemplateMappingService.mapCourseTemplateToCourseTemplateDto(updatedCourseTemplate);
     }
 
     @DeleteMapping("/{courseTemplateId}/qualification/{qualificationId}")
-    public CourseTemplateDto deleteQualificationFromCourse(@PathVariable long courseTemplateId, @PathVariable long qualificationId) {
-        return null;
+    public CourseTemplateDto deleteQualificationFromCourseTemplate(@PathVariable long courseTemplateId, @PathVariable long qualificationId) {
+        var courseTemplate = this.service.findById(courseTemplateId);
+        var qualification = this.qualificationService.findById(qualificationId);
+        var updatedCourseTemplate = this.service.removeQualificationFromCourseTemplate(courseTemplate, qualification);
+
+        return this.courseTemplateMappingService.mapCourseTemplateToCourseTemplateDto(updatedCourseTemplate);
     }
 
     @PostMapping("/{courseTemplateId}/price/{courseTemplatePriceId}")
-    public CourseTemplateDto addPriceToCourse(@PathVariable long courseTemplateId, @PathVariable long courseTemplatePriceId) {
+    public CourseTemplateDto addPriceToCourseTemplate(@PathVariable long courseTemplateId, @PathVariable long courseTemplatePriceId) {
         var courseTemplate = this.service.findById(courseTemplateId);
         var courseTemplatePrice = this.courseTemplatePriceService.findById(courseTemplatePriceId);
 
         var updatedCourseTemplate = this.service.addPriceToCourseTemplate(courseTemplate, courseTemplatePrice);
 
-        return this.courseTemplateMappingService.mapCourseTemplateToCourseTemplateDto(courseTemplate);
+        return this.courseTemplateMappingService.mapCourseTemplateToCourseTemplateDto(updatedCourseTemplate);
     }
 
     @DeleteMapping("/{courseTemplateId}/price/{courseTemplatePriceId}")
-    public CourseTemplateDto deletePriceFromCourse(@PathVariable long courseTemplateId, @PathVariable long courseTemplatePriceId) {
-        return null;
+    public CourseTemplateDto deletePriceFromCourseTemplate(@PathVariable long courseTemplateId, @PathVariable long courseTemplatePriceId) {
+        var courseTemplate = this.service.findById(courseTemplateId);
+        var courseTemplatePrice = this.courseTemplatePriceService.findById(courseTemplatePriceId);
+
+        var updatedCourseTemplate = this.service.removePriceFromCourseTemplate(courseTemplate, courseTemplatePrice);
+
+        return this.courseTemplateMappingService.mapCourseTemplateToCourseTemplateDto(updatedCourseTemplate);
     }
 
     private ResponseEntity<CourseTemplateDto> checkValidity(CourseTemplate dto) {
