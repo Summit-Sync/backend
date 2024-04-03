@@ -1,5 +1,20 @@
 package com.summitsync.api.status;
 
-public enum Status {
-    ACCEPTED,DECLINED,IN_APPLICATION_PROCESS
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@NoArgsConstructor
+@Data
+@AllArgsConstructor
+@Builder
+@Table(name = "SS_Status")
+public class Status {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    long statusId;
+    String text;
 }
