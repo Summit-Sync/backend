@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -18,10 +19,9 @@ public class Participant {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long participantId;
-    private String name;
-    private String firstName;
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private ParticipantStatus status;
+    private String subjectId;
     @ManyToMany(fetch = FetchType.LAZY)
-    private List<Course> courses;
+    private Set<Course> courses;
+    @OneToOne(fetch = FetchType.LAZY)
+    private Status status;
 }
