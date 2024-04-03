@@ -18,5 +18,6 @@ public class EventDate {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long eventDateId;
-    private LocalDateTime date;
+    private LocalDateTime startTime;
+    private int durationInMinutes;
 }
