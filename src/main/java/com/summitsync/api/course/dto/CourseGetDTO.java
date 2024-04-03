@@ -2,9 +2,11 @@ package com.summitsync.api.course.dto;
 
 import com.summitsync.api.coursetemplate.CourseTemplate;
 import com.summitsync.api.date.EventDate;
+import com.summitsync.api.date.dto.EventDateGetDto;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.participant.Participant;
 import com.summitsync.api.qualification.Qualification;
+import com.summitsync.api.qualification.dto.QualificationDto;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -16,10 +18,11 @@ public class CourseGetDTO {
     private CourseTemplate template;
     private String description;
     private String title;
-    private List<Qualification> requiredQualifications;
+    private List<QualificationDto> requiredQualifications;
+    // TODO: Replace Participant with ParticipantDTO when it exists
     private List<Participant> participants;
     private String notes;
-    private List<EventDate> dates;
+    private List<EventDateGetDto> dates;
     private BigDecimal actualPrice;
     private Location location;
 }

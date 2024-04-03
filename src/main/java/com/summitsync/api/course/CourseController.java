@@ -53,4 +53,15 @@ public class CourseController {
         CourseGetDTO response = this.mapper.mapCourseToCourseGetDTO(dbCourse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PutMapping("/{id}/qualification/{qualificationId}")
+    public ResponseEntity<CourseGetDTO> addQualificationToCourse(@PathVariable long id, @PathVariable long qualificationId) {
+
+    }
+
+    @DeleteMapping("/{id}/qualification/{qualificationId}")
+    public ResponseEntity<CourseGetDTO> removeQualificationFromCourse(@PathVariable long id, @PathVariable long qualificationId) {
+
+    }
+
 }
