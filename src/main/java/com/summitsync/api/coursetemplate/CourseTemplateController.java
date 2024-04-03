@@ -2,7 +2,8 @@ package com.summitsync.api.coursetemplate;
 
 import com.summitsync.api.coursetemplate.dto.CourseTemplateDto;
 import com.summitsync.api.coursetemplate.dto.PostCourseTemplateDto;
-import com.summitsync.api.coursetemplate.dto.UpdateCourseTemplateDto;
+import com.summitsync.api.coursetemplateprice.CourseTemplatePriceService;
+import com.summitsync.api.qualification.QualificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/coursetemplate")
+@RequestMapping("/api/v1/template/course")
 @RequiredArgsConstructor
 public class CourseTemplateController {
 
     private final CourseTemplateService service;
     private final CourseTemplateMappingService courseTemplateMappingService;
+    private final QualificationService qualificationService;
+    private final CourseTemplatePriceService courseTemplatePriceService;
 
     @PostMapping
     public ResponseEntity<CourseTemplateDto>createCourseTemplate(@RequestBody PostCourseTemplateDto dto){
@@ -36,8 +39,8 @@ public class CourseTemplateController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CourseTemplateDto>updateCourseTemplate(@RequestBody UpdateCourseTemplateDto dto, @PathVariable final Long id){
-        CourseTemplate template = this.courseTemplateMappingService.mapUpdateCourseTemplateDtoToCourseTemplate(dto);
+    public ResponseEntity<CourseTemplateDto>updateCourseTemplate(@RequestBody PostCourseTemplateDto dto, @PathVariable final Long id){
+        CourseTemplate template = this.courseTemplateMappingService.mapPostCourseTemplateDtoToCourseTemplate(dto);
         ResponseEntity<CourseTemplateDto> BAD_REQUEST = this.checkValidity(template);
         if (BAD_REQUEST != null){
             return BAD_REQUEST;
@@ -61,6 +64,36 @@ public class CourseTemplateController {
             response.add(this.courseTemplateMappingService.mapCourseTemplateToCourseTemplateDto(courseTemplate));
         }
         return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    @PostMapping("/{courseTemplateId}/qualification/{qualificationId}")
+    public CourseTemplateDto addQualificationToCourse(@PathVariable long courseTemplateId, @PathVariable long qualificationId) {
+        var courseTemplate = this.service.findById(courseTemplateId);
+        var qualification = this.qualificationService.findById(qualificationId);
+        // TODO: don't return optional from service
+        var updatedCourseTemplate = this.service.addQualificationToCourseTemplate(courseTemplate, qualification);
+
+        return this.courseTemplateMappingService.mapCourseTemplateToCourseTemplateDto(updatedCourseTemplate);
+    }
+
+    @DeleteMapping("/{courseTemplateId}/qualification/{qualificationId}")
+    public CourseTemplateDto deleteQualificationFromCourse(@PathVariable long courseTemplateId, @PathVariable long qualificationId) {
+        return null;
+    }
+
+    @PostMapping("/{courseTemplateId}/price/{courseTemplatePriceId}")
+    public CourseTemplateDto addPriceToCourse(@PathVariable long courseTemplateId, @PathVariable long courseTemplatePriceId) {
+        var courseTemplate = this.service.findById(courseTemplateId);
+        var courseTemplatePrice = this.courseTemplatePriceService.findById(courseTemplatePriceId);
+
+        var updatedCourseTemplate = this.service.addPriceToCourseTemplate(courseTemplate, courseTemplatePrice);
+
+        return this.courseTemplateMappingService.mapCourseTemplateToCourseTemplateDto(courseTemplate);
+    }
+
+    @DeleteMapping("/{courseTemplateId}/price/{courseTemplatePriceId}")
+    public CourseTemplateDto deletePriceFromCourse(@PathVariable long courseTemplateId, @PathVariable long courseTemplatePriceId) {
+        return null;
     }
 
     private ResponseEntity<CourseTemplateDto> checkValidity(CourseTemplate dto) {

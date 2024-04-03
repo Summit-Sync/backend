@@ -17,10 +17,8 @@ public class PostCourseTemplateDto {
     private int duration;
     private int numberOfDates;
     private String description;
-    private List<Qualification>qualificationList;
     private int numberOfParticipants;
     private int numberOfWaitList;
     private int numberOfTrainers;
-    private List<CourseTemplatePrice>priceList;
     private int numberOfMinutesPerDate;
 }
