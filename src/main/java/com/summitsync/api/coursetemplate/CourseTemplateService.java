@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class CourseTemplateService {
@@ -67,11 +69,39 @@ public class CourseTemplateService {
         return this.repository.save(courseTemplate);
     }
 
+    public CourseTemplate removeQualificationFromCourseTemplate(CourseTemplate courseTemplate, Qualification qualification) {
+        var qualificationList = courseTemplate.getRequiredQualifications();
+
+        var updatedQualificationList = qualificationList
+                .stream()
+                .filter(
+                        q -> q.getQualificationId() != qualification.getQualificationId()
+                )
+                .collect(Collectors.toSet());
+
+        courseTemplate.setRequiredQualifications(updatedQualificationList);
+        return this.repository.save(courseTemplate);
+    }
+
     public CourseTemplate addPriceToCourseTemplate(CourseTemplate courseTemplate, CourseTemplatePrice courseTemplatePrice) {
         var priceList = courseTemplate.getPriceList();
         priceList.add(courseTemplatePrice);
 
         courseTemplate.setPriceList(priceList);
+        return this.repository.save(courseTemplate);
+    }
+
+    public CourseTemplate removePriceFromCourseTemplate(CourseTemplate courseTemplate, CourseTemplatePrice courseTemplatePrice) {
+        var priceList = courseTemplate.getPriceList();
+
+        var updatedPriceList = priceList
+                .stream()
+                .filter(
+                        price -> price.getCourseTemplatePriceId() != courseTemplatePrice.getCourseTemplatePriceId()
+                )
+                .collect(Collectors.toSet());
+
+        courseTemplate.setPriceList(updatedPriceList);
         return this.repository.save(courseTemplate);
     }
 }
