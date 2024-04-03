@@ -2,13 +2,16 @@ package com.summitsync.api.course;
 
 import com.summitsync.api.course.dto.CourseGetDTO;
 import com.summitsync.api.course.dto.CoursePostDTO;
+import com.summitsync.api.qualification.QualificationMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class CourseMapper {
     public Course mapCourseGetDTOToCourse(CourseGetDTO dto) {
         Course course = new Course();
-        course.setRequiredQualifications(dto.getRequiredQualifications());
+        //course.setRequiredQualifications(dto.getRequiredQualifications());
         course.setDescription(dto.getDescription());
         course.setTitle(dto.getTitle());
         course.setNotes(dto.getNotes());
@@ -34,7 +37,7 @@ public class CourseMapper {
         dto.setActualPrice(course.getActualPrice());
         dto.setDescription(course.getDescription());
         dto.setTitle(course.getTitle());
-        dto.setRequiredQualifications(course.getRequiredQualifications());
+        //dto.setRequiredQualifications(course.getRequiredQualifications());
         dto.setNotes(course.getNotes());
         dto.setId(course.getCourseId());
         return dto;
