@@ -2,6 +2,7 @@ package com.summitsync.api.status;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @AllArgsConstructor
+@Builder
 @Table(name = "SS_Status")
 public class Status {
     @Id
