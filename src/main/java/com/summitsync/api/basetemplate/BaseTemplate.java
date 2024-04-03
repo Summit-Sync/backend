@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 @MappedSuperclass
 @NoArgsConstructor
@@ -22,11 +23,11 @@ public class BaseTemplate {
     private String description;
     private int duration;
     @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    private List<Qualification> requiredQualifications;
+    private Set<Qualification> requiredQualifications;
     private BigDecimal durationInMinutes;
     private int numberOfMinutesPerDate;
 
-    public BaseTemplate(String acronym, String title, int numberOfDates, String description, List<Qualification> requiredQualifications, int duration, int numberOfMinutesPerDate) {
+    public BaseTemplate(String acronym, String title, int numberOfDates, String description, Set<Qualification> requiredQualifications, int duration, int numberOfMinutesPerDate) {
         this.acronym = acronym;
         this.title = title;
         this.numberOfDates = numberOfDates;
