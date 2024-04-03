@@ -5,18 +5,21 @@ import com.summitsync.api.group.dto.GroupPostDTO;
 import com.summitsync.api.grouptemplate.GroupTemplate;
 import com.summitsync.api.grouptemplate.GroupTemplateMapper;
 import com.summitsync.api.qualification.Qualification;
+import com.summitsync.api.qualification.QualificationMapper;
 import com.summitsync.api.qualification.QualificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class GroupMapper {
     private final GroupTemplateMapper templateMapper;
     private final QualificationService qualificationService;
+    private final QualificationMapper qualificationMapper;
     public GroupGetDTO mapGroupToGroupGetDto(Group group) {
         GroupGetDTO dto = new GroupGetDTO();
         dto.setDescription(group.getDescription());
@@ -24,7 +27,13 @@ public class GroupMapper {
         dto.setTemplate(this.templateMapper.mapGroupTemplateToGroupTemplateGetDTO(group.getTemplate()));
         dto.setNumberOfParticipants(group.getNumberOfParticipants());
         dto.setPricePerParticipant(group.getPricePerParticipant());
-        dto.setRequiredQualifications(group.getRequiredQualifications());
+        dto.setRequiredQualifications(
+                group.getRequiredQualifications()
+                        .stream()
+                        .map(this.qualificationMapper::mapQualificationToQualificationDto)
+                        .collect(Collectors.toSet()
+                        )
+        );
         return dto;
     }
     public Group mapGroupPostDTOToGroup(GroupPostDTO dto) {
@@ -33,30 +42,9 @@ public class GroupMapper {
         group.setDescription(dto.getDescription() == null ? template.getDescription() : dto.getDescription());
         group.setNotes(dto.getNotes());
         group.setNumberOfParticipants(dto.getNumberOfParticipants());
-        if (dto.getRequiredQualificationIDs() == null) {
-            group.setRequiredQualifications(template.getRequiredQualifications());
-        }
-        else {
-            List<Qualification> qualificationList = new ArrayList<>();
-            for (long id : dto.getRequiredQualificationIDs()) {
-                qualificationList.add(this.qualificationService.findById(id));
-            }
-            group.setRequiredQualifications(qualificationList);
-        }
         group.setDescription(dto.getDescription() == null ? template.getDescription() : dto.getDescription());
         group.setPricePerParticipant(dto.getPricePerParticipant());
         return group;
     }
 
-    public Group mapGroupGetDTOToGroup(GroupGetDTO dto) {
-        Group group = new Group();
-        GroupTemplate template = this.templateMapper.mapGroupTemplateGetDtoToGroupTemplate(dto.getTemplate());
-        group.setDescription(dto.getDescription() == null ? template.getDescription() : dto.getDescription());
-        group.setNotes(dto.getNotes());
-        group.setNumberOfParticipants(dto.getNumberOfParticipants());
-        group.setRequiredQualifications(dto.getRequiredQualifications() == null ? template.getRequiredQualifications() : dto.getRequiredQualifications());
-        group.setDescription(dto.getDescription() == null ? template.getDescription() : dto.getDescription());
-        group.setPricePerParticipant(dto.getPricePerParticipant());
-        return group;
-    }
 }

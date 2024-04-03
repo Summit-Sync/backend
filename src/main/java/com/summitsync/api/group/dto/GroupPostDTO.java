@@ -7,9 +7,8 @@ import java.math.BigDecimal;
 import java.util.List;
 @Data
 public class GroupPostDTO {
-    private GroupTemplateGetDTO template;
+    private long template;
     private String notes;
-    private List<Integer> requiredQualificationIDs;
     private BigDecimal pricePerParticipant;
     private Integer numberOfParticipants;
     private String description;

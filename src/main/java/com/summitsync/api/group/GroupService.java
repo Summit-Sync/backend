@@ -21,7 +21,7 @@ public class GroupService {
     public Group create(Group group) { return this.repository.save(group); }
 
     public Group createFromTemplate(long templateId, Group group) {
-        GroupTemplate template = this.templateService.get(templateId);
+        GroupTemplate template = this.templateService.findById(templateId);
         group.setTemplate(template);
         return create(group);
     }
