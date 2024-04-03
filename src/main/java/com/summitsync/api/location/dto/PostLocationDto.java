@@ -1,21 +1,15 @@
-package com.summitsync.api.location;
+package com.summitsync.api.location.dto;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "SS_Location")
-public class Location {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long locationId;
+public class PostLocationDto {
     private String room;
     private String street;
     private String postCode;
