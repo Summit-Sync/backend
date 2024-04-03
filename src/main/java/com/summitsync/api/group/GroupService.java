@@ -1,5 +1,6 @@
 package com.summitsync.api.group;
 
+import com.summitsync.api.date.EventDate;
 import com.summitsync.api.grouptemplate.GroupTemplate;
 import com.summitsync.api.grouptemplate.GroupTemplateService;
 import lombok.RequiredArgsConstructor;
@@ -80,5 +81,19 @@ public class GroupService {
             log.info("GroupList is empty");
         }
         return all;
+    }
+
+    public Group addEventDate(Group groupToUpdate, EventDate eventDate) {
+        var period = groupToUpdate.getPeriod();
+        period.add(eventDate);
+        groupToUpdate.setPeriod(period);
+        return this.repository.save(groupToUpdate);
+    }
+
+    public Group deleteEventDate(Group groupToUpdate, EventDate eventDate) {
+        var period = groupToUpdate.getPeriod();
+        period.remove(eventDate);
+        groupToUpdate.setPeriod(period);
+        return this.repository.save(groupToUpdate);
     }
 }

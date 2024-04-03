@@ -1,11 +1,13 @@
 package com.summitsync.api.group;
 
+import com.summitsync.api.date.EventDateService;
 import com.summitsync.api.group.dto.GroupGetDTO;
 import com.summitsync.api.group.dto.GroupPostDTO;
 import com.summitsync.api.grouptemplate.GroupTemplateMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ public class GroupController {
 
     private final GroupService service;
     private final GroupMapper mapper;
+    private final EventDateService eventDateService;
 
     @PostMapping
     public ResponseEntity<GroupGetDTO> createGroupFromTemplate(@RequestBody CreateGroupWrapperDTO wrapper) {
@@ -56,5 +59,21 @@ public class GroupController {
         Group dbGroup = this.service.update(groupToUpdate);
         GroupGetDTO response = this.mapper.mapGroupToGroupGetDto(dbGroup);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}/eventDate/{eventDateId}")
+    public ResponseEntity<GroupGetDTO> addEventDate(@PathVariable long id, @PathVariable long eventDateId) {
+        var groupToUpdate = this.service.get(id);
+        var eventDate = this.eventDateService.findById(eventDateId);
+        Group group = this.service.addEventDate(groupToUpdate, eventDate);
+        return new ResponseEntity<>(this.mapper.mapGroupToGroupGetDto(group), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}/eventDate/{eventDateId}")
+    public ResponseEntity<GroupGetDTO> deleteEventDate(@PathVariable long id, @PathVariable long eventDateId) {
+        var groupToUpdate = this.service.get(id);
+        var eventDate = this.eventDateService.findById(eventDateId);
+        Group group = this.service.deleteEventDate(groupToUpdate, eventDate);
+        return new ResponseEntity<>(this.mapper.mapGroupToGroupGetDto(group), HttpStatus.OK);
     }
 }
