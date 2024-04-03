@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 public class CourseTemplatePriceMapper {
     public CourseTemplatePriceDto mapCourseTemplatePriceToCourseTemplatePriceDto(CourseTemplatePrice courseTemplatePrice) {
         return CourseTemplatePriceDto.builder()
-                .id(courseTemplatePrice.getCourseTemplateId())
+                .id(courseTemplatePrice.getCourseTemplatePriceId())
                 .price(courseTemplatePrice.getPrice())
                 .category(courseTemplatePrice.getCategory())
                 .build();
