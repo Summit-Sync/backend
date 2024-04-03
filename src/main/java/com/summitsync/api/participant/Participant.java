@@ -1,7 +1,7 @@
 package com.summitsync.api.participant;
 
 import com.summitsync.api.course.Course;
-import com.summitsync.api.participantstatus.ParticipantStatus;
+import com.summitsync.api.status.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
