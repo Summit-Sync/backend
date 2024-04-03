@@ -2,7 +2,6 @@ package com.summitsync.api.group;
 
 import com.summitsync.api.contact.Contact;
 import com.summitsync.api.date.EventDate;
-import com.summitsync.api.eventperiod.EventPeriod;
 import com.summitsync.api.grouptemplate.GroupTemplate;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.qualification.Qualification;

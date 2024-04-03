@@ -23,5 +23,6 @@ public class CourseTrainer {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_cId")
     private Course course;
+    @OneToOne()
     private Status status;
 }

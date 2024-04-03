@@ -8,6 +8,7 @@ import com.summitsync.api.group.dto.GroupGetDTO;
 import com.summitsync.api.group.dto.GroupPostDTO;
 import com.summitsync.api.grouptemplate.GroupTemplate;
 import com.summitsync.api.grouptemplate.GroupTemplateMapper;
+import com.summitsync.api.grouptemplate.GroupTemplateService;
 import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.qualification.QualificationMapper;
 import com.summitsync.api.qualification.QualificationService;
@@ -24,6 +25,7 @@ public class GroupMapper {
     private final GroupTemplateMapper templateMapper;
     private final EventDateMapper eventDateMapper;
     private final QualificationMapper qualificationMapper;
+    private final GroupTemplateService groupTemplateService;
     public GroupGetDTO mapGroupToGroupGetDto(Group group) {
         GroupGetDTO dto = new GroupGetDTO();
         dto.setDescription(group.getDescription());
@@ -47,7 +49,7 @@ public class GroupMapper {
     }
     public Group mapGroupPostDTOToGroup(GroupPostDTO dto) {
         Group group = new Group();
-        GroupTemplate template = this.templateMapper.mapGroupTemplateGetDtoToGroupTemplate(dto.getTemplate());
+        var template = this.groupTemplateService.findById(dto.getTemplate());
         group.setDescription(dto.getDescription() == null ? template.getDescription() : dto.getDescription());
         group.setNotes(dto.getNotes());
         group.setNumberOfParticipants(dto.getNumberOfParticipants());
