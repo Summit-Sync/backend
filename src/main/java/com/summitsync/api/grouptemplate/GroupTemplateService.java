@@ -61,4 +61,13 @@ public class GroupTemplateService {
 
         return this.repository.save(groupTemplate);
     }
+
+    public GroupTemplate deleteQualificationFromGroupTemplate(GroupTemplate groupTemplate, Qualification qualification) {
+        var qualifications = groupTemplate.getRequiredQualifications();
+        qualifications.remove(qualification);
+
+        groupTemplate.setRequiredQualifications(qualifications);
+
+        return this.repository.save(groupTemplate);
+    }
 }

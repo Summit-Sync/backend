@@ -1,5 +1,9 @@
 package com.summitsync.api.group;
 
+import com.summitsync.api.date.EventDate;
+import com.summitsync.api.date.EventDateMapper;
+import com.summitsync.api.date.dto.EventDateGetDto;
+import com.summitsync.api.date.dto.EventDatePostDto;
 import com.summitsync.api.group.dto.GroupGetDTO;
 import com.summitsync.api.group.dto.GroupPostDTO;
 import com.summitsync.api.grouptemplate.GroupTemplate;
@@ -18,7 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GroupMapper {
     private final GroupTemplateMapper templateMapper;
-    private final QualificationService qualificationService;
+    private final EventDateMapper eventDateMapper;
     private final QualificationMapper qualificationMapper;
     public GroupGetDTO mapGroupToGroupGetDto(Group group) {
         GroupGetDTO dto = new GroupGetDTO();
@@ -34,6 +38,11 @@ public class GroupMapper {
                         .collect(Collectors.toSet()
                         )
         );
+        List<EventDateGetDto> period = new ArrayList<>();
+        for (EventDate date : group.getPeriod()) {
+            period.add(eventDateMapper.mapEventDateToEventDateGetDto(date));
+        }
+        dto.setPeriod(period);
         return dto;
     }
     public Group mapGroupPostDTOToGroup(GroupPostDTO dto) {
@@ -44,6 +53,11 @@ public class GroupMapper {
         group.setNumberOfParticipants(dto.getNumberOfParticipants());
         group.setDescription(dto.getDescription() == null ? template.getDescription() : dto.getDescription());
         group.setPricePerParticipant(dto.getPricePerParticipant());
+        List<EventDate> period = new ArrayList<>();
+        for (EventDatePostDto date : dto.getPeriod()) {
+            period.add(eventDateMapper.mapEventDatePostDtoToEventDate(date));
+        }
+        group.setPeriod(period);
         return group;
     }
 

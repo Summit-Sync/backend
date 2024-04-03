@@ -59,11 +59,21 @@ public class GroupTemplateController {
     }
 
     @PutMapping("/{id}/qualfication/{qualificationId}")
-    public GroupTemplateGetDTO addQualificationToGetTemplate(@PathVariable long id, @PathVariable long qualificationId) {
+    public GroupTemplateGetDTO addQualificationToTemplate(@PathVariable long id, @PathVariable long qualificationId) {
         var groupTemplate = this.groupTemplateService.findById(id);
         var qualification = this.qualificationService.findById(qualificationId);
 
         var updatedGroupTemplate = this.groupTemplateService.addQualificationToGroupTemplate(groupTemplate, qualification);
+
+        return this.groupTemplateMapper.mapGroupTemplateToGroupTemplateGetDTO(updatedGroupTemplate);
+    }
+
+    @DeleteMapping("/{id}/qualification/{qualificationId}")
+    public GroupTemplateGetDTO deleteQualificationFromTemplate(@PathVariable long id, @PathVariable long qualificationId) {
+        var groupTemplate = this.groupTemplateService.findById(id);
+        var qualification = this.qualificationService.findById(qualificationId);
+
+        var updatedGroupTemplate = this.groupTemplateService.deleteQualificationFromGroupTemplate(groupTemplate, qualification);
 
         return this.groupTemplateMapper.mapGroupTemplateToGroupTemplateGetDTO(updatedGroupTemplate);
     }
