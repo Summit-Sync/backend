@@ -1,5 +1,6 @@
 package com.summitsync.api.group.dto;
 
+import com.summitsync.api.date.dto.EventDatePostDto;
 import com.summitsync.api.grouptemplate.dto.GroupTemplateGetDTO;
 import lombok.Data;
 
@@ -12,4 +13,5 @@ public class GroupPostDTO {
     private BigDecimal pricePerParticipant;
     private Integer numberOfParticipants;
     private String description;
+    private List<EventDatePostDto> period;
 }

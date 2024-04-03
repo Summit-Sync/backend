@@ -1,5 +1,7 @@
 package com.summitsync.api.grouptemplate;
 
+import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
+import com.summitsync.api.qualification.Qualification;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +22,7 @@ public class GroupTemplateService {
     }
 
     public GroupTemplate updateTemplate(GroupTemplate template) {
-        Optional<GroupTemplate> data = this.findById(template.getBaseTemplateId());
-        if (data.isEmpty()) {
-            log.info("GroupTemplate with id {} does not exist", template.getBaseTemplateId());
-            throw new RuntimeException("GroupTemplate with id " + template.getBaseTemplateId() + " does not exist");
-        }
-        GroupTemplate dbTemplate = data.get();
+        var dbTemplate = this.findById(template.getBaseTemplateId());
         dbTemplate.setAcronym(template.getAcronym());
         dbTemplate.setDescription(template.getDescription());
         dbTemplate.setTitle(template.getTitle());
@@ -38,39 +35,39 @@ public class GroupTemplateService {
         return this.repository.save(dbTemplate);
     }
 
-    private void deleteTemplate(GroupTemplate template) {
+    public void deleteTemplate(GroupTemplate template) {
         this.repository.delete(template);
     }
 
-    public GroupTemplate deleteTemplateById(long id) {
-        Optional<GroupTemplate> data = this.findById(id);
-        if (data.isEmpty()) {
-            log.info("GroupTemplate with id {} does not exist", id);
-            throw new RuntimeException("GroupTemplate with id" + id + " does not exist");
-        }
-        GroupTemplate dbTemplate = data.get();
-        deleteTemplate(dbTemplate);
-        return dbTemplate;
-    }
 
-    private Optional<GroupTemplate> findById(long id) {
-        return this.repository.findById(id);
-    }
-
-    public GroupTemplate get(long id) {
-        Optional<GroupTemplate> data = this.findById(id);
-        if (data.isEmpty()) {
-            log.info("GroupTemplate with id {} does not exist", id);
-            throw new RuntimeException("GroupTemplate with id " + id + " does not exist");
+    public GroupTemplate findById(long id) {
+        var groupTemplate =  this.repository.findById(id);
+        if (groupTemplate.isEmpty()) {
+            throw new ResourceNotFoundException("GroupTemplate on id " + id + " not found");
         }
-        return data.get();
+
+        return groupTemplate.get();
     }
 
     public List<GroupTemplate> getAll() {
-        List<GroupTemplate> all = this.repository.findAll();
-        if (all.isEmpty()) {
-            log.info("GroupTemplateList is empty");
-        }
-        return all;
+        return this.repository.findAll();
+    }
+
+    public GroupTemplate addQualificationToGroupTemplate(GroupTemplate groupTemplate, Qualification qualification) {
+        var qualifications = groupTemplate.getRequiredQualifications();
+        qualifications.add(qualification);
+
+        groupTemplate.setRequiredQualifications(qualifications);
+
+        return this.repository.save(groupTemplate);
+    }
+
+    public GroupTemplate deleteQualificationFromGroupTemplate(GroupTemplate groupTemplate, Qualification qualification) {
+        var qualifications = groupTemplate.getRequiredQualifications();
+        qualifications.remove(qualification);
+
+        groupTemplate.setRequiredQualifications(qualifications);
+
+        return this.repository.save(groupTemplate);
     }
 }
