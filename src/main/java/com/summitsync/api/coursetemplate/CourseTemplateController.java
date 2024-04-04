@@ -57,13 +57,19 @@ public class CourseTemplateController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CourseTemplateDto>>getAllCourseTemplates(){
+    public ResponseEntity<List<CourseTemplateDto>> getAllCourseTemplates(){
         List<CourseTemplate>data = this.service.findAll();
         List<CourseTemplateDto>response = new ArrayList<>();
         for(CourseTemplate courseTemplate : data){
             response.add(this.courseTemplateMappingService.mapCourseTemplateToCourseTemplateDto(courseTemplate));
         }
         return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CourseTemplateDto> getCourseTemplate(@PathVariable long id) {
+        CourseTemplate template = this.service.findById(id);
+        return new ResponseEntity<>(this.courseTemplateMappingService.mapCourseTemplateToCourseTemplateDto(template), HttpStatus.OK);
     }
 
     @PostMapping("/{courseTemplateId}/qualification/{qualificationId}")
