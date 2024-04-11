@@ -61,6 +61,7 @@ public class CourseTemplateController {
         List<CourseTemplate>data = this.service.findAll();
         List<CourseTemplateDto>response = new ArrayList<>();
         for(CourseTemplate courseTemplate : data){
+
             response.add(this.courseTemplateMappingService.mapCourseTemplateToCourseTemplateDto(courseTemplate));
         }
         return new ResponseEntity<>(response,HttpStatus.OK);
