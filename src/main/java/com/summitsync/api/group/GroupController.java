@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -23,57 +24,42 @@ public class GroupController {
     private final EventDateService eventDateService;
 
     @PostMapping
-    public ResponseEntity<GroupGetDTO> createGroupFromTemplate(@RequestBody CreateGroupWrapperDTO wrapper) {
-        Group group = this.service.createFromTemplate(wrapper.getTemplateId(), this.mapper.mapGroupPostDTOToGroup(wrapper.getGroup()));
-        return new ResponseEntity<>(this.mapper.mapGroupToGroupGetDto(group), HttpStatus.OK);
+    public ResponseEntity<GroupGetDTO> createGroup(@RequestBody GroupPostDTO dto, JwtAuthenticationToken jwt) {
+        Group group = this.mapper.mapGroupPostDTOToGroup(dto);
+        var createdGroup = this.service.create(group);
+        return new ResponseEntity<>(this.mapper.mapGroupToGroupGetDto(createdGroup, jwt.getToken().getTokenValue()), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<GroupGetDTO> deleteGroup(@PathVariable long id) {
+    public ResponseEntity<GroupGetDTO> deleteGroup(@PathVariable long id, JwtAuthenticationToken jwt) {
         Group group = this.service.deleteById(id);
-        GroupGetDTO dto = this.mapper.mapGroupToGroupGetDto(group);
+        GroupGetDTO dto = this.mapper.mapGroupToGroupGetDto(group, jwt.getToken().getTokenValue());
         return new ResponseEntity<>(dto, HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GroupGetDTO> getGroupById(@PathVariable long id) {
+    public ResponseEntity<GroupGetDTO> getGroupById(@PathVariable long id, JwtAuthenticationToken jwt) {
         Group group = this.service.get(id);
-        GroupGetDTO response = this.mapper.mapGroupToGroupGetDto(group);
+        GroupGetDTO response = this.mapper.mapGroupToGroupGetDto(group, jwt.getToken().getTokenValue());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<GroupGetDTO>> getAllGroups() {
+    public ResponseEntity<List<GroupGetDTO>> getAllGroups(JwtAuthenticationToken jwt) {
         List<Group> all = this.service.getAll();
         List<GroupGetDTO> DTOs = new ArrayList<>();
         for (Group group : all) {
-            DTOs.add(this.mapper.mapGroupToGroupGetDto(group));
+            DTOs.add(this.mapper.mapGroupToGroupGetDto(group, jwt.getToken().getTokenValue()));
         }
         return new ResponseEntity<>(DTOs, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GroupGetDTO> updateGroup(@RequestBody GroupPostDTO dto, @PathVariable long id) {
-        Group groupToUpdate = this.mapper.mapGroupPostDTOToGroup(dto);
-        groupToUpdate.setGroupId(id);
-        Group dbGroup = this.service.update(groupToUpdate);
-        GroupGetDTO response = this.mapper.mapGroupToGroupGetDto(dbGroup);
+    public ResponseEntity<GroupGetDTO> updateGroup(@RequestBody GroupPostDTO dto, @PathVariable long id, JwtAuthenticationToken jwt) {
+        var group = this.mapper.mapGroupPostDTOToGroup(dto);
+        var groupToUpdate = this.service.get(id);
+        Group dbGroup = this.service.update(groupToUpdate, group);
+        GroupGetDTO response = this.mapper.mapGroupToGroupGetDto(dbGroup, jwt.getToken().getTokenValue());
         return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @PutMapping("/{id}/eventDate/{eventDateId}")
-    public ResponseEntity<GroupGetDTO> addEventDate(@PathVariable long id, @PathVariable long eventDateId) {
-        var groupToUpdate = this.service.get(id);
-        var eventDate = this.eventDateService.findById(eventDateId);
-        Group group = this.service.addEventDate(groupToUpdate, eventDate);
-        return new ResponseEntity<>(this.mapper.mapGroupToGroupGetDto(group), HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{id}/eventDate/{eventDateId}")
-    public ResponseEntity<GroupGetDTO> deleteEventDate(@PathVariable long id, @PathVariable long eventDateId) {
-        var groupToUpdate = this.service.get(id);
-        var eventDate = this.eventDateService.findById(eventDateId);
-        Group group = this.service.deleteEventDate(groupToUpdate, eventDate);
-        return new ResponseEntity<>(this.mapper.mapGroupToGroupGetDto(group), HttpStatus.OK);
     }
 }

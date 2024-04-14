@@ -1,26 +1,40 @@
 package com.summitsync.api.grouptemplate;
 
-import com.summitsync.api.basetemplate.BaseTemplate;
-import com.summitsync.api.contact.Contact;
+import com.summitsync.api.location.Location;
 import com.summitsync.api.qualification.Qualification;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Builder
 @Table(name = "SS_GroupTemplate")
-public class GroupTemplate extends BaseTemplate {
-    private BigDecimal pricePerTrainerPerHour;
-    private int trainerKey;
-    @OneToOne(fetch = FetchType.LAZY)
-    private Contact contact;
+public class GroupTemplate {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long groupTemplateId;
+    private String acronym;
+    private String title;
+    private String description;
+    private int numberOfDates;
+    private int duration;
+    @OneToOne
+    private Location location;
+    private String meetingPoint;
+    private BigDecimal trainerPricerPerHour;
+    private BigDecimal pricePerParticipant;
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    private Set<Qualification> requiredQualifications;
+    private int participantsPerTrainer;
+
 }

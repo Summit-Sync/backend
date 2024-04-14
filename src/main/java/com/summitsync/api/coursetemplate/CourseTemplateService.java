@@ -22,22 +22,25 @@ public class CourseTemplateService {
     private final Logger log = LoggerFactory.getLogger(CourseTemplateService.class);
     private final CourseTemplateRepository repository;
 
-    public CourseTemplate createCourse(CourseTemplate newTemplate){
+    public CourseTemplate createCourse(CourseTemplate newTemplate) {
         return this.repository.save(newTemplate);
     }
-    public CourseTemplate updateCourse(CourseTemplate updatedTemplate, Long id){
-        var courseTemplate = this.findById(id);
 
-        courseTemplate.setNumberOfParticipants(updatedTemplate.getNumberOfParticipants());
-        courseTemplate.setNumberOfTrainers(updatedTemplate.getNumberOfTrainers());
-        courseTemplate.setNumberOfWaitList(updatedTemplate.getNumberOfWaitList());
-        courseTemplate.setAcronym(updatedTemplate.getAcronym());
-        courseTemplate.setDescription(updatedTemplate.getDescription());
-        courseTemplate.setNumberOfDates(updatedTemplate.getNumberOfDates());
-        courseTemplate.setTitle(updatedTemplate.getTitle());
-        courseTemplate.setDuration(updatedTemplate.getDuration());
+    public CourseTemplate updateCourse(CourseTemplate courseTemplateToUpdate, CourseTemplate updatedCourseTemplate){
+        courseTemplateToUpdate.setAcronym(updatedCourseTemplate.getAcronym());
+        courseTemplateToUpdate.setTitle(updatedCourseTemplate.getTitle());
+        courseTemplateToUpdate.setDescription(updatedCourseTemplate.getDescription());
+        courseTemplateToUpdate.setNumberOfDates(updatedCourseTemplate.getNumberOfDates());
+        courseTemplateToUpdate.setDuration(updatedCourseTemplate.getDuration());
+        courseTemplateToUpdate.setNumberParticipants(updatedCourseTemplate.getNumberParticipants());
+        courseTemplateToUpdate.setNumberWaitlist(updatedCourseTemplate.getNumberWaitlist());
+        courseTemplateToUpdate.setLocation(updatedCourseTemplate.getLocation());
+        courseTemplateToUpdate.setMeetingPoint(updatedCourseTemplate.getMeetingPoint());
+        courseTemplateToUpdate.setCourseTemplatePrices(updatedCourseTemplate.getCourseTemplatePrices());
+        courseTemplateToUpdate.setQualifications(updatedCourseTemplate.getQualifications());
+        courseTemplateToUpdate.setNumberTrainer(updatedCourseTemplate.getNumberTrainer());
 
-        return this.repository.save(courseTemplate);
+        return this.repository.save(courseTemplateToUpdate);
     }
     public CourseTemplate findById(long id){
         var courseTemplate = this.repository.findById(id);
@@ -61,47 +64,4 @@ public class CourseTemplateService {
         return this.repository.findAll();
     }
 
-    public CourseTemplate addQualificationToCourseTemplate(CourseTemplate courseTemplate, Qualification qualification) {
-        var qualifications = courseTemplate.getRequiredQualifications();
-        qualifications.add(qualification);
-
-        courseTemplate.setRequiredQualifications(qualifications);
-        return this.repository.save(courseTemplate);
-    }
-
-    public CourseTemplate removeQualificationFromCourseTemplate(CourseTemplate courseTemplate, Qualification qualification) {
-        var qualificationList = courseTemplate.getRequiredQualifications();
-
-        var updatedQualificationList = qualificationList
-                .stream()
-                .filter(
-                        q -> q.getQualificationId() != qualification.getQualificationId()
-                )
-                .collect(Collectors.toSet());
-
-        courseTemplate.setRequiredQualifications(updatedQualificationList);
-        return this.repository.save(courseTemplate);
-    }
-
-    public CourseTemplate addPriceToCourseTemplate(CourseTemplate courseTemplate, CourseTemplatePrice courseTemplatePrice) {
-        var priceList = courseTemplate.getPriceList();
-        priceList.add(courseTemplatePrice);
-
-        courseTemplate.setPriceList(priceList);
-        return this.repository.save(courseTemplate);
-    }
-
-    public CourseTemplate removePriceFromCourseTemplate(CourseTemplate courseTemplate, CourseTemplatePrice courseTemplatePrice) {
-        var priceList = courseTemplate.getPriceList();
-
-        var updatedPriceList = priceList
-                .stream()
-                .filter(
-                        price -> price.getCourseTemplatePriceId() != courseTemplatePrice.getCourseTemplatePriceId()
-                )
-                .collect(Collectors.toSet());
-
-        courseTemplate.setPriceList(updatedPriceList);
-        return this.repository.save(courseTemplate);
-    }
 }

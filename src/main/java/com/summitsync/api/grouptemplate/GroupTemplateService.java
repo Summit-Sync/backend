@@ -1,7 +1,11 @@
 package com.summitsync.api.grouptemplate;
 
 import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
+import com.summitsync.api.grouptemplate.dto.GroupTemplatePostDTO;
+import com.summitsync.api.location.LocationRepository;
+import com.summitsync.api.location.LocationService;
 import com.summitsync.api.qualification.Qualification;
+import com.summitsync.api.qualification.QualificationService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,30 +13,34 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class GroupTemplateService {
 
     private final GroupTemplateRepository repository;
+    private final LocationService locationService;
+    private final QualificationService qualificationService;
     private final Logger log = LoggerFactory.getLogger(GroupTemplateService.class);
 
     public GroupTemplate createTemplate(GroupTemplate template) {
         return this.repository.save(template);
     }
 
-    public GroupTemplate updateTemplate(GroupTemplate template) {
-        var dbTemplate = this.findById(template.getBaseTemplateId());
-        dbTemplate.setAcronym(template.getAcronym());
-        dbTemplate.setDescription(template.getDescription());
-        dbTemplate.setTitle(template.getTitle());
-        dbTemplate.setNumberOfDates(template.getNumberOfDates());
-        dbTemplate.setDurationInMinutes(template.getDurationInMinutes());
-        dbTemplate.setDuration(template.getDuration());
-        dbTemplate.setPricePerTrainerPerHour(template.getPricePerTrainerPerHour());
-        dbTemplate.setRequiredQualifications(template.getRequiredQualifications());
-        dbTemplate.setTrainerKey(template.getTrainerKey());
-        return this.repository.save(dbTemplate);
+    public GroupTemplate updateTemplate(GroupTemplate template, GroupTemplatePostDTO updated) {
+        template.setAcronym(updated.getAcronym());
+        template.setTitle(updated.getTitle());
+        template.setDescription(updated.getDescription());
+        template.setNumberOfDates(updated.getNumberOfDates());
+        template.setDuration(updated.getDuration());
+        template.setLocation(this.locationService.getLocationById(updated.getLocation()));
+        template.setMeetingPoint(updated.getMeetingPoint());
+        template.setTrainerPricerPerHour(updated.getTrainerPricePerHour());
+        template.setPricePerParticipant(updated.getPricePerParticipant());
+        template.setRequiredQualifications(updated.getRequiredQualificationList().stream().map(this.qualificationService::findById).collect(Collectors.toSet()));
+        template.setParticipantsPerTrainer(updated.getParticipantsPerTrainer());
+        return this.repository.save(template);
     }
 
     public void deleteTemplate(GroupTemplate template) {
@@ -51,23 +59,5 @@ public class GroupTemplateService {
 
     public List<GroupTemplate> getAll() {
         return this.repository.findAll();
-    }
-
-    public GroupTemplate addQualificationToGroupTemplate(GroupTemplate groupTemplate, Qualification qualification) {
-        var qualifications = groupTemplate.getRequiredQualifications();
-        qualifications.add(qualification);
-
-        groupTemplate.setRequiredQualifications(qualifications);
-
-        return this.repository.save(groupTemplate);
-    }
-
-    public GroupTemplate deleteQualificationFromGroupTemplate(GroupTemplate groupTemplate, Qualification qualification) {
-        var qualifications = groupTemplate.getRequiredQualifications();
-        qualifications.remove(qualification);
-
-        groupTemplate.setRequiredQualifications(qualifications);
-
-        return this.repository.save(groupTemplate);
     }
 }

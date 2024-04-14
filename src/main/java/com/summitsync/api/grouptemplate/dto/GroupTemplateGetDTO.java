@@ -1,5 +1,6 @@
 package com.summitsync.api.grouptemplate.dto;
 
+import com.summitsync.api.location.dto.GetLocationDto;
 import com.summitsync.api.qualification.dto.QualificationDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,10 +16,20 @@ import java.util.Set;
 @Builder
 public class GroupTemplateGetDTO {
     private long id;
-    private String title;
     private String acronym;
-    private int trainerKey;
-    private BigDecimal pricePerTrainerPerHour;
+    private String title;
     private String description;
-    private Set<QualificationDto> requiredQualification;
+    private int numberOfDates;
+    private int duration;
+    private GetLocationDto location;
+    private String meetingPoint;
+    private BigDecimal trainerPricePerHour;
+    private BigDecimal pricePerParticipant;
+    private Set<QualificationDto> requiredQualificationList;
+    private int participantsPerTrainer;
 }
+
+// id (long), acronym (string), title (string), description (string), numberOfDates (int), duration (int),
+// LocationDTO, meetingPoint (String), TrainerPricePerHour (BigDecimal),
+// PricePerParticipant (BigDecimal), requiredQulaificationList (Liste von QualifiationDTOs),
+// participantsPerTrainer (int)

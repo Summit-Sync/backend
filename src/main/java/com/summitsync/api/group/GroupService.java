@@ -21,30 +21,24 @@ public class GroupService {
 
     public Group create(Group group) { return this.repository.save(group); }
 
-    public Group createFromTemplate(long templateId, Group group) {
-        GroupTemplate template = this.templateService.findById(templateId);
-        group.setTemplate(template);
-        return create(group);
-    }
-    public Group update(Group group) {
-        Optional<Group> data = this.findById(group.getGroupId());
-        if (data.isEmpty()) {
-            log.info("Group with id {} does not exist", group.getGroupId());
-            throw new RuntimeException("Group with id " + group.getGroupId() + " does not exist");
-        }
-        Group dbGroup = data.get();
-        dbGroup.setContact(group.getContact());
-        dbGroup.setNotes(group.getNotes());
-        dbGroup.setDescription(group.getDescription());
-        dbGroup.setLocation(group.getLocation());
-        dbGroup.setPeriod(group.getPeriod());
-        dbGroup.setNumberOfDates(group.getNumberOfDates());
-        dbGroup.setNumberOfParticipants(group.getNumberOfParticipants());
-        dbGroup.setPricePerParticipant(group.getPricePerParticipant());
-        dbGroup.setRequiredQualifications(group.getRequiredQualifications());
-        dbGroup.setTemplate(group.getTemplate());
-        dbGroup.setTotalPrice(group.getTotalPrice());
-        return this.repository.save(dbGroup);
+    public Group update(Group groupToUpdate, Group group) {
+        groupToUpdate.setCancelled(group.isCancelled());
+        groupToUpdate.setTitle(group.getTitle());
+        groupToUpdate.setDescription(group.getDescription());
+        groupToUpdate.setNumberOfDates(group.getNumberOfDates());
+        groupToUpdate.setDuration(group.getDuration());
+        groupToUpdate.setContact(group.getContact());
+        groupToUpdate.setDates(group.getDates());
+        groupToUpdate.setNumberParticipants(group.getNumberParticipants());
+        groupToUpdate.setLocation(group.getLocation());
+        groupToUpdate.setMeetingPoint(group.getMeetingPoint());
+        groupToUpdate.setTrainerPricePerHour(group.getTrainerPricePerHour());
+        groupToUpdate.setPricePerParticipant(group.getPricePerParticipant());
+        groupToUpdate.setQualifications(group.getQualifications());
+        groupToUpdate.setParticipantsPerTrainer(group.getParticipantsPerTrainer());
+        groupToUpdate.setTrainers(group.getTrainers());
+
+        return groupToUpdate;
     }
 
     private void delete(Group group) {
@@ -81,19 +75,5 @@ public class GroupService {
             log.info("GroupList is empty");
         }
         return all;
-    }
-
-    public Group addEventDate(Group groupToUpdate, EventDate eventDate) {
-        var period = groupToUpdate.getPeriod();
-        period.add(eventDate);
-        groupToUpdate.setPeriod(period);
-        return this.repository.save(groupToUpdate);
-    }
-
-    public Group deleteEventDate(Group groupToUpdate, EventDate eventDate) {
-        var period = groupToUpdate.getPeriod();
-        period.remove(eventDate);
-        groupToUpdate.setPeriod(period);
-        return this.repository.save(groupToUpdate);
     }
 }

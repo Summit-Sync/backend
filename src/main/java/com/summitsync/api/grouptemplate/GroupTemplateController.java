@@ -2,13 +2,10 @@ package com.summitsync.api.grouptemplate;
 
 import com.summitsync.api.grouptemplate.dto.GroupTemplateGetDTO;
 import com.summitsync.api.grouptemplate.dto.GroupTemplatePostDTO;
-import com.summitsync.api.qualification.QualificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,7 +17,6 @@ public class GroupTemplateController {
 
     private final GroupTemplateService groupTemplateService;
     private final GroupTemplateMapper groupTemplateMapper;
-    private final QualificationService qualificationService;
     @PostMapping
     public GroupTemplateGetDTO createGroupTemplate(@RequestBody GroupTemplatePostDTO dto) {
         GroupTemplate templateToCreate = this.groupTemplateMapper.mapGroupPostDtoToGroupTemplate(dto);
@@ -37,9 +33,8 @@ public class GroupTemplateController {
 
     @PutMapping("/{id}")
     public GroupTemplateGetDTO updateTemplate(@RequestBody GroupTemplatePostDTO dto, @PathVariable long id) {
-        GroupTemplate templateToUpdate = this.groupTemplateMapper.mapGroupPostDtoToGroupTemplate(dto);
-        templateToUpdate.setBaseTemplateId(id);
-        GroupTemplate dbTemplate = this.groupTemplateService.updateTemplate(templateToUpdate);
+        var templateToUpdate = this.groupTemplateService.findById(id);
+        GroupTemplate dbTemplate = this.groupTemplateService.updateTemplate(templateToUpdate, dto);
         return this.groupTemplateMapper.mapGroupTemplateToGroupTemplateGetDTO(dbTemplate);
     }
 
@@ -56,25 +51,5 @@ public class GroupTemplateController {
                 .stream()
                 .map(this.groupTemplateMapper::mapGroupTemplateToGroupTemplateGetDTO)
                 .collect(Collectors.toSet());
-    }
-
-    @PutMapping("/{id}/qualfication/{qualificationId}")
-    public GroupTemplateGetDTO addQualificationToTemplate(@PathVariable long id, @PathVariable long qualificationId) {
-        var groupTemplate = this.groupTemplateService.findById(id);
-        var qualification = this.qualificationService.findById(qualificationId);
-
-        var updatedGroupTemplate = this.groupTemplateService.addQualificationToGroupTemplate(groupTemplate, qualification);
-
-        return this.groupTemplateMapper.mapGroupTemplateToGroupTemplateGetDTO(updatedGroupTemplate);
-    }
-
-    @DeleteMapping("/{id}/qualification/{qualificationId}")
-    public GroupTemplateGetDTO deleteQualificationFromTemplate(@PathVariable long id, @PathVariable long qualificationId) {
-        var groupTemplate = this.groupTemplateService.findById(id);
-        var qualification = this.qualificationService.findById(qualificationId);
-
-        var updatedGroupTemplate = this.groupTemplateService.deleteQualificationFromGroupTemplate(groupTemplate, qualification);
-
-        return this.groupTemplateMapper.mapGroupTemplateToGroupTemplateGetDTO(updatedGroupTemplate);
     }
 }

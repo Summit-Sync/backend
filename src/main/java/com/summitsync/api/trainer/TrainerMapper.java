@@ -1,7 +1,10 @@
 package com.summitsync.api.trainer;
 
+import com.summitsync.api.keycloak.KeycloakRestService;
 import com.summitsync.api.keycloak.dto.KeycloakAddUserRequest;
 import com.summitsync.api.keycloak.dto.KeycloakUser;
+import com.summitsync.api.participant.Participant;
+import com.summitsync.api.participant.dto.ParticipantDto;
 import com.summitsync.api.qualification.QualificationMapper;
 import com.summitsync.api.trainer.dto.AddTrainerDto;
 import com.summitsync.api.trainer.dto.TrainerDto;
@@ -17,6 +20,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TrainerMapper {
     final private QualificationMapper qualificationMapper;
+    private KeycloakRestService keycloakRestService;
+
     public KeycloakAddUserRequest mapAddTrainerDtoToKeycloakAddUserRequest(AddTrainerDto addTrainerDto) {
         var groups = new ArrayList<String>();
         groups.add("trainer");
@@ -47,5 +52,11 @@ public class TrainerMapper {
                 .phone(keycloakUser.getAttributes().get("phone").getFirst())
                 .email(keycloakUser.getEmail())
                 .build();
+    }
+
+    public TrainerDto mapTrainerToTrainerDto(Trainer trainer, String jwt) {
+        var keycloakUser = this.keycloakRestService.getUser(trainer.getSubjectId(), jwt);
+
+        return this.mapKeycloakUserToTrainerDto(keycloakUser, trainer);
     }
 }

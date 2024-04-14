@@ -2,7 +2,10 @@ package com.summitsync.api.course;
 
 import com.summitsync.api.course.dto.CourseGetDTO;
 import com.summitsync.api.course.dto.CoursePostDTO;
+import com.summitsync.api.participant.ParticipantMapper;
+import com.summitsync.api.participant.ParticipantService;
 import com.summitsync.api.qualification.QualificationService;
+import com.summitsync.api.trainer.TrainerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/course")
@@ -19,12 +24,16 @@ public class CourseController {
     private final CourseService service;
     private final CourseMapper mapper;
     private final QualificationService qualificationService;
-    @PostMapping
-    public ResponseEntity<CourseGetDTO> createCourseFromTemplate(@RequestBody CreateCourseWrapperDTO wrapper, JwtAuthenticationToken jwt) {
-        Course course = this.service.createFromTemplate(wrapper.getTemplateId(), this.mapper.mapCoursePostDTOToCourse(wrapper.getCourse()));
-        return new ResponseEntity<>(this.mapper.mapCourseToCourseGetDTO(course, jwt.getToken().getTokenValue()), HttpStatus.OK);
-    }
+    private final ParticipantMapper participantMapper;
+    private final ParticipantService participantService;
+    private final TrainerService trainerService;
 
+    @PostMapping
+    public ResponseEntity<CourseGetDTO> addCourse(@RequestBody CoursePostDTO course, JwtAuthenticationToken jwt) {
+        var createdCourse = this.service.create(this.mapper.mapCoursePostDTOToCourse(course));
+
+        return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(createdCourse, jwt.getToken().getTokenValue()));
+    }
     @GetMapping("/{id}")
     public ResponseEntity<CourseGetDTO> getCourseById(@PathVariable long id, JwtAuthenticationToken jwt) {
         Course course = this.service.get(id);
@@ -51,8 +60,8 @@ public class CourseController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CourseGetDTO> updateCourse(@RequestBody CoursePostDTO dto, @PathVariable long id, JwtAuthenticationToken jwt) {
-        Course courseToUpdate = this.mapper.mapCoursePostDTOToCourse(dto);
-        Course dbCourse = this.service.update(courseToUpdate, id);
+        Course updatedCourse = this.mapper.mapCoursePostDTOToCourse(dto);
+        Course dbCourse = this.service.update(this.service.get(id), updatedCourse);
         CourseGetDTO response = this.mapper.mapCourseToCourseGetDTO(dbCourse, jwt.getToken().getTokenValue());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -78,4 +87,54 @@ public class CourseController {
         return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(updatedCourse, jwt.getToken().getTokenValue()));
     }
 
+    @PutMapping("/{id}/participant")
+    public ResponseEntity<CourseGetDTO> addParticipantsToCourse(@PathVariable long id, @RequestBody Set<Long> participantIds, JwtAuthenticationToken jwt) {
+        var course = this.service.get(id);
+
+        var updatedCourse = this.service.addParticipants(course, participantIds.stream().map(this.participantService::findById).collect(Collectors.toSet()));
+
+        return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(updatedCourse, jwt.getToken().getTokenValue()));
+    }
+
+    @DeleteMapping("/{id}/participant/{participantId}")
+    public ResponseEntity<CourseGetDTO> deleteParticipantFromCourse(@PathVariable long id, @PathVariable long participantId, JwtAuthenticationToken jwt) {
+        var course = this.service.get(id);
+        var updatedCourse = this.service.removeParticipants(course, participantId);
+
+        return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(updatedCourse, jwt.getToken().getTokenValue()));
+    }
+
+    @PutMapping("/{id}/waitlist")
+    public ResponseEntity<CourseGetDTO> addWaitlistToCourse(@PathVariable long id, @RequestBody Set<Long> participantIds, JwtAuthenticationToken jwt) {
+        var course = this.service.get(id);
+
+        var updatedCourse = this.service.addWaitlist(course, participantIds.stream().map(this.participantService::findById).collect(Collectors.toSet()));
+
+        return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(updatedCourse, jwt.getToken().getTokenValue()));
+    }
+
+    @DeleteMapping("/{id}/waitlist/{waitlistId}")
+    public ResponseEntity<CourseGetDTO> deleteWaitlistFromCourse(@PathVariable long id, @PathVariable long waitlistId, JwtAuthenticationToken jwt) {
+        var course = this.service.get(id);
+        var updatedCourse = this.service.removeWaitlist(course, waitlistId);
+
+        return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(updatedCourse, jwt.getToken().getTokenValue()));
+    }
+
+    @PutMapping("/{id}/trainer")
+    public ResponseEntity<CourseGetDTO> addTrainersToWaitlist(@PathVariable long id, @RequestBody Set<Long> trainerIds, JwtAuthenticationToken jwt) {
+        var course = this.service.get(id);
+
+        var updatedCourse = this.service.addTrainer(course, trainerIds.stream().map(this.trainerService::findById).collect(Collectors.toSet()));
+
+        return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(updatedCourse, jwt.getToken().getTokenValue()));
+    }
+
+    @DeleteMapping("/{id}/waitlist/{trainerId}")
+    public ResponseEntity<CourseGetDTO> removeTrainerFromCourse(@PathVariable long id, @PathVariable long trainerId, JwtAuthenticationToken jwt) {
+        var course = this.service.get(id);
+        var updatedCourse = this.service.removeTrainer(course, trainerId);
+
+        return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(updatedCourse, jwt.getToken().getTokenValue()));
+    }
 }

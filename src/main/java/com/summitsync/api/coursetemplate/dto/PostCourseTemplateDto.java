@@ -1,7 +1,5 @@
 package com.summitsync.api.coursetemplate.dto;
 
-import com.summitsync.api.coursetemplateprice.CourseTemplatePrice;
-import com.summitsync.api.qualification.Qualification;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,11 +12,18 @@ import java.util.List;
 public class PostCourseTemplateDto {
     private String acronym;
     private String title;
-    private int duration;
-    private int numberOfDates;
     private String description;
-    private int numberOfParticipants;
-    private int numberOfWaitList;
-    private int numberOfTrainers;
-    private int numberOfMinutesPerDate;
+    private int numberOfDates;
+    private int duration;
+    private int numberParticipants;
+    private int numberWaitlist;
+    private long location;
+    private String meetingPoint;
+    private List<Long> price;
+    private List<Long> requiredQualifications;
+    private int numberTrainers;
 }
+
+//PostCourseTemplateDTO: acronym (string), title (string), description (string), numberOfDates (int), duration (int),
+// numberParticipants (int), numberWaitlist (int), location: Location (int), meetingPoint (String), price: Price (array von int),
+// requiredQulaifications (array von int), numberTrainers (int)

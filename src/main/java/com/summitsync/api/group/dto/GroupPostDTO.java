@@ -1,17 +1,31 @@
 package com.summitsync.api.group.dto;
 
-import com.summitsync.api.date.dto.EventDatePostDto;
-import com.summitsync.api.grouptemplate.dto.GroupTemplateGetDTO;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+
 @Data
 public class GroupPostDTO {
-    private long template;
-    private String notes;
-    private BigDecimal pricePerParticipant;
-    private Integer numberOfParticipants;
-    private String description;
-    private List<EventDatePostDto> period;
+    String title;
+    String description;
+    int numberOfDates;
+    List<LocalDateTime> dates;
+    int duration;
+    int numberParticipants;
+    long contact;
+    long location;
+    String meetingPoint;
+    BigDecimal trainerPricePerHour;
+    BigDecimal pricePerParticipant;
+    Set<Integer> requiredQualifications;
+    int participantsPerTrainer;
+    Set<Integer> trainers;
+
 }
+
+// PostGroupDTO: title (string), description (string), numberOfDates (int), Array of eventDateObj (date (date)), duration (int),
+// numberParticipants (int), PostContactDTO, LocationDTO, meetingPoint (String), TrainerPricePerHour (BigDecimal), PricePerParticipant (BigDecimal),
+// requiredQulaificationList (Liste von QualifiationDTOs), participantsPerTrainer (int), trainerList (Liste von Trainer DTOs)
