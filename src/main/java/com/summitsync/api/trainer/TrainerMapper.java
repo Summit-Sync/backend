@@ -8,6 +8,7 @@ import com.summitsync.api.participant.dto.ParticipantDto;
 import com.summitsync.api.qualification.QualificationMapper;
 import com.summitsync.api.trainer.dto.AddTrainerDto;
 import com.summitsync.api.trainer.dto.TrainerDto;
+import com.summitsync.api.trainer.dto.UpdateTrainerDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +52,16 @@ public class TrainerMapper {
                 .qualifications(qualifications)
                 .phone(keycloakUser.getAttributes().get("phone").getFirst())
                 .email(keycloakUser.getEmail())
+                .build();
+    }
+
+    public KeycloakAddUserRequest mapUpdateTrainerDtoToKeycloakAddUserRequest(UpdateTrainerDto updateTrainerDto) {
+        var attributes = new HashMap<String, Object>();
+        attributes.put("phone", updateTrainerDto.getPhone());
+        return KeycloakAddUserRequest.builder()
+                .lastName(updateTrainerDto.getLastName())
+                .email(updateTrainerDto.getEmail())
+                .attributes(attributes)
                 .build();
     }
 

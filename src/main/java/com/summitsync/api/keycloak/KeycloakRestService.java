@@ -2,8 +2,8 @@ package com.summitsync.api.keycloak;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.summitsync.api.exceptionhandler.CodeExchangeException;
 import com.summitsync.api.exceptionhandler.KeycloakApiException;
+import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
 import com.summitsync.api.keycloak.dto.KeycloakAddUserRequest;
 import com.summitsync.api.keycloak.dto.KeycloakResetPasswordRequest;
 import com.summitsync.api.keycloak.dto.KeycloakUser;
@@ -16,8 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class KeycloakRestService {
@@ -45,6 +44,9 @@ public class KeycloakRestService {
 
        return preparedRequest.retrieve()
         .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
+            if (response.getStatusCode().isSameCodeAs(HttpStatusCode.valueOf(404))) {
+               throw new KeycloakApiException("resource not found", (HttpStatus) response.getStatusCode());
+            }
             var objectMapper = new ObjectMapper();
             Map<String, String> errorMap = objectMapper.readValue(response.getBody(), new TypeReference<>() {});
             String errorMessage;
@@ -105,6 +107,25 @@ public class KeycloakRestService {
         }
 
         return this.getUser(subjectId, jwt);
+    }
+
+    public String getGroupIdByName(String groupName, String jwt) {
+        var uri = UriComponentsBuilder.fromUriString(apiBase).pathSegment("groups").toUriString();
+        var response = this.request(HttpMethod.GET, uri, jwt, null, ArrayList.class);
+
+        for (var entry: response) {
+            var mapEntry = (HashMap<String, String>) entry;
+            if (mapEntry.get("name").equals(groupName)) {
+                return mapEntry.get("id");
+            }
+        }
+
+        throw new ResourceNotFoundException("no group with name " + groupName + " found");
+    }
+
+    public List<KeycloakUser> getAllMembersOfGroup(String groupId, String jwt) {
+        var uri = UriComponentsBuilder.fromUriString(apiBase).pathSegment("groups", groupId, "members").toUriString();
+        return Arrays.stream(this.request(HttpMethod.GET, uri, jwt, null, KeycloakUser[].class)).toList();
     }
 
 }

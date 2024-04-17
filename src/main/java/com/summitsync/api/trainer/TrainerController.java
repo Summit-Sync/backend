@@ -3,10 +3,14 @@ package com.summitsync.api.trainer;
 import com.summitsync.api.qualification.QualificationService;
 import com.summitsync.api.trainer.dto.AddTrainerDto;
 import com.summitsync.api.trainer.dto.TrainerDto;
+import com.summitsync.api.trainer.dto.UpdateTrainerDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -46,9 +50,14 @@ public class TrainerController {
     }
 
     @PutMapping("/{trainerId}")
-    public TrainerDto updateTrainer(@PathVariable long trainerId, @RequestBody AddTrainerDto addTrainerDto, JwtAuthenticationToken jwt) {
+    public TrainerDto updateTrainer(@PathVariable long trainerId, @RequestBody UpdateTrainerDto updateTrainerDto, JwtAuthenticationToken jwt) {
         var trainer = this.trainerService.findById(trainerId);
 
-        return this.trainerService.updateTrainer(trainer, addTrainerDto, jwt.getToken().getTokenValue());
+        return this.trainerService.updateTrainer(trainer, updateTrainerDto, jwt.getToken().getTokenValue());
+    }
+
+    @GetMapping
+    public List<TrainerDto> getAllTrainers(JwtAuthenticationToken jwt) {
+        return this.trainerService.getAllTrainer(jwt.getToken().getTokenValue());
     }
 }

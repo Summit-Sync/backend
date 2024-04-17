@@ -6,10 +6,12 @@ import com.summitsync.api.keycloak.dto.KeycloakResetPasswordRequest;
 import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.trainer.dto.AddTrainerDto;
 import com.summitsync.api.trainer.dto.TrainerDto;
+import com.summitsync.api.trainer.dto.UpdateTrainerDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,8 +79,8 @@ public class TrainerService {
         return this.trainerDtoFromTrainer(this.trainerRepository.save(trainer), jwt);
     }
 
-    public TrainerDto updateTrainer(Trainer trainer, AddTrainerDto addTrainerDto, String jwt) {
-        var keycloakAddUser = this.trainerMapper.mapAddTrainerDtoToKeycloakAddUserRequest(addTrainerDto);
+    public TrainerDto updateTrainer(Trainer trainer, UpdateTrainerDto updateTrainerDto, String jwt) {
+        var keycloakAddUser = this.trainerMapper.mapUpdateTrainerDtoToKeycloakAddUserRequest(updateTrainerDto);
 
         var keycloakUser = this.keycloakRestService.updateUser(trainer.getSubjectId(), keycloakAddUser, jwt);
 
@@ -88,5 +90,22 @@ public class TrainerService {
     private TrainerDto trainerDtoFromTrainer(Trainer trainer, String jwt) {
         var keycloakUser = this.keycloakRestService.getUser(trainer.getSubjectId(), jwt);
         return this.trainerMapper.mapKeycloakUserToTrainerDto(keycloakUser, trainer);
+    }
+
+    public List<TrainerDto> getAllTrainer(String jwt) {
+        var groupId = this.keycloakRestService.getGroupIdByName("trainer", jwt);
+        var trainers = this.keycloakRestService.getAllMembersOfGroup(groupId, jwt);
+        var res = new ArrayList<TrainerDto>();
+        for (var trainer: trainers) {
+            var dbTrainer = this.trainerRepository.findBySubjectId(trainer.getId());
+            if (dbTrainer.isEmpty()) {
+                System.out.println("WARNING: trainer with id " + trainer.getId() + " found in keycloak but not in database. Skipping...");
+                continue;
+            }
+
+            res.add(this.trainerMapper.mapKeycloakUserToTrainerDto(trainer, dbTrainer.get()));
+        }
+
+        return res;
     }
 }
