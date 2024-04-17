@@ -1,20 +1,25 @@
 package com.summitsync.api.trainerapplication;
 
 import com.summitsync.api.course.Course;
+import com.summitsync.api.course.CourseService;
 import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
 import com.summitsync.api.group.Group;
+import com.summitsync.api.group.GroupService;
 import com.summitsync.api.trainer.Trainer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class TrainerApplicationService {
 
     private final TrainerApplicationRepository repository;
+    private final GroupService groupService;
+    private final CourseService courseService;
     public TrainerApplication applyToGroup(Trainer trainer, Group group) {
         TrainerApplication newApplication = new TrainerApplication();
         newApplication.setTrainer(trainer);
@@ -55,6 +60,7 @@ public class TrainerApplicationService {
     public TrainerApplication acceptGroupApplication(Trainer trainer, Group group) {
         TrainerApplication application = getGroupApplications(trainer, group);
         application.setAccepted(AcceptStatus.Accepted);
+        this.groupService.addTrainer(group, trainer);
         return this.repository.save(application);
     }
 
@@ -70,6 +76,7 @@ public class TrainerApplicationService {
     public TrainerApplication acceptCourseApplication(Trainer trainer, Course course) {
         TrainerApplication application = getCourseApplications(trainer, course);
         application.setAccepted(AcceptStatus.Accepted);
+        this.courseService.addTrainer(course, Set.of(trainer));
         return this.repository.save(application);
     }
 

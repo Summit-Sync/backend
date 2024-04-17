@@ -1,6 +1,7 @@
 package com.summitsync.api.trainerapplication.dto;
 
 import com.summitsync.api.qualification.dto.QualificationDto;
+import com.summitsync.api.trainerapplication.AcceptStatus;
 import lombok.Data;
 
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.List;
 @Data
 public class TrainerApplicationDto {
     long id;
-    boolean accepted;
+    AcceptStatus accepted;
     String firstName;
     String lastName;
     String email;
