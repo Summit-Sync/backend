@@ -1,4 +1,4 @@
-@trainerName = ttrainer99912345
+@trainerName = ttrainer
 @trainerId = 1
 
 ### Create trainer
@@ -46,4 +46,8 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 
 ### Delete qualification from trainer
 DELETE http://localhost:8080/api/v1/trainer/{{trainerId}}/qualification/{{qualificationId}}
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### Get all trainers
+GET localhost:8080/api/v1/trainer
 Authorization: Bearer {{$auth.token("auth-id")}}
