@@ -50,6 +50,7 @@ public class Course {
     @ManyToMany
     private Set<Trainer> trainers;
     private String notes;
+    private String title;
 }
 
 

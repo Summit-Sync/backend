@@ -61,6 +61,7 @@ public class CourseMapper {
                 .numberTrainers(course.getNumberTrainer())
                 .trainerList(course.getTrainers().stream().map(trainer -> this.trainerMapper.mapTrainerToTrainerDto(trainer, jwt)).toList())
                 .notes(course.getNotes())
+                .title(course.getTitle())
                 .build();
     }
 
@@ -95,6 +96,7 @@ public class CourseMapper {
                 .requiredQualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).collect(Collectors.toSet()))
                 .numberTrainer(dto.getNumberTrainers())
                 .trainers(new HashSet<>())
+                .title(dto.getTitle())
                 .build();
     }
 }
