@@ -130,11 +130,29 @@ public class CourseController {
         return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(updatedCourse, jwt.getToken().getTokenValue()));
     }
 
-    @DeleteMapping("/{id}/waitlist/{trainerId}")
+    @DeleteMapping("/{id}/trainer/{trainerId}")
     public ResponseEntity<CourseGetDTO> removeTrainerFromCourse(@PathVariable long id, @PathVariable long trainerId, JwtAuthenticationToken jwt) {
         var course = this.service.get(id);
         var updatedCourse = this.service.removeTrainer(course, trainerId);
 
         return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(updatedCourse, jwt.getToken().getTokenValue()));
     }
+
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<CourseGetDTO> cancelCourse(@PathVariable long id, JwtAuthenticationToken jwt) {
+        var course = this.service.get(id);
+        var updatedCourse = this.service.cancel(course);
+
+        return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(updatedCourse, jwt.getToken().getTokenValue()));
+    }
+
+
+    @PutMapping("/{id}/publish")
+    public ResponseEntity<CourseGetDTO> publishCourse(@PathVariable long id, JwtAuthenticationToken jwt) {
+        var course = this.service.get(id);
+        var updatedCourse = this.service.publish(course);
+
+        return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(updatedCourse, jwt.getToken().getTokenValue()));
+    }
+
 }
