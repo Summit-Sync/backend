@@ -34,6 +34,7 @@ public class CourseGetDTO {
     private int numberTrainers;
     private List<TrainerDto> trainerList;
     private String notes;
+    private String title;
 }
 
 //CourseDTO: id (long), visible (boolean), canceled (boolean), finished (boolean), courseNumber (calculated String), acronym (string),

@@ -30,6 +30,7 @@ public class CoursePostDTO {
     private List<Long> requiredQualifications;
     private int numberTrainers;
     private String notes;
+    private String title;
 }
 
 // PostCourseDTO: visible (boolean), acronym (string), description (String), dates (Date als string), duration(int),

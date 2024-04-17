@@ -61,6 +61,7 @@ public class CourseMapper {
                 .numberTrainers(course.getNumberTrainer())
                 .trainerList(course.getTrainers().stream().map(trainer -> this.trainerMapper.mapTrainerToTrainerDto(trainer, jwt)).toList())
                 .notes(course.getNotes())
+                .title(course.getTitle())
                 .build();
     }
 

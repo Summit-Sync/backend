@@ -47,6 +47,7 @@ public class CourseService {
         courseToUpdate.setRequiredQualifications(course.getRequiredQualifications());
         courseToUpdate.setNumberTrainer(course.getNumberTrainer());
         courseToUpdate.setNotes(course.getNotes());
+        courseToUpdate.setTitle(course.getTitle());
         return this.repository.save(courseToUpdate);
     }
 
