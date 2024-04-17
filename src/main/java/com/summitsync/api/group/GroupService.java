@@ -3,6 +3,7 @@ package com.summitsync.api.group;
 import com.summitsync.api.date.EventDate;
 import com.summitsync.api.grouptemplate.GroupTemplate;
 import com.summitsync.api.grouptemplate.GroupTemplateService;
+import com.summitsync.api.trainer.Trainer;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -75,6 +76,12 @@ public class GroupService {
             log.info("GroupList is empty");
         }
         return all;
+    }
+
+    public void addTrainer(Group group, Trainer trainer) {
+        group.trainers.add(trainer);
+
+        this.repository.save(group);
     }
 
     public Group cancel(Group group) {

@@ -19,7 +19,7 @@ public class TrainerApplicationMapper {
         dto.setQualificationDTOs(trainerDto.getQualifications());
         dto.setLastName(trainerDto.getLastName());
         dto.setFirstName(trainerDto.getFirstName());
-        dto.setAccepted(application.isAccepted());
+        dto.setAccepted(application.getAccepted());
         dto.setEmail(trainerDto.getEmail());
         return dto;
     }
