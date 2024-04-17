@@ -76,4 +76,9 @@ public class GroupService {
         }
         return all;
     }
+
+    public Group cancel(Group group) {
+        group.setCancelled(true);
+        return this.repository.save(group);
+    }
 }

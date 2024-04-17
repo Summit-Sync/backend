@@ -1,10 +1,13 @@
 package com.summitsync.api.qualification;
 
+import com.summitsync.api.course.CourseService;
+import com.summitsync.api.course.dto.CourseGetDTO;
 import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
 import com.summitsync.api.qualification.dto.AddQualificationDto;
 import com.summitsync.api.qualification.dto.QualificationDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -16,10 +19,12 @@ import java.util.stream.Collectors;
 public class QualificationController {
     private final QualificationMapper qualificationMapper;
     private final QualificationService qualificationService;
+    private final CourseService courseService;
 
-    public QualificationController(QualificationMapper qualificationMapper, QualificationService qualificationService) {
+    public QualificationController(QualificationMapper qualificationMapper, QualificationService qualificationService, CourseService courseService) {
         this.qualificationMapper = qualificationMapper;
         this.qualificationService = qualificationService;
+        this.courseService = courseService;
     }
     @PostMapping
     public QualificationDto newQualification(@RequestBody AddQualificationDto addQualificationDto) {
@@ -52,5 +57,11 @@ public class QualificationController {
         var ret = this.qualificationService.updateQualification(id, qualification);
 
         return new ResponseEntity<>(this.qualificationMapper.mapQualificationToQualificationDto(ret), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/course")
+    public ResponseEntity<List<CourseGetDTO>> getCoursesWithQualification(@PathVariable("id") long id, JwtAuthenticationToken jwt) {
+        var qualification = this.qualificationService.findById(id);
+        return new ResponseEntity<>(this.courseService.getAllWithQualification(qualification, jwt), HttpStatus.OK);
     }
 }

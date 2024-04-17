@@ -45,12 +45,18 @@ public class CourseTemplateController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CourseTemplateDto>>getAllCourseTemplates(){
+    public ResponseEntity<List<CourseTemplateDto>> getAllCourseTemplates(){
         List<CourseTemplate>data = this.courseTemplateService.findAll();
         List<CourseTemplateDto>response = new ArrayList<>();
         for(CourseTemplate courseTemplate : data){
             response.add(this.courseTemplateMapper.mapCourseTemplateToCourseTemplateDto(courseTemplate));
         }
         return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CourseTemplateDto> getCourseTemplate(@PathVariable long id) {
+        var template = this.courseTemplateService.findById(id);
+        return new ResponseEntity<>(this.courseTemplateMapper.mapCourseTemplateToCourseTemplateDto(template), HttpStatus.OK);
     }
 }

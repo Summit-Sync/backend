@@ -1,5 +1,6 @@
 package com.summitsync.api.course;
 
+import com.summitsync.api.course.dto.CourseGetDTO;
 import com.summitsync.api.coursetemplate.CourseTemplate;
 import com.summitsync.api.coursetemplate.CourseTemplateService;
 import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
@@ -9,8 +10,12 @@ import com.summitsync.api.trainer.Trainer;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -22,6 +27,7 @@ public class CourseService {
 
     private final Logger log = LoggerFactory.getLogger(CourseService.class);
     private final CourseRepository repository;
+    private final CourseMapper mapper;
 
     public Course create(Course course) { return this.repository.save(course); }
 
@@ -151,6 +157,27 @@ public class CourseService {
                 .collect(Collectors.toSet());
 
         course.setTrainers(updatedTrainers);
+        return this.repository.save(course);
+    }
+
+    public List<CourseGetDTO> getAllWithQualification(Qualification qualification, JwtAuthenticationToken jwt) {
+        var all = this.getAll();
+        var filter = all.stream().filter(course -> course.getRequiredQualifications().contains(qualification));
+        var courses = filter.toList();
+        List<CourseGetDTO> result = new ArrayList<>();
+        for (Course course : courses) {
+            result.add(this.mapper.mapCourseToCourseGetDTO(course, jwt.getToken().getTokenValue()));
+        }
+        return result;
+    }
+
+    public Course cancel(Course course) {
+        course.setCancelled(true);
+        return this.repository.save(course);
+    }
+
+    public Course publish(Course course) {
+        course.setCancelled(false);
         return this.repository.save(course);
     }
 }
