@@ -1,19 +1,12 @@
 package com.summitsync.api.coursetemplate;
 
-import com.summitsync.api.course.Course;
-import com.summitsync.api.coursetemplateprice.CourseTemplatePrice;
 import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
-import com.summitsync.api.qualification.Qualification;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +29,7 @@ public class CourseTemplateService {
         courseTemplateToUpdate.setNumberWaitlist(updatedCourseTemplate.getNumberWaitlist());
         courseTemplateToUpdate.setLocation(updatedCourseTemplate.getLocation());
         courseTemplateToUpdate.setMeetingPoint(updatedCourseTemplate.getMeetingPoint());
-        courseTemplateToUpdate.setCourseTemplatePrices(updatedCourseTemplate.getCourseTemplatePrices());
+        courseTemplateToUpdate.setPrices(updatedCourseTemplate.getPrices());
         courseTemplateToUpdate.setQualifications(updatedCourseTemplate.getQualifications());
         courseTemplateToUpdate.setNumberTrainer(updatedCourseTemplate.getNumberTrainer());
 

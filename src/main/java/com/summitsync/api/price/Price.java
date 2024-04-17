@@ -1,6 +1,5 @@
-package com.summitsync.api.coursetemplateprice;
+package com.summitsync.api.price;
 
-import com.summitsync.api.coursetemplate.CourseTemplate;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -16,10 +14,10 @@ import java.util.List;
 @Data
 @Table(name = "SS_CourseTemplatePrice")
 @Builder
-public class CourseTemplatePrice {
+public class Price {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long courseTemplatePriceId;
     private BigDecimal price;
-    private String category;
+    private String name;
 }

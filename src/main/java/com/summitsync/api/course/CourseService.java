@@ -31,7 +31,6 @@ public class CourseService {
         courseToUpdate.setFinished(course.isFinished());
         courseToUpdate.setCourseNumber(course.getCourseNumber());
         courseToUpdate.setAcronym(course.getAcronym());
-        // FIXME: we always create new dates here...
         courseToUpdate.setDates(course.getDates());
         courseToUpdate.setDuration(course.getDuration());
         courseToUpdate.setNumberParticipants(course.getNumberParticipants());

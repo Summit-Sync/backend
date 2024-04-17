@@ -2,7 +2,7 @@ package com.summitsync.api.integrationtest.coursetemplate;
 
 import com.summitsync.api.coursetemplate.CourseTemplate;
 import com.summitsync.api.coursetemplate.CourseTemplateRepository;
-import com.summitsync.api.coursetemplateprice.CourseTemplatePrice;
+import com.summitsync.api.price.Price;
 import com.summitsync.api.integrationtest.testcontainers.AbstractIntegrationTest;
 import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.qualification.QualificationRepository;
@@ -34,7 +34,7 @@ public class CreateCourseTemplateTest extends AbstractIntegrationTest {
     public void setUp() throws Exception{
         this.qualificationRepository.save(Qualification.builder().name("Erste Hilfe Kurs").build());
         this.repository.save(new CourseTemplate("EK", "Test",2,"test", List.of(Qualification.builder().name("Erste Hilfe Kurs").build())
-                ,20, 5, 2,List.of(CourseTemplatePrice.builder().price(BigDecimal.TEN).category("Mitglied").build()), 1000, 90));
+                ,20, 5, 2,List.of(Price.builder().price(BigDecimal.TEN).category("Mitglied").build()), 1000, 90));
     }
     @Test
     public void createCourseTemplateHappyPath() throws Exception{

@@ -1,4 +1,4 @@
-package com.summitsync.api.coursetemplateprice.dto;
+package com.summitsync.api.price.dto;
 
 import lombok.Builder;
 import lombok.Data;
@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Data
 @Builder
-public class CourseTemplatePriceDto {
+public class PriceDto {
     long id;
     BigDecimal price;
     String category;
