@@ -1,6 +1,6 @@
 package com.summitsync.api.coursetemplate.dto;
 
-import com.summitsync.api.coursetemplateprice.dto.CourseTemplatePriceDto;
+import com.summitsync.api.price.dto.PriceDto;
 import com.summitsync.api.location.dto.GetLocationDto;
 import com.summitsync.api.qualification.dto.QualificationDto;
 import lombok.AllArgsConstructor;
@@ -26,7 +26,7 @@ public class CourseTemplateDto {
     private int numberWaitlist;
     private GetLocationDto location;
     private String meetingPoint;
-    private List<CourseTemplatePriceDto> price;
+    private List<PriceDto> price;
     private List<QualificationDto> requiredQualifications;
 }
 

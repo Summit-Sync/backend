@@ -10,6 +10,8 @@ import com.summitsync.api.location.LocationMapper;
 import com.summitsync.api.location.LocationService;
 import com.summitsync.api.participant.ParticipantMapper;
 import com.summitsync.api.participant.dto.ParticipantDto;
+import com.summitsync.api.price.PriceMapper;
+import com.summitsync.api.price.PriceService;
 import com.summitsync.api.qualification.QualificationMapper;
 import com.summitsync.api.qualification.QualificationService;
 import com.summitsync.api.trainer.TrainerMapper;
@@ -33,6 +35,8 @@ public class CourseMapper {
     private final EventDateService eventDateService;
     private final LocationService locationService;
     private final QualificationService qualificationService;
+    private final PriceMapper priceMapper;
+    private final PriceService priceService;
 
     public CourseGetDTO mapCourseToCourseGetDTO(Course course, String jwt) {
 
@@ -50,7 +54,7 @@ public class CourseMapper {
                 .participants(course.getParticipants().stream().map(participant -> this.participantMapper.mapParticipantToParticipantDto(participant, jwt)).toList())
                 .waitList(course.getWaitList().stream().map(participant -> this.participantMapper.mapParticipantToParticipantDto(participant, jwt)).toList())
                 .numberWaitlist(course.getNumberWaitlist())
-                // TODO coursePrices
+                .coursePrices(course.getCoursePrices().stream().map(this.priceMapper::mapPriceToPriceDto).toList())
                 .location(this.locationMapper.mapLocationToGetLocationDto(course.getLocation()))
                 .meetingPoint(course.getMeetingPoint())
                 .requiredQualifications(course.getRequiredQualifications().stream().map(this.qualificationMapper::mapQualificationToQualificationDto).toList())
@@ -85,7 +89,7 @@ public class CourseMapper {
                 .participants(new HashSet<>())
                 .waitList(new HashSet<>())
                 .numberWaitlist(dto.getNumberWaitlist())
-                // TODO coursePrices
+                .coursePrices(dto.getPrices().stream().map(this.priceService::findById).collect(Collectors.toSet()))
                 .location(this.locationService.getLocationById(dto.getLocation()))
                 .meetingPoint(dto.getMeetingPoint())
                 .requiredQualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).collect(Collectors.toSet()))

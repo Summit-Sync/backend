@@ -1,20 +1,13 @@
 package com.summitsync.api.course.dto;
 
-import com.summitsync.api.courseprice.CoursePrice;
-import com.summitsync.api.coursetemplate.CourseTemplate;
-import com.summitsync.api.date.EventDate;
-import com.summitsync.api.date.dto.EventDateGetDto;
-import com.summitsync.api.location.Location;
 import com.summitsync.api.location.dto.GetLocationDto;
-import com.summitsync.api.participant.Participant;
 import com.summitsync.api.participant.dto.ParticipantDto;
-import com.summitsync.api.qualification.Qualification;
+import com.summitsync.api.price.dto.PriceDto;
 import com.summitsync.api.qualification.dto.QualificationDto;
 import com.summitsync.api.trainer.dto.TrainerDto;
 import lombok.Builder;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,7 +27,7 @@ public class CourseGetDTO {
     private List<ParticipantDto> participants;
     private List<ParticipantDto> waitList;
     private int numberWaitlist;
-    private List<CoursePrice> coursePrices;
+    private List<PriceDto> coursePrices;
     private GetLocationDto location;
     private String meetingPoint;
     private List<QualificationDto> requiredQualifications;

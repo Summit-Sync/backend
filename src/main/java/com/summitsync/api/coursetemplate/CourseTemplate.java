@@ -1,6 +1,6 @@
 package com.summitsync.api.coursetemplate;
 
-import com.summitsync.api.coursetemplateprice.CourseTemplatePrice;
+import com.summitsync.api.price.Price;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.qualification.Qualification;
 import jakarta.persistence.*;
@@ -32,7 +32,7 @@ public class CourseTemplate {
     private Location location;
     private String meetingPoint;
     @OneToMany
-    private Set<CourseTemplatePrice> courseTemplatePrices;
+    private Set<Price> prices;
     @OneToMany
     private Set<Qualification> qualifications;
     private int numberTrainer;

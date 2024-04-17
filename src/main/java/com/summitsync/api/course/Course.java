@@ -1,9 +1,9 @@
 package com.summitsync.api.course;
 
-import com.summitsync.api.courseprice.CoursePrice;
 import com.summitsync.api.date.EventDate;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.participant.Participant;
+import com.summitsync.api.price.Price;
 import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.trainer.Trainer;
 import jakarta.persistence.*;
@@ -40,7 +40,7 @@ public class Course {
     private Set<Participant> waitList;
     private int numberWaitlist;
     @ManyToMany
-    private Set<CoursePrice> coursePrices;
+    private Set<Price> coursePrices;
     @ManyToOne
     private Location location;
     private String meetingPoint;

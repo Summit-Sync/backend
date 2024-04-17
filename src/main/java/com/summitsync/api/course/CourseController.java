@@ -2,7 +2,6 @@ package com.summitsync.api.course;
 
 import com.summitsync.api.course.dto.CourseGetDTO;
 import com.summitsync.api.course.dto.CoursePostDTO;
-import com.summitsync.api.participant.ParticipantMapper;
 import com.summitsync.api.participant.ParticipantService;
 import com.summitsync.api.qualification.QualificationService;
 import com.summitsync.api.trainer.TrainerService;
@@ -24,7 +23,6 @@ public class CourseController {
     private final CourseService service;
     private final CourseMapper mapper;
     private final QualificationService qualificationService;
-    private final ParticipantMapper participantMapper;
     private final ParticipantService participantService;
     private final TrainerService trainerService;
 
