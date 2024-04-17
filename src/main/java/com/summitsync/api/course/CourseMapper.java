@@ -96,6 +96,7 @@ public class CourseMapper {
                 .requiredQualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).collect(Collectors.toSet()))
                 .numberTrainer(dto.getNumberTrainers())
                 .trainers(new HashSet<>())
+                .title(dto.getTitle())
                 .build();
     }
 }
