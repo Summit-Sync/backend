@@ -15,10 +15,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,7 +26,21 @@ public class CourseService {
     private final CourseRepository repository;
     private final CourseMapper mapper;
 
-    public Course create(Course course) { return this.repository.save(course); }
+    public Course create(Course course) {
+        course.setCourseNumber(this.generateCourseNumber(course.getAcronym()));
+        return this.repository.save(course);
+    }
+
+    private String generateCourseNumber(String acronym) {
+        var allCoursesWithAcronym = this.repository.findAll().stream().filter(course -> Objects.equals(course.getAcronym(), acronym)).toList();
+        if (allCoursesWithAcronym.isEmpty()) {
+            return acronym + "001";
+        }
+        var highestNumber = allCoursesWithAcronym.stream().sorted(Comparator.comparing(Course::getCourseNumber)).toList().reversed().getFirst();
+        var numberPartFromHighest = Integer.parseInt(highestNumber.getCourseNumber().split(acronym)[1]);
+        var nextNumber = numberPartFromHighest + 1;
+        return acronym + String.format("%03d", nextNumber);
+    }
 
     public Course update(Course courseToUpdate, Course course) {
         courseToUpdate.setVisible(course.isVisible());
