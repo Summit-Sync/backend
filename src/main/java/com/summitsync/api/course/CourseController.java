@@ -5,6 +5,7 @@ import com.summitsync.api.course.dto.CoursePostDTO;
 import com.summitsync.api.participant.ParticipantService;
 import com.summitsync.api.qualification.QualificationService;
 import com.summitsync.api.trainer.TrainerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class CourseController {
     private final TrainerService trainerService;
 
     @PostMapping
-    public ResponseEntity<CourseGetDTO> addCourse(@RequestBody CoursePostDTO course, JwtAuthenticationToken jwt) {
+    public ResponseEntity<CourseGetDTO> addCourse(@RequestBody @Valid CoursePostDTO course, JwtAuthenticationToken jwt) {
         var createdCourse = this.service.create(this.mapper.mapCoursePostDTOToCourse(course));
 
         return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(createdCourse, jwt.getToken().getTokenValue()));
@@ -57,7 +58,7 @@ public class CourseController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CourseGetDTO> updateCourse(@RequestBody CoursePostDTO dto, @PathVariable long id, JwtAuthenticationToken jwt) {
+    public ResponseEntity<CourseGetDTO> updateCourse(@RequestBody @Valid CoursePostDTO dto, @PathVariable long id, JwtAuthenticationToken jwt) {
         Course updatedCourse = this.mapper.mapCoursePostDTOToCourse(dto);
         Course dbCourse = this.service.update(this.service.get(id), updatedCourse);
         CourseGetDTO response = this.mapper.mapCourseToCourseGetDTO(dbCourse, jwt.getToken().getTokenValue());
