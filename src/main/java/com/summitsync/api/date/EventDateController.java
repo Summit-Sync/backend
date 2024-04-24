@@ -2,6 +2,7 @@ package com.summitsync.api.date;
 
 import com.summitsync.api.date.dto.EventDateGetDto;
 import com.summitsync.api.date.dto.EventDatePostDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class EventDateController {
     private final EventDateMapper mapper;
 
     @PostMapping
-    public ResponseEntity<EventDateGetDto> createEventDate(@RequestBody EventDatePostDto dto) {
+    public ResponseEntity<EventDateGetDto> createEventDate(@RequestBody @Valid EventDatePostDto dto) {
         EventDate eventDate = this.service.create(this.mapper.mapEventDatePostDtoToEventDate(dto));
         return new ResponseEntity<>(this.mapper.mapEventDateToEventDateGetDto(eventDate), HttpStatus.OK);
     }
@@ -48,7 +49,7 @@ public class EventDateController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EventDateGetDto> updateEventDate(@PathVariable long id, @RequestBody EventDatePostDto dto) {
+    public ResponseEntity<EventDateGetDto> updateEventDate(@PathVariable long id, @RequestBody @Valid EventDatePostDto dto) {
         EventDate eventDate = this.service.update(id, dto);
         return new ResponseEntity<>(this.mapper.mapEventDateToEventDateGetDto(eventDate), HttpStatus.OK);
     }
