@@ -5,6 +5,7 @@ import com.summitsync.api.course.dto.CourseGetDTO;
 import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
 import com.summitsync.api.qualification.dto.AddQualificationDto;
 import com.summitsync.api.qualification.dto.QualificationDto;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -27,7 +28,7 @@ public class QualificationController {
         this.courseService = courseService;
     }
     @PostMapping
-    public QualificationDto newQualification(@RequestBody AddQualificationDto addQualificationDto) {
+    public QualificationDto newQualification(@RequestBody @Valid AddQualificationDto addQualificationDto) {
         var qualification = this.qualificationMapper.mapAddQualificationDtoToQualification(addQualificationDto);
         var savedQualification = this.qualificationService.saveQualification(qualification);
         return this.qualificationMapper.mapQualificationToQualificationDto(savedQualification);
@@ -52,7 +53,7 @@ public class QualificationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<QualificationDto> putQualification(@PathVariable("id") long id, @RequestBody AddQualificationDto addQualificationDto) {
+    public ResponseEntity<QualificationDto> putQualification(@PathVariable("id") long id, @RequestBody @Valid AddQualificationDto addQualificationDto) {
         var qualification = this.qualificationMapper.mapAddQualificationDtoToQualification(addQualificationDto);
         var ret = this.qualificationService.updateQualification(id, qualification);
 
