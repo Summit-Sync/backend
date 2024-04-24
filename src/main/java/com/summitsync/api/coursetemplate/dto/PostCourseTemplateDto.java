@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class PostCourseTemplateDto {
-    @Size(max = 3, min = 3, message = "acronym has to be 3 long")
+    @Size(max = 3, min = 2, message = "acronym has to be 2 or 3 long")
     private String acronym;
     @NotBlank(message = "acronym cannot be empty")
     private String title;
@@ -27,7 +27,7 @@ public class PostCourseTemplateDto {
     private int numberParticipants;
     @PositiveOrZero(message = "the number of participants on the waitlist can not be negative")
     private int numberWaitlist;
-    private long location;
+    private Long location;
     private String meetingPoint;
     private List<Long> price;
     private List<Long> requiredQualifications;

@@ -25,7 +25,7 @@ public class CourseTemplateMapper {
     private final LocationMapper locationMapper;
 
     public CourseTemplate mapPostCourseTemplateDtoToCourseTemplate(PostCourseTemplateDto dto){
-        return CourseTemplate.builder()
+        var courseTemplate = CourseTemplate.builder()
                 .acronym(dto.getAcronym())
                 .title(dto.getTitle())
                 .description(dto.getDescription())
@@ -33,17 +33,27 @@ public class CourseTemplateMapper {
                 .duration(dto.getDuration())
                 .numberParticipants(dto.getNumberParticipants())
                 .numberWaitlist(dto.getNumberWaitlist())
-                .location(this.locationService.getLocationById(dto.getLocation()))
                 .meetingPoint(dto.getMeetingPoint())
-                .prices(dto.getPrice().stream().map(this.priceService::findById).collect(Collectors.toSet()))
-                .qualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).collect(Collectors.toSet()))
                 .numberTrainer(dto.getNumberTrainers())
                 .build();
 
+        if (dto.getLocation() != null) {
+            courseTemplate.setLocation(this.locationService.getLocationById(dto.getLocation()));
+        }
+
+        if (dto.getPrice() != null && !dto.getPrice().isEmpty()) {
+            courseTemplate.setPrices(dto.getPrice().stream().map(this.priceService::findById).collect(Collectors.toSet()));
+        }
+
+        if (dto.getRequiredQualifications() != null && !dto.getRequiredQualifications().isEmpty()) {
+            courseTemplate.setQualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).collect(Collectors.toSet()));
+        }
+
+        return courseTemplate;
     }
 
     public CourseTemplateDto mapCourseTemplateToCourseTemplateDto(CourseTemplate courseTemplate){
-        return CourseTemplateDto.builder()
+        var dto = CourseTemplateDto.builder()
                 .id(courseTemplate.getCourseTemplateId())
                 .acronym(courseTemplate.getAcronym())
                 .title(courseTemplate.getTitle())
@@ -52,10 +62,21 @@ public class CourseTemplateMapper {
                 .duration(courseTemplate.getDuration())
                 .numberParticipants(courseTemplate.getNumberParticipants())
                 .numberWaitlist(courseTemplate.getNumberWaitlist())
-                .location(this.locationMapper.mapLocationToGetLocationDto(courseTemplate.getLocation()))
                 .meetingPoint(courseTemplate.getMeetingPoint())
-                .price(courseTemplate.getPrices().stream().map(this.priceMapper::mapPriceToPriceDto).toList())
-                .requiredQualifications(courseTemplate.getQualifications().stream().map(this.qualificationMapper::mapQualificationToQualificationDto).toList())
                 .build();
+
+        if (courseTemplate.getLocation() != null) {
+            dto.setLocation(this.locationMapper.mapLocationToGetLocationDto(courseTemplate.getLocation()));
+        }
+
+        if (courseTemplate.getPrices() != null && !courseTemplate.getPrices().isEmpty()) {
+            dto.setPrice(courseTemplate.getPrices().stream().map(this.priceMapper::mapPriceToPriceDto).toList());
+        }
+
+        if (courseTemplate.getQualifications() != null && !courseTemplate.getQualifications().isEmpty()) {
+            dto.setRequiredQualifications(courseTemplate.getQualifications().stream().map(this.qualificationMapper::mapQualificationToQualificationDto).toList());
+        }
+
+        return dto;
     }
 }
