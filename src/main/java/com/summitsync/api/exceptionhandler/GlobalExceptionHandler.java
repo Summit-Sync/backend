@@ -2,8 +2,11 @@ package com.summitsync.api.exceptionhandler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -30,4 +33,19 @@ public class GlobalExceptionHandler {
         var errorResponse = new ErrorResponse("keycloak", keycloakApiException.getMessage());
         return new ResponseEntity<>(errorResponse, keycloakApiException.getStatus());
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?>  handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        var errorMsg = new StringBuilder();
+        errorMsg.append("Error(s) occurred during validation:\n");
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errorMsg.append(fieldName).append(": ").append(errorMessage).append("\n");
+        });
+        var errorResponse = new ErrorResponse("validation", errorMsg.toString());
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
 }
