@@ -38,7 +38,7 @@ public class ContactService {
         contact.setFirstName(contactPostDto.getFirstName());
         contact.setLastName(contactPostDto.getLastName());
         contact.setEmail(contactPostDto.getEmail());
-        contact.setTelephone(contactPostDto.getTelephone());
+        contact.setTelephone(contactPostDto.getPhone());
 
         return this.contactRepository.save(contact);
     }

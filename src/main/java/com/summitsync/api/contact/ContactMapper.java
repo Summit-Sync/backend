@@ -12,7 +12,7 @@ public class ContactMapper {
                 .firstName(contactPostDto.getFirstName())
                 .lastName(contactPostDto.getLastName())
                 .email(contactPostDto.getEmail())
-                .telephone(contactPostDto.getTelephone())
+                .telephone(contactPostDto.getPhone())
                 .build();
     }
 
@@ -23,7 +23,7 @@ public class ContactMapper {
                 .firstName(contact.getFirstName())
                 .lastName(contact.getLastName())
                 .email(contact.getEmail())
-                .telephone(contact.getTelephone())
+                .phone(contact.getTelephone())
                 .build();
     }
 }
