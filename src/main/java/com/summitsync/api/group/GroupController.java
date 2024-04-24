@@ -4,6 +4,7 @@ import com.summitsync.api.date.EventDateService;
 import com.summitsync.api.group.dto.GroupGetDTO;
 import com.summitsync.api.group.dto.GroupPostDTO;
 import com.summitsync.api.grouptemplate.GroupTemplateMapper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class GroupController {
     private final EventDateService eventDateService;
 
     @PostMapping
-    public ResponseEntity<GroupGetDTO> createGroup(@RequestBody GroupPostDTO dto, JwtAuthenticationToken jwt) {
+    public ResponseEntity<GroupGetDTO> createGroup(@RequestBody @Valid GroupPostDTO dto, JwtAuthenticationToken jwt) {
         Group group = this.mapper.mapGroupPostDTOToGroup(dto);
         var createdGroup = this.service.create(group);
         return new ResponseEntity<>(this.mapper.mapGroupToGroupGetDto(createdGroup, jwt.getToken().getTokenValue()), HttpStatus.OK);
@@ -55,7 +56,7 @@ public class GroupController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GroupGetDTO> updateGroup(@RequestBody GroupPostDTO dto, @PathVariable long id, JwtAuthenticationToken jwt) {
+    public ResponseEntity<GroupGetDTO> updateGroup(@RequestBody @Valid GroupPostDTO dto, @PathVariable long id, JwtAuthenticationToken jwt) {
         var group = this.mapper.mapGroupPostDTOToGroup(dto);
         var groupToUpdate = this.service.get(id);
         Group dbGroup = this.service.update(groupToUpdate, group);
