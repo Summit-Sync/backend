@@ -4,6 +4,7 @@ import com.summitsync.api.qualification.QualificationService;
 import com.summitsync.api.trainer.dto.AddTrainerDto;
 import com.summitsync.api.trainer.dto.TrainerDto;
 import com.summitsync.api.trainer.dto.UpdateTrainerDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -20,7 +21,7 @@ public class TrainerController {
     private final TrainerService trainerService;
     private final QualificationService qualificationService;
     @PostMapping
-    public TrainerDto newTrainer(@RequestBody AddTrainerDto addTrainerDto, JwtAuthenticationToken jwt) {
+    public TrainerDto newTrainer(@RequestBody @Valid AddTrainerDto addTrainerDto, JwtAuthenticationToken jwt) {
         return this.trainerService.newTrainer(addTrainerDto, jwt.getToken().getTokenValue());
     }
 
@@ -50,7 +51,7 @@ public class TrainerController {
     }
 
     @PutMapping("/{trainerId}")
-    public TrainerDto updateTrainer(@PathVariable long trainerId, @RequestBody UpdateTrainerDto updateTrainerDto, JwtAuthenticationToken jwt) {
+    public TrainerDto updateTrainer(@PathVariable long trainerId, @RequestBody @Valid UpdateTrainerDto updateTrainerDto, JwtAuthenticationToken jwt) {
         var trainer = this.trainerService.findById(trainerId);
 
         return this.trainerService.updateTrainer(trainer, updateTrainerDto, jwt.getToken().getTokenValue());
