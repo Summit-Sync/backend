@@ -33,6 +33,7 @@ public class WebSecurityConfig {
                         jwt.jwtAuthenticationConverter(new JwtAuthenticationConverterRoles())
                         )
                 )
+                .cors().disable()
                 .sessionManagement((man) -> man.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }
