@@ -59,6 +59,7 @@ public class TrainerMapper {
         var attributes = new HashMap<String, Object>();
         attributes.put("phone", updateTrainerDto.getPhone());
         return KeycloakAddUserRequest.builder()
+                .firstName(updateTrainerDto.getFirstName())
                 .lastName(updateTrainerDto.getLastName())
                 .email(updateTrainerDto.getEmail())
                 .attributes(attributes)

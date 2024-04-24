@@ -2,6 +2,7 @@ package com.summitsync.api.price;
 
 import com.summitsync.api.price.dto.PriceDto;
 import com.summitsync.api.price.dto.PricePostDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class PriceController {
     private final PriceMapper priceMapper;
 
     @PostMapping
-    public PriceDto newPrice(@RequestBody PricePostDto pricePostDto) {
+    public PriceDto newPrice(@RequestBody @Valid PricePostDto pricePostDto) {
         var dbPrice = this.priceService.create(this.priceMapper.mapPostPriceDtoToPrice(pricePostDto));
 
         return this.priceMapper.mapPriceToPriceDto(dbPrice);
@@ -33,7 +34,7 @@ public class PriceController {
     }
 
     @PutMapping("/{id}")
-    public PriceDto updatePrice(@RequestBody PricePostDto pricePostDto, @PathVariable long id) {
+    public PriceDto updatePrice(@RequestBody @Valid PricePostDto pricePostDto, @PathVariable long id) {
         var priceToUpdate = this.priceService.findById(id);
         var updatedPrice = this.priceMapper.mapPostPriceDtoToPrice(pricePostDto);
         return this.priceMapper.mapPriceToPriceDto(this.priceService.update(priceToUpdate, updatedPrice));

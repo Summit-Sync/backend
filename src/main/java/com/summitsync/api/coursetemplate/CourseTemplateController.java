@@ -2,6 +2,7 @@ package com.summitsync.api.coursetemplate;
 
 import com.summitsync.api.coursetemplate.dto.CourseTemplateDto;
 import com.summitsync.api.coursetemplate.dto.PostCourseTemplateDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class CourseTemplateController {
     private final CourseTemplateMapper courseTemplateMapper;
 
     @PostMapping
-    public ResponseEntity<CourseTemplateDto>createCourseTemplate(@RequestBody PostCourseTemplateDto dto){
+    public ResponseEntity<CourseTemplateDto>createCourseTemplate(@RequestBody @Valid PostCourseTemplateDto dto){
         CourseTemplate template = this.courseTemplateMapper.mapPostCourseTemplateDtoToCourseTemplate(dto);
         CourseTemplate data = this.courseTemplateService.createCourse(template);
         CourseTemplateDto createdCourse = this.courseTemplateMapper.mapCourseTemplateToCourseTemplateDto(data);
@@ -31,7 +32,7 @@ public class CourseTemplateController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CourseTemplateDto>updateCourseTemplate(@RequestBody PostCourseTemplateDto dto, @PathVariable final Long id){
+    public ResponseEntity<CourseTemplateDto>updateCourseTemplate(@RequestBody @Valid PostCourseTemplateDto dto, @PathVariable final Long id){
         CourseTemplate updatedCourse = this.courseTemplateMapper.mapPostCourseTemplateDtoToCourseTemplate(dto);
         var courseToUpdate = this.courseTemplateService.findById(id);
         CourseTemplate data = this.courseTemplateService.updateCourse(courseToUpdate, updatedCourse);
