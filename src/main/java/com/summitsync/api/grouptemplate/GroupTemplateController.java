@@ -2,6 +2,7 @@ package com.summitsync.api.grouptemplate;
 
 import com.summitsync.api.grouptemplate.dto.GroupTemplateGetDTO;
 import com.summitsync.api.grouptemplate.dto.GroupTemplatePostDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class GroupTemplateController {
     private final GroupTemplateService groupTemplateService;
     private final GroupTemplateMapper groupTemplateMapper;
     @PostMapping
-    public GroupTemplateGetDTO createGroupTemplate(@RequestBody GroupTemplatePostDTO dto) {
+    public GroupTemplateGetDTO createGroupTemplate(@RequestBody @Valid GroupTemplatePostDTO dto) {
         GroupTemplate templateToCreate = this.groupTemplateMapper.mapGroupPostDtoToGroupTemplate(dto);
         GroupTemplate createdTemplate = this.groupTemplateService.createTemplate(templateToCreate);
 
@@ -32,7 +33,7 @@ public class GroupTemplateController {
     }
 
     @PutMapping("/{id}")
-    public GroupTemplateGetDTO updateTemplate(@RequestBody GroupTemplatePostDTO dto, @PathVariable long id) {
+    public GroupTemplateGetDTO updateTemplate(@RequestBody @Valid GroupTemplatePostDTO dto, @PathVariable long id) {
         var templateToUpdate = this.groupTemplateService.findById(id);
         GroupTemplate dbTemplate = this.groupTemplateService.updateTemplate(templateToUpdate, dto);
         return this.groupTemplateMapper.mapGroupTemplateToGroupTemplateGetDTO(dbTemplate);
