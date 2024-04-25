@@ -30,7 +30,6 @@ public class LocationService {
         data.setCountry(location.getCountry());
         data.setPhone(location.getPhone());
         data.setEmail(location.getEmail());
-        data.setRoom(location.getRoom());
         data.setStreet(location.getStreet());
         data.setMapsUrl(location.getMapsUrl());
         data.setPostCode(location.getPostCode());

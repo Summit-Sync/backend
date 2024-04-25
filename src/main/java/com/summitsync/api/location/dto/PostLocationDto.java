@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class PostLocationDto {
-    private String room;
     private String street;
     private String postCode;
     private String country;
