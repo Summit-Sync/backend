@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class GetLocationDto {
     private long locationId;
-    private String room;
     private String street;
     private String postCode;
     private String country;

@@ -16,7 +16,6 @@ public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long locationId;
-    private String room;
     private String street;
     private String postCode;
     private String country;
