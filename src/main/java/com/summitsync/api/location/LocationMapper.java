@@ -15,7 +15,10 @@ public class LocationMapper {
                 .postCode(dto.getPostCode())
                 .phone(dto.getPhone())
                 .street(dto.getStreet())
-                .room(dto.getRoom()).build();
+                .room(dto.getRoom())
+                .city(dto.getCity())
+                .title(dto.getTitle())
+                .build();
     }
 
     public GetLocationDto mapLocationToGetLocationDto(Location location){
@@ -27,7 +30,10 @@ public class LocationMapper {
                 .phone(location.getPhone())
                 .postCode(location.getPostCode())
                 .room(location.getRoom())
-                .street(location.getStreet()).build();
+                .street(location.getStreet())
+                .city(location.getCity())
+                .title(location.getTitle())
+                .build();
     }
 
     public Location mapLocationDtoToLocation(GetLocationDto dto){
@@ -39,6 +45,9 @@ public class LocationMapper {
                 .postCode(dto.getPostCode())
                 .phone(dto.getPhone())
                 .street(dto.getStreet())
-                .room(dto.getRoom()).build();
+                .room(dto.getRoom())
+                .title(dto.getTitle())
+                .city(dto.getCity())
+                .build();
     }
 }

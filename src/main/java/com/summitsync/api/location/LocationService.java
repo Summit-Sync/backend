@@ -34,6 +34,8 @@ public class LocationService {
         data.setStreet(location.getStreet());
         data.setMapsUrl(location.getMapsUrl());
         data.setPostCode(location.getPostCode());
+        data.setTitle(location.getTitle());
+        data.setCity(location.getCity());
         return repository.save(data);
     }
 

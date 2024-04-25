@@ -23,4 +23,6 @@ public class Location {
     private String email;
     private String phone;
     private String mapsUrl;
+    private String title;
+    private String city;
 }
