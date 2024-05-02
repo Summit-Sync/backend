@@ -9,8 +9,10 @@ import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.qualification.dto.QualificationDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,6 +20,8 @@ import java.util.List;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CoursePostDTO {
     @NotBlank(message = "Visible cannot be empty.")
     private boolean visible;
