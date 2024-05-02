@@ -49,7 +49,7 @@ public class WebSecurityConfig {
         var configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-        configuration.setAllowedHeaders(List.of("Authorization"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         var configurationSource = new UrlBasedCorsConfigurationSource();
 
         configurationSource.registerCorsConfiguration("/**", configuration);
