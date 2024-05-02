@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: eclipse-temurin:21
+    services:
+      db:
+        image: postgres:16-bookworm
+        env:
+          POSTGRES_PASSWORD: dev
+          POSTGRES_USER: dev
+          POSTGRES_DB: summitsync
+        options: >-
+          --health-cmd "pg_isready -U dev -d summitsync"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+    steps:
+      - name: Install git
+        run: |
+          apt update && apt install --yes git
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Build and Test
+        run: |
+          ./gradlew clean test
+        env:
+          REDIS_HOST: redis
+          POSTGRES_HOST: db
+          POSTGRES_PORT: 5432
