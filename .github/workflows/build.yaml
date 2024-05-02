@@ -1,7 +1,6 @@
 name: Docker build and publish
 
 on:
-  # TODO: only run on main push
   push:
     branches:
       - main
