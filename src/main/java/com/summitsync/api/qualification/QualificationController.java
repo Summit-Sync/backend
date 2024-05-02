@@ -67,8 +67,8 @@ public class QualificationController {
     }
 
     @PutMapping("/{id}/trainers")
-    public ResponseEntity<QualificationDto> giveMultipleTrainersQualification(@PathVariable("id") long id, @RequestBody List<Long> ids) {
+    public ResponseEntity<QualificationDto> giveMultipleTrainersQualification(@PathVariable("id") long id, @RequestBody List<Long> ids, JwtAuthenticationToken jwt) {
         var qualification = this.qualificationService.findById(id);
-        return new ResponseEntity<>(this.qualificationService.addTrainerList(qualification, ids), HttpStatus.OK);
+        return new ResponseEntity<>(this.qualificationService.addTrainerList(qualification, ids, jwt), HttpStatus.OK);
     }
 }
