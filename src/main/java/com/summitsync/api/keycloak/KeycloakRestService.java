@@ -42,18 +42,19 @@ public class KeycloakRestService {
             preparedRequest.body(body);
         }
 
-       return preparedRequest.retrieve()
-        .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
+       var kcResponse = preparedRequest.retrieve();
+        kcResponse.onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
             if (response.getStatusCode().isSameCodeAs(HttpStatusCode.valueOf(404))) {
                throw new KeycloakApiException("resource not found", (HttpStatus) response.getStatusCode());
             }
             var objectMapper = new ObjectMapper();
-            Map<String, String> errorMap = objectMapper.readValue(response.getBody(), new TypeReference<>() {});
-            String errorMessage;
-            errorMessage = errorMap.getOrDefault("errorMessage", "unknown keycloak error");
+            Map<String, Object> errorMap = objectMapper.readValue(response.getBody(), new TypeReference<>() {});
+            String errorMessage = (String) errorMap.getOrDefault("errorMessage", "unknown keycloak error");
 
             throw new KeycloakApiException(errorMessage, (HttpStatus) response.getStatusCode());
         }));
+
+        return kcResponse;
     }
 
     public <B, R> R request(HttpMethod method, String uri, String jwt, B body, Class<R> responseType) {
