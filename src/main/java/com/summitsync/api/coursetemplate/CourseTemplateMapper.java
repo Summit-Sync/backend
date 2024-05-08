@@ -52,8 +52,7 @@ public class CourseTemplateMapper {
                         .name(pricePostDto.getName())
                         .price(pricePostDto.getPrice())
                         .build();
-
-                prices.add(price);
+                prices.add(this.priceService.create(price));
             }
 
             courseTemplate.setPrices(prices);
