@@ -8,6 +8,7 @@ import com.summitsync.api.participant.Participant;
 import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.qualification.dto.QualificationDto;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,10 +35,10 @@ public class CoursePostDTO {
     @NotBlank(message = "Duration cannot be empty.")
     @PositiveOrZero(message = "Duration must be positive or zero.")
     private int duration;
-    @NotBlank(message = "Number of Participants cannot be empty.")
+    @NotNull(message = "Number of Participants cannot be empty.")
     @PositiveOrZero(message = "Number of Participants must be positive or zero.")
     private int numberParticipants;
-    @NotBlank(message = "Number of Waitlist cannot be empty.")
+    @NotNull(message = "Number of Waitlist cannot be empty.")
     @PositiveOrZero(message = "Number of Waitlist must be positive or zero.")
     private int numberWaitlist;
     @NotBlank(message = "Prices cannot be empty.")
@@ -48,7 +49,7 @@ public class CoursePostDTO {
     private String meetingPoint;
     @NotBlank(message = "Required Qualifications cannot be empty.")
     private List<Long> requiredQualifications;
-    @NotBlank(message = "Number of Trainers cannot be empty.")
+    @NotNull(message = "Number of Trainers cannot be empty.")
     @PositiveOrZero(message = "Number of Trainers must be positive or zero.")
     private int numberTrainers;
     private String notes;
