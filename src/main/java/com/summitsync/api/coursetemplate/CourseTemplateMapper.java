@@ -2,6 +2,7 @@ package com.summitsync.api.coursetemplate;
 
 import com.summitsync.api.coursetemplate.dto.CourseTemplateDto;
 import com.summitsync.api.coursetemplate.dto.PostCourseTemplateDto;
+import com.summitsync.api.price.Price;
 import com.summitsync.api.price.PriceMapper;
 import com.summitsync.api.price.PriceService;
 import com.summitsync.api.location.LocationMapper;
@@ -11,6 +12,8 @@ import com.summitsync.api.qualification.QualificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -42,7 +45,18 @@ public class CourseTemplateMapper {
         }
 
         if (dto.getPrice() != null && !dto.getPrice().isEmpty()) {
-            courseTemplate.setPrices(dto.getPrice().stream().map(this.priceService::findById).collect(Collectors.toSet()));
+            var prices = new HashSet<Price>();
+            for (var pricePostDto: dto.getPrice()) {
+                var price = Price
+                        .builder()
+                        .name(pricePostDto.getName())
+                        .price(pricePostDto.getPrice())
+                        .build();
+
+                prices.add(price);
+            }
+
+            courseTemplate.setPrices(prices);
         }
 
         if (dto.getRequiredQualifications() != null && !dto.getRequiredQualifications().isEmpty()) {

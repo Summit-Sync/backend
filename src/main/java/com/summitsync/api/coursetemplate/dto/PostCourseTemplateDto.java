@@ -1,5 +1,6 @@
 package com.summitsync.api.coursetemplate.dto;
 
+import com.summitsync.api.price.dto.PricePostDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -29,7 +30,7 @@ public class PostCourseTemplateDto {
     private int numberWaitlist;
     private Long location;
     private String meetingPoint;
-    private List<Long> price;
+    private List<PricePostDto> price;
     private List<Long> requiredQualifications;
     @PositiveOrZero(message = "the number of trainers has to be more than 0")
     private int numberTrainers;
