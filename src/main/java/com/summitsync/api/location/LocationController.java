@@ -44,9 +44,10 @@ public class LocationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GetLocationDto>updateLocation(@PathVariable Long id, @RequestBody GetLocationDto dto){
-        Location location=service.updateLocation(mapper.mapLocationDtoToLocation(dto));
-        GetLocationDto response=mapper.mapLocationToGetLocationDto(location);
+    public ResponseEntity<GetLocationDto>updateLocation(@PathVariable Long id, @RequestBody PostLocationDto dto){
+        var dbLocation = this.service.getLocationById(id);
+        Location location = service.updateLocation(dbLocation, dto);
+        GetLocationDto response = mapper.mapLocationToGetLocationDto(location);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
