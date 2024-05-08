@@ -76,6 +76,7 @@ public class CourseTemplateMapper {
                 .numberParticipants(courseTemplate.getNumberParticipants())
                 .numberWaitlist(courseTemplate.getNumberWaitlist())
                 .meetingPoint(courseTemplate.getMeetingPoint())
+                .numberTrainers(courseTemplate.getNumberTrainer())
                 .build();
 
         if (courseTemplate.getLocation() != null) {

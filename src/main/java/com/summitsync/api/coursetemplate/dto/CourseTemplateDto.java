@@ -28,6 +28,7 @@ public class CourseTemplateDto {
     private String meetingPoint;
     private List<PriceDto> price;
     private List<QualificationDto> requiredQualifications;
+    private int numberTrainers;
 }
 
 // CourseTemplateDTO: id (long), acronym (string), title (string), description (string), numberOfDates (int), duration (int),
