@@ -10,7 +10,7 @@ public class PriceMapper {
         return PriceDto.builder()
                 .id(price.getCourseTemplatePriceId())
                 .price(price.getPrice())
-                .category(price.getName())
+                .name(price.getName())
                 .build();
     }
 
