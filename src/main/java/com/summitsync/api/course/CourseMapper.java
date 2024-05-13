@@ -3,26 +3,19 @@ package com.summitsync.api.course;
 import com.summitsync.api.course.dto.CourseGetDTO;
 import com.summitsync.api.course.dto.CoursePostDTO;
 import com.summitsync.api.date.EventDate;
-import com.summitsync.api.date.EventDateMapper;
 import com.summitsync.api.date.EventDateService;
-import com.summitsync.api.keycloak.KeycloakRestService;
 import com.summitsync.api.location.LocationMapper;
 import com.summitsync.api.location.LocationService;
 import com.summitsync.api.participant.ParticipantMapper;
-import com.summitsync.api.participant.dto.ParticipantDto;
 import com.summitsync.api.price.PriceMapper;
 import com.summitsync.api.price.PriceService;
 import com.summitsync.api.qualification.QualificationMapper;
 import com.summitsync.api.qualification.QualificationService;
 import com.summitsync.api.trainer.TrainerMapper;
-import com.summitsync.api.trainer.TrainerService;
-import jakarta.servlet.http.Part;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,7 +47,7 @@ public class CourseMapper {
                 .participants(course.getParticipants().stream().map(participant -> this.participantMapper.mapParticipantToParticipantDto(participant, jwt)).toList())
                 .waitList(course.getWaitList().stream().map(participant -> this.participantMapper.mapParticipantToParticipantDto(participant, jwt)).toList())
                 .numberWaitlist(course.getNumberWaitlist())
-                .coursePrices(course.getCoursePrices().stream().map(this.priceMapper::mapPriceToPriceDto).toList())
+                .prices(course.getCoursePrices().stream().map(this.priceMapper::mapPriceToPriceDto).toList())
                 .location(this.locationMapper.mapLocationToGetLocationDto(course.getLocation()))
                 .meetingPoint(course.getMeetingPoint())
                 .requiredQualifications(course.getRequiredQualifications().stream().map(this.qualificationMapper::mapQualificationToQualificationDto).toList())
