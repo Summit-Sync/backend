@@ -27,7 +27,7 @@ public class CourseGetDTO {
     private List<ParticipantDto> participants;
     private List<ParticipantDto> waitList;
     private int numberWaitlist;
-    private List<PriceDto> coursePrices;
+    private List<PriceDto> prices;
     private GetLocationDto location;
     private String meetingPoint;
     private List<QualificationDto> requiredQualifications;
