@@ -8,6 +8,7 @@ import com.summitsync.api.participant.Participant;
 import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.qualification.dto.QualificationDto;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
@@ -24,15 +25,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CoursePostDTO {
-    @NotBlank(message = "Visible cannot be empty.")
+    @NotNull(message = "Visible cannot be empty.")
     private boolean visible;
     @NotBlank(message = "Acronym cannot be empty.")
     private String acronym;
     @NotBlank(message = "Description cannot be empty.")
     private String description;
-    @NotBlank(message = "Dates cannot be empty.")
+    @NotEmpty(message = "Dates cannot be empty.")
     private List<LocalDateTime> dates;
-    @NotBlank(message = "Duration cannot be empty.")
+    @NotNull(message = "Duration cannot be empty.")
     @PositiveOrZero(message = "Duration must be positive or zero.")
     private int duration;
     @NotNull(message = "Number of Participants cannot be empty.")
@@ -41,13 +42,12 @@ public class CoursePostDTO {
     @NotNull(message = "Number of Waitlist cannot be empty.")
     @PositiveOrZero(message = "Number of Waitlist must be positive or zero.")
     private int numberWaitlist;
-    @NotBlank(message = "Prices cannot be empty.")
+    @NotEmpty(message = "Prices cannot be empty.")
     private List<Long> prices;
-    @NotBlank(message = "Location cannot be empty.")
+    @NotNull(message = "Location cannot be empty.")
     private long location;
     @NotBlank(message = "Meeting Point cannot be empty.")
     private String meetingPoint;
-    @NotBlank(message = "Required Qualifications cannot be empty.")
     private List<Long> requiredQualifications;
     @NotNull(message = "Number of Trainers cannot be empty.")
     @PositiveOrZero(message = "Number of Trainers must be positive or zero.")
