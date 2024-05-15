@@ -44,7 +44,6 @@ public class CoursePostDTO {
     private int numberWaitlist;
     @NotEmpty(message = "Prices cannot be empty.")
     private List<Long> prices;
-    @NotNull(message = "Location cannot be empty.")
     private long location;
     @NotBlank(message = "Meeting Point cannot be empty.")
     private String meetingPoint;
