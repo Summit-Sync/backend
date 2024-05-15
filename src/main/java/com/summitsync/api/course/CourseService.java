@@ -185,13 +185,13 @@ public class CourseService {
         return result;
     }
 
-    public Course cancel(Course course) {
-        course.setCancelled(true);
+    public Course cancel(Course course, boolean canceling) {
+        course.setCancelled(canceling);
         return this.repository.save(course);
     }
 
-    public Course publish(Course course) {
-        course.setCancelled(false);
+    public Course publish(Course course, boolean published) {
+        course.setVisible(published);
         return this.repository.save(course);
     }
 }
