@@ -28,7 +28,7 @@ public class CourseTemplate {
     private int duration;
     private int numberParticipants;
     private int numberWaitlist;
-    @OneToOne
+    @ManyToOne
     private Location location;
     private String meetingPoint;
     @OneToMany
