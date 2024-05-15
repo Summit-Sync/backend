@@ -52,7 +52,7 @@ public class CourseMapper {
                 .meetingPoint(course.getMeetingPoint())
                 .requiredQualifications(course.getRequiredQualifications().stream().map(this.qualificationMapper::mapQualificationToQualificationDto).toList())
                 .numberTrainers(course.getNumberTrainer())
-                .trainerList(course.getTrainers().stream().map(trainer -> this.trainerMapper.mapTrainerToTrainerDto(trainer, jwt)).toList())
+                .trainers(course.getTrainers().stream().map(trainer -> this.trainerMapper.mapTrainerToTrainerDto(trainer, jwt)).toList())
                 .notes(course.getNotes())
                 .title(course.getTitle())
                 .build();

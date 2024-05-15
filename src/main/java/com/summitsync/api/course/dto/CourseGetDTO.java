@@ -32,7 +32,7 @@ public class CourseGetDTO {
     private String meetingPoint;
     private List<QualificationDto> requiredQualifications;
     private int numberTrainers;
-    private List<TrainerDto> trainerList;
+    private List<TrainerDto> trainers;
     private String notes;
     private String title;
 }
