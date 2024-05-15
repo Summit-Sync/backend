@@ -1,9 +1,11 @@
 package com.summitsync.api.trainer.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class AddTrainerDto {
     @NotBlank(message = "username can not be empty")
     String username;

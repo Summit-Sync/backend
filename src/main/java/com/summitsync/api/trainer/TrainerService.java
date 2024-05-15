@@ -4,14 +4,19 @@ import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
 import com.summitsync.api.keycloak.KeycloakRestService;
 import com.summitsync.api.keycloak.dto.KeycloakResetPasswordRequest;
 import com.summitsync.api.qualification.Qualification;
+import com.summitsync.api.qualification.QualificationService;
 import com.summitsync.api.trainer.dto.AddTrainerDto;
 import com.summitsync.api.trainer.dto.TrainerDto;
 import com.summitsync.api.trainer.dto.UpdateTrainerDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,12 +24,22 @@ import java.util.stream.Collectors;
 public class TrainerService {
     final private TrainerRepository trainerRepository;
     final private KeycloakRestService keycloakRestService;
+    private QualificationService qualificationService;
     final private TrainerMapper trainerMapper;
 
     public TrainerDto getTrainer(long id, String jwt) {
         var trainer = this.findById(id);
         var keycloakTrainer = this.keycloakRestService.getUser(trainer.getSubjectId(), jwt);
         return this.trainerMapper.mapKeycloakUserToTrainerDto(keycloakTrainer, trainer);
+    }
+
+    @Autowired
+    private void setQualificationService(@Lazy QualificationService qualificationService) {
+        this.qualificationService = qualificationService;
+    }
+
+    private QualificationService getQualificationService() {
+        return this.qualificationService;
     }
 
     public Trainer findById(long id) {
@@ -80,10 +95,15 @@ public class TrainerService {
     }
 
     public TrainerDto updateTrainer(Trainer trainer, UpdateTrainerDto updateTrainerDto, String jwt) {
+        var qualifications = new HashSet<Qualification>();
+        for (var qualification: updateTrainerDto.getQualifications()) {
+            qualifications.add(this.getQualificationService().findById(qualification.getId()));
+        }
+
+        trainer.setQualifications(qualifications);
         var keycloakAddUser = this.trainerMapper.mapUpdateTrainerDtoToKeycloakAddUserRequest(updateTrainerDto);
 
         var keycloakUser = this.keycloakRestService.updateUser(trainer.getSubjectId(), keycloakAddUser, jwt);
-
         return this.trainerMapper.mapKeycloakUserToTrainerDto(keycloakUser, trainer);
     }
 
