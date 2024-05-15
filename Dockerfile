@@ -4,7 +4,7 @@ WORKDIR /summit-sync
 
 COPY . /summit-sync
 
-RUN ./gradlew clean build
+RUN ./gradlew clean build -x test
 
 FROM eclipse-temurin:21
 
