@@ -2,6 +2,7 @@ package com.summitsync.api.course;
 
 import com.summitsync.api.course.dto.CourseGetDTO;
 import com.summitsync.api.course.dto.CoursePostDTO;
+import com.summitsync.api.course.dto.CourseUpdateDTO;
 import com.summitsync.api.participant.ParticipantService;
 import com.summitsync.api.qualification.QualificationService;
 import com.summitsync.api.trainer.TrainerService;
@@ -58,9 +59,9 @@ public class CourseController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CourseGetDTO> updateCourse(@RequestBody @Valid CoursePostDTO dto, @PathVariable long id, JwtAuthenticationToken jwt) {
+    public ResponseEntity<CourseGetDTO> updateCourse(@RequestBody @Valid CourseUpdateDTO dto, @PathVariable long id, JwtAuthenticationToken jwt) {
         Course updatedCourse = this.mapper.mapCoursePostDTOToCourse(dto);
-        Course dbCourse = this.service.update(this.service.get(id), updatedCourse);
+        Course dbCourse = this.service.update(this.service.get(id), updatedCourse, dto.isCancelled(), dto.isFinished());
         CourseGetDTO response = this.mapper.mapCourseToCourseGetDTO(dbCourse, jwt.getToken().getTokenValue());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

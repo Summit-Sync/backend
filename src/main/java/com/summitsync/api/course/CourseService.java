@@ -42,7 +42,7 @@ public class CourseService {
         return acronym + String.format("%03d", nextNumber);
     }
 
-    public Course update(Course courseToUpdate, Course course) {
+    public Course update(Course courseToUpdate, Course course, boolean cancelled, boolean finished) {
         courseToUpdate.setVisible(course.isVisible());
         courseToUpdate.setCancelled(course.isCancelled());
         courseToUpdate.setFinished(course.isFinished());
@@ -59,6 +59,8 @@ public class CourseService {
         courseToUpdate.setNumberTrainer(course.getNumberTrainer());
         courseToUpdate.setNotes(course.getNotes());
         courseToUpdate.setTitle(course.getTitle());
+        courseToUpdate.setCancelled(cancelled);
+        courseToUpdate.setFinished(finished);
         return this.repository.save(courseToUpdate);
     }
 

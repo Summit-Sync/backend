@@ -90,6 +90,7 @@ public class CourseMapper {
                 .numberTrainer(dto.getNumberTrainers())
                 .trainers(new HashSet<>())
                 .title(dto.getTitle())
+                .notes(dto.getNotes())
                 .build();
     }
 }
