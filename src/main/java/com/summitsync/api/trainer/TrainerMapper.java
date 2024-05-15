@@ -20,8 +20,8 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class TrainerMapper {
-    final private QualificationMapper qualificationMapper;
-    private KeycloakRestService keycloakRestService;
+    private final QualificationMapper qualificationMapper;
+    private final KeycloakRestService keycloakRestService;
 
     public KeycloakAddUserRequest mapAddTrainerDtoToKeycloakAddUserRequest(AddTrainerDto addTrainerDto) {
         var groups = new ArrayList<String>();
