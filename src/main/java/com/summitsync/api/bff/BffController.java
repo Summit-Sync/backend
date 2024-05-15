@@ -6,6 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 @Controller
 @RequestMapping("/auth")
 public class BffController {
@@ -19,7 +22,9 @@ public class BffController {
     public ResponseEntity<BffAccessTokenResponse> getAccessToken(@CookieValue("SESSION_ID") String sessionId) {
         var sessionOptional = this.sessionRepository.findById(sessionId);
         var session = sessionOptional.orElseThrow(InvalidSessionException::new);
-        var body = new BffAccessTokenResponse(session.getAccessToken(), session.getExpiresIn());
+        var now = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+        var sessionExpiresAt = session.getCreated().toEpochSecond(ZoneOffset.UTC) + session.getExpiresIn();
+        var body = new BffAccessTokenResponse(session.getAccessToken(), Math.max(0, sessionExpiresAt - now), session.getRole());
         return new ResponseEntity<>(body, HttpStatus.OK);
    }
 }

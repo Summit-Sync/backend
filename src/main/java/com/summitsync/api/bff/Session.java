@@ -21,6 +21,7 @@ public class Session {
     private String refreshToken;
     private String idToken;
     private LocalDateTime created;
+    private String role;
     @TimeToLive
     public Long getTimeToLive() {
         return (long) this.expiresIn;

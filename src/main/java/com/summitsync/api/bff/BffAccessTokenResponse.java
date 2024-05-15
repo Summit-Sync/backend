@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class BffAccessTokenResponse {
-    String access_token;
-    long expires_in;
+    String accessToken;
+    long expiresIn;
+    String role;
 }

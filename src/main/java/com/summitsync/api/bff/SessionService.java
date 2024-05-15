@@ -1,11 +1,13 @@
 package com.summitsync.api.bff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.summitsync.api.JwtAuthenticationConverterRoles;
 import com.summitsync.api.exceptionhandler.CodeExchangeException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
@@ -16,6 +18,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.HashMap;
 
 @Service
 public class SessionService {
@@ -41,12 +44,14 @@ public class SessionService {
     private final SecureRandom secureRandom;
     private final AuthStateRepository authStateRepository;
     private final SessionRepository sessionRepository;
-    public SessionService(AuthStateRepository authStateRepository, SessionRepository sessionRepository) {
+    private final NimbusJwtDecoder jwtDecoder;
+    public SessionService(AuthStateRepository authStateRepository, SessionRepository sessionRepository, @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") final String issuerUri) {
         this.restClient = RestClient.create();
         this.objectMapper = new ObjectMapper();
         this.secureRandom = new SecureRandom();
         this.authStateRepository = authStateRepository;
         this.sessionRepository = sessionRepository;
+        this.jwtDecoder = NimbusJwtDecoder.withIssuerLocation(issuerUri).build();
     }
 
     private String getRandomString(int length) {
@@ -129,8 +134,8 @@ public class SessionService {
 
     public String newSession(AccessTokenResponseDto accessTokenResponseDto) {
         var sessionId = this.getRandomString(32);
-
-        var session = SessionMapper.MapAccessTokenResponseDtoToSession(sessionId, accessTokenResponseDto);
+        var role = JwtAuthenticationConverterRoles.extractRolesFromJwt(this.jwtDecoder.decode(accessTokenResponseDto.getAccess_token())).getFirst();
+        var session = SessionMapper.mapAccessTokenResponseDtoToSession(sessionId, accessTokenResponseDto, role);
         this.sessionRepository.save(session);
 
         return sessionId;

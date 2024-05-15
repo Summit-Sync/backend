@@ -26,16 +26,18 @@ public class SessionController {
     }
 
     @GetMapping("/callback")
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void AuthCallback(@RequestParam String code, @RequestParam String state, HttpServletResponse response) {
+    public String AuthCallback(@RequestParam String code, @RequestParam String state, HttpServletResponse response) {
         var accessTokenResponse = this.sessionService.accessTokenRequest(code, state);
         var sessionId = this.sessionService.newSession(accessTokenResponse);
         var sessionIdCookie = new Cookie("SESSION_ID", sessionId);
         sessionIdCookie.setPath("/");
         sessionIdCookie.setSecure(true);
         sessionIdCookie.setHttpOnly(true);
-        sessionIdCookie.setAttribute("Same-Site", "strict");
+        sessionIdCookie.setAttribute("Same-Site", "lax");
+        sessionIdCookie.setMaxAge(864000);
 
         response.addCookie(sessionIdCookie);
+
+        return "redirect:http://localhost:4200";
     }
 }

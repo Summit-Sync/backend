@@ -1,0 +1,13 @@
+{
+    local_certs
+    skip_install_trust
+}
+
+
+api.ss {
+    reverse_proxy localhost:8080
+}
+
+front.ss {
+    reverse_proxy localhost:4200
+}

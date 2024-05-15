@@ -22,12 +22,15 @@ public class JwtAuthenticationConverterRoles implements Converter<Jwt, AbstractA
                 .collect(toSet()));
     }
 
-    private Collection<? extends GrantedAuthority> extractResourceRoles(Jwt jwt)
-    {
+    private Collection<? extends GrantedAuthority> extractResourceRoles(Jwt jwt) {
+        var resourceRoles = JwtAuthenticationConverterRoles.extractRolesFromJwt(jwt);
+        return resourceRoles.isEmpty() ? emptySet() : resourceRoles.stream().map(r -> new SimpleGrantedAuthority("ROLE_" + r)).collect(toSet());
+    }
+
+    public static ArrayList<String> extractRolesFromJwt(Jwt jwt) {
         var resourceAccess = new HashMap<>(jwt.getClaim("resource_access"));
 
         var resource = (Map<String, List<String>>) resourceAccess.get("summitsync");
-        var resourceRoles = new ArrayList<>(resource.get("roles"));
-        return resourceRoles.isEmpty() ? emptySet() : resourceRoles.stream().map(r -> new SimpleGrantedAuthority("ROLE_" + r)).collect(toSet());
+        return new ArrayList<>(resource.get("roles"));
     }
 }
