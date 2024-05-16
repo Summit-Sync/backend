@@ -46,7 +46,6 @@ public class TrainerMapper {
         return TrainerDto.builder()
                 .id(trainer.getTrainerId())
                 .subjectId(keycloakUser.getId())
-                .username(keycloakUser.getUsername())
                 .firstName(keycloakUser.getFirstName())
                 .lastName(keycloakUser.getLastName())
                 .qualifications(qualifications)

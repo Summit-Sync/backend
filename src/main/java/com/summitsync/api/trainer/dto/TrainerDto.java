@@ -14,7 +14,6 @@ public class TrainerDto {
     String subjectId;
     String firstName;
     String lastName;
-    String username;
     List<QualificationDto> qualifications;
     String email;
     String phone;
