@@ -33,7 +33,7 @@ public class ParticipantMapper {
                 .email(keycloakUser.getEmail())
                 .firstName(keycloakUser.getFirstName())
                 .name(keycloakUser.getLastName())
-                .status(participant.getStatus().getText())
+                .status(participant.getStatus().getStatusId())
                 .build();
     }
 

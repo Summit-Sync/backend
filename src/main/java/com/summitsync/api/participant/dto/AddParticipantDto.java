@@ -8,6 +8,6 @@ import lombok.Data;
 public class AddParticipantDto {
     String name;
     String firstName;
-    String status;
+    long status;
     String email;
 }
