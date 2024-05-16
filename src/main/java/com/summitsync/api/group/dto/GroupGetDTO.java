@@ -21,6 +21,7 @@ public class GroupGetDTO {
     long id;
     boolean cancelled;
     String groupNumber;
+    String acronym;
     String title;
     String description;
     int numberOfDates;

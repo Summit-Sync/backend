@@ -3,6 +3,7 @@ package com.summitsync.api.group.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -45,7 +46,9 @@ public class GroupPostDTO {
     int participantsPerTrainer;
     @NotBlank(message = "Trainers cannot be empty.")
     Set<Integer> trainers;
-
+    @NotBlank(message = "Acronym cannot be empty")
+    @Length(max = 2, message = "Acronym cant be longer than 2")
+    String acronym;
 }
 
 // PostGroupDTO: title (string), description (string), numberOfDates (int), Array of eventDateObj (date (date)), duration (int),

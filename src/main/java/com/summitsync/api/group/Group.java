@@ -48,4 +48,5 @@ public class Group {
     @ManyToMany
     Set<Trainer> trainers;
     BigDecimal totalPrice;
+    String acronym;
 }
