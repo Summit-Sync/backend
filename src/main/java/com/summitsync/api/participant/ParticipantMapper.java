@@ -42,4 +42,13 @@ public class ParticipantMapper {
 
         return this.mapKeycloakUserToParticipantDto(keycloakUser, participant);
     }
+
+    public AddParticipantDto mapParticipantDtoToAddDto(ParticipantDto participant) {
+        return AddParticipantDto.builder()
+                .email(participant.getEmail())
+                .firstName(participant.getFirstName())
+                .name(participant.getName())
+                .status(participant.getStatus())
+                .build();
+    }
 }
