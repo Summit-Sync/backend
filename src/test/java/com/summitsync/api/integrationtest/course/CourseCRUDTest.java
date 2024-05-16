@@ -90,7 +90,10 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
    ],
    "title":"kvTitle",
    "visible":false,
-   "notes": "test"
+   "notes": "test",
+   "waitList": [],
+   "participants": [],
+   "trainers": []
 }
 """;
         this.mockMvc.perform(post("/api/v1/course")
@@ -146,7 +149,10 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
       2
    ],
    "title":"kvTitle",
-   "visible":false
+   "visible":false,
+   "waitList": [],
+   "participants": [],
+   "trainers": []
 }
 """;
         this.mockMvc.perform(put("/api/v1/course/1")
@@ -193,7 +199,10 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
    ],
    "title":"kvTitle",
    "visible":false,
-   "notes": "test"
+   "notes": "test",
+   "waitList": [],
+   "participants": [],
+   "trainers": []
 }
 """;
         this.mockMvc.perform(post("/api/v1/course")
