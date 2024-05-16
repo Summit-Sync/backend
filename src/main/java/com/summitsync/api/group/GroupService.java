@@ -24,6 +24,7 @@ public class GroupService {
 
     public Group update(Group groupToUpdate, Group group) {
         groupToUpdate.setCancelled(group.isCancelled());
+        groupToUpdate.setAcronym(group.getAcronym());
         groupToUpdate.setTitle(group.getTitle());
         groupToUpdate.setDescription(group.getDescription());
         groupToUpdate.setNumberOfDates(group.getNumberOfDates());

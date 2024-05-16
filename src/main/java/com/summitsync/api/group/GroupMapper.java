@@ -59,6 +59,7 @@ public class GroupMapper {
 
         return GroupGetDTO.builder()
                 .id(group.getGroupId())
+                .acronym(group.getAcronym())
                 .groupNumber(group.getGroupNumber())
                 .title(group.getTitle())
                 .description(group.getDescription())
@@ -91,6 +92,7 @@ public class GroupMapper {
         }
         return Group.builder()
                 .cancelled(false)
+                .acronym(dto.getAcronym())
                 .title(dto.getTitle())
                 .description(dto.getDescription())
                 .numberOfDates(dto.getNumberOfDates())
