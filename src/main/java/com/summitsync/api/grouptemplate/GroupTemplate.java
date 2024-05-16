@@ -28,7 +28,7 @@ public class GroupTemplate {
     private String description;
     private int numberOfDates;
     private int duration;
-    @OneToOne
+    @ManyToOne
     private Location location;
     private String meetingPoint;
     private BigDecimal trainerPricerPerHour;
