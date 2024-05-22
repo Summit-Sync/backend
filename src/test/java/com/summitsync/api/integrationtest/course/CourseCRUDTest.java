@@ -18,8 +18,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.math.BigDecimal;
 import java.util.Random;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -208,5 +207,16 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("location.country").value("Germany"))
                 .andExpect(jsonPath("notes").value("test"));
 
+    }
+
+    @Test
+    @Order(5)
+    void testDeleteCourse() throws Exception {
+        this.mockMvc.perform(delete("/api/v1/course/1"))
+                .andExpect(status().is(204));
+
+        this.mockMvc.perform(get("/api/v1/course"))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.length()").value(1));
     }
 }

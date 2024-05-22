@@ -52,10 +52,9 @@ public class CourseController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<CourseGetDTO> deleteById(@PathVariable long id, JwtAuthenticationToken jwt) {
-        Course course = this.service.deleteById(id);
-        CourseGetDTO dto = this.mapper.mapCourseToCourseGetDTO(course, jwt.getToken().getTokenValue());
-        return new ResponseEntity<>(dto, HttpStatus.NO_CONTENT);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable long id, JwtAuthenticationToken jwt) {
+        this.service.deleteById(id);
     }
 
     @PutMapping("/{id}")

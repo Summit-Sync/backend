@@ -32,10 +32,9 @@ public class GroupController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<GroupGetDTO> deleteGroup(@PathVariable long id, JwtAuthenticationToken jwt) {
-        Group group = this.service.deleteById(id);
-        GroupGetDTO dto = this.mapper.mapGroupToGroupGetDto(group, jwt.getToken().getTokenValue());
-        return new ResponseEntity<>(dto, HttpStatus.NO_CONTENT);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteGroup(@PathVariable long id, JwtAuthenticationToken jwt) {
+        this.service.deleteById(id);
     }
 
     @GetMapping("/{id}")
