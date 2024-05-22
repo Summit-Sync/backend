@@ -1,20 +1,26 @@
 package com.summitsync.api.bff;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Optional;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccessTokenResponseDto {
-    private String access_token;
-    private String token_type;
-    private int expires_in;
-    private String refresh_token;
-    private String id_token;
+    @JsonProperty("access_token")
+    private String accessToken;
+    @JsonProperty("token_type")
+    private String tokenType;
+    @JsonProperty("expires_in")
+    private int expiresIn;
+    @JsonProperty("refresh_expires_in")
+    private int refreshExpiresIn;
+    @JsonProperty("refresh_token")
+    private String refreshToken;
+    @JsonProperty("id_token")
+    private String idToken;
 }

@@ -10,5 +10,6 @@ import lombok.Setter;
 public class BffAccessTokenResponse {
     String accessToken;
     long expiresIn;
+    long refreshTokenExpiresIn;
     String role;
 }

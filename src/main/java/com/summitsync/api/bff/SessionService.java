@@ -17,8 +17,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.Base64;
-import java.util.HashMap;
 
 @Service
 public class SessionService {
@@ -134,10 +134,42 @@ public class SessionService {
 
     public String newSession(AccessTokenResponseDto accessTokenResponseDto) {
         var sessionId = this.getRandomString(32);
-        var role = JwtAuthenticationConverterRoles.extractRolesFromJwt(this.jwtDecoder.decode(accessTokenResponseDto.getAccess_token())).getFirst();
+        var role = JwtAuthenticationConverterRoles.extractRolesFromJwt(this.jwtDecoder.decode(accessTokenResponseDto.getAccessToken())).getFirst();
         var session = SessionMapper.mapAccessTokenResponseDtoToSession(sessionId, accessTokenResponseDto, role);
         this.sessionRepository.save(session);
 
         return sessionId;
+    }
+
+    public Session updateSession(Session session, AccessTokenResponseDto accessTokenResponseDto) {
+        session.setAccessToken(accessTokenResponseDto.getAccessToken());
+        session.setExpiresIn(accessTokenResponseDto.getExpiresIn());
+        session.setRefreshExpiresIn(accessTokenResponseDto.getRefreshExpiresIn());
+        session.setRefreshToken(accessTokenResponseDto.getRefreshToken());
+        session.setIdToken(accessTokenResponseDto.getIdToken());
+        session.setUpdated(LocalDateTime.now());
+
+        return this.sessionRepository.save(session);
+
+    }
+
+    public AccessTokenResponseDto refreshToken(String refreshToken) {
+        System.out.println("refreshing token");
+        System.out.println(refreshToken);
+        // FIXME: can probably deduplicate some code here with other http requests to keycloak
+        var body = new LinkedMultiValueMap<String, String>();
+        body.add("client_id", clientID);
+        body.add("client_secret", clientSecret);
+        body.add("grant_type", "refresh_token");
+        body.add("refresh_token", refreshToken);
+
+        return this.restClient
+                .post()
+                .uri(tokenUrl)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(body)
+                .retrieve()
+                .body(AccessTokenResponseDto.class);
     }
 }
