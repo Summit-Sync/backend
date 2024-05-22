@@ -113,19 +113,12 @@ public class TrainerService {
     }
 
     public List<TrainerDto> getAllTrainer(String jwt) {
-        var groupId = this.keycloakRestService.getGroupIdByName("trainer", jwt);
-        var trainers = this.keycloakRestService.getAllMembersOfGroup(groupId, jwt);
-        var res = new ArrayList<TrainerDto>();
-        for (var trainer: trainers) {
-            var dbTrainer = this.trainerRepository.findBySubjectId(trainer.getId());
-            if (dbTrainer.isEmpty()) {
-                System.out.println("WARNING: trainer with id " + trainer.getId() + " found in keycloak but not in database. Skipping...");
-                continue;
-            }
-
-            res.add(this.trainerMapper.mapKeycloakUserToTrainerDto(trainer, dbTrainer.get()));
+        var allTrainers = this.trainerRepository.findAll();
+        var result = new ArrayList<TrainerDto>();
+        for (var trainer : allTrainers) {
+            result.add(this.trainerMapper.mapTrainerToTrainerDto(trainer, jwt));
         }
 
-        return res;
+        return result;
     }
 }
