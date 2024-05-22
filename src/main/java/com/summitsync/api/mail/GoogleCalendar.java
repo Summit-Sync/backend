@@ -17,6 +17,7 @@ import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.Events;
 import com.summitsync.api.SummitSyncApplication;
+import com.summitsync.api.trainer.Trainer;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -52,7 +53,7 @@ public class GoogleCalendar {
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
 
-    public static void createEvent(EventDateTime start, EventDateTime end, List<EventAttendee> attendees) throws GeneralSecurityException, IOException {
+    public static void createEvent(String title, EventDateTime start, EventDateTime end, String acronym, String trainer, String notes) throws GeneralSecurityException, IOException {
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         Calendar service =
                 new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
@@ -62,7 +63,9 @@ public class GoogleCalendar {
         Event event = new Event();
         event.setStart(start);
         event.setEnd(end);
-        event.setAttendees(attendees);
+        event.setDescription(title);
+        String summary = acronym + ": Trainer ist " + trainer + "\n" + "Notizen: " + notes;
+        event.setSummary(summary);
         service.events().insert("primary", event).execute();
     }
 }
