@@ -1,5 +1,6 @@
 package com.summitsync.api.contact;
 
+import com.summitsync.api.group.Group;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,4 +21,6 @@ public class Contact {
     private String lastName;
     private String email;
     private String telephone;
+    @OneToOne(mappedBy = "contact", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Group group;
 }

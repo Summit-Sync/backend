@@ -1,10 +1,16 @@
 package com.summitsync.api.location;
 
+import com.summitsync.api.course.Course;
+import com.summitsync.api.coursetemplate.CourseTemplate;
+import com.summitsync.api.group.Group;
+import com.summitsync.api.grouptemplate.GroupTemplate;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -24,4 +30,12 @@ public class Location {
     private String mapsUrl;
     private String title;
     private String city;
+    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Course> courses;
+    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<CourseTemplate> courseTemplates;
+    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Group> groups;
+    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<GroupTemplate> groupTemplates;
 }

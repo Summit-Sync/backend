@@ -1,5 +1,7 @@
 package com.summitsync.api.date;
 
+import com.summitsync.api.course.Course;
+import com.summitsync.api.group.Group;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,4 +22,8 @@ public class EventDate {
     private long eventDateId;
     private LocalDateTime startTime;
     private int durationInMinutes;
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Course course;
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Group group;
 }

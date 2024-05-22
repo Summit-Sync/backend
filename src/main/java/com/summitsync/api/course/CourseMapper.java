@@ -9,6 +9,7 @@ import com.summitsync.api.location.LocationService;
 import com.summitsync.api.participant.Participant;
 import com.summitsync.api.participant.ParticipantMapper;
 import com.summitsync.api.participant.ParticipantService;
+import com.summitsync.api.price.Price;
 import com.summitsync.api.price.PriceMapper;
 import com.summitsync.api.price.PriceService;
 import com.summitsync.api.qualification.QualificationMapper;
@@ -102,6 +103,14 @@ public class CourseMapper {
             trainers.add(this.trainerService.findById(trainer));
         }
 
+        var prices = new HashSet<Price>();
+
+        for (var price : dto.getPrices()) {
+            var mappedPrice = this.priceMapper.mapPostPriceDtoToPrice(price);
+            var savedPrice = this.priceService.create(mappedPrice);
+            prices.add(savedPrice);
+        }
+
         return Course.builder()
                 .visible(false)
                 .cancelled(false)
@@ -115,7 +124,7 @@ public class CourseMapper {
                 .participants(participants)
                 .waitList(waitList)
                 .numberWaitlist(dto.getNumberWaitlist())
-                .coursePrices(dto.getPrices().stream().map(this.priceMapper::mapPostPriceDtoToPrice).collect(Collectors.toSet()))
+                .coursePrices(prices)
                 .location(this.locationService.getLocationById(dto.getLocation()))
                 .meetingPoint(dto.getMeetingPoint())
                 .requiredQualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).collect(Collectors.toSet()))

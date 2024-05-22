@@ -1,17 +1,20 @@
 package com.summitsync.api.course;
 
+import com.summitsync.api.coursetrainer.CourseTrainer;
 import com.summitsync.api.date.EventDate;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.participant.Participant;
 import com.summitsync.api.price.Price;
 import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.trainer.Trainer;
+import com.summitsync.api.trainerapplication.TrainerApplication;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -30,27 +33,31 @@ public class Course {
     private String courseNumber;
     private String acronym;
     private String description;
-    @OneToMany
+    @OneToMany(mappedBy = "course", cascade = CascadeType.PERSIST)
     private Set<EventDate> dates;
     private int duration;
     private int numberParticipants;
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.PERSIST, mappedBy = "courses", fetch = FetchType.LAZY)
     private Set<Participant> participants;
-    @ManyToMany
+    @ManyToMany(mappedBy = "coursesWaitList", cascade = CascadeType.PERSIST)
     private Set<Participant> waitList;
     private int numberWaitlist;
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "courses", cascade = CascadeType.PERSIST)
     private Set<Price> coursePrices;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Location location;
     private String meetingPoint;
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER, mappedBy = "courses")
     private Set<Qualification> requiredQualifications;
     private int numberTrainer;
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER, mappedBy = "courses")
     private Set<Trainer> trainers;
     private String notes;
     private String title;
+    @OneToMany(mappedBy = "course", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    private List<CourseTrainer> courseTrainers;
+    @OneToMany(mappedBy = "course", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    private List<TrainerApplication> applications;
 }
 
 

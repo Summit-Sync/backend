@@ -25,24 +25,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CourseCRUDTest extends AbstractIntegrationTest {
-    @Autowired
-    private QualificationService qualificationService;
-    @Autowired
-    private LocationService locationService;
-    @Autowired
-    private TrainerService trainerService;
-    private Random random = new Random();
-    @Autowired
-    private PriceService priceService;
 
-    @BeforeEach
-    void setup() {
+    @BeforeAll
+    static void setup(@Autowired QualificationService qualificationService, @Autowired LocationService locationService, @Autowired TrainerService trainerService, @Autowired PriceService priceService) {
+        var random = new Random();
         var testQuali1 = Qualification.builder().name("Erste Hilfe").build();
         var testQuali2 = Qualification.builder().name("Zweite Hilfe").build();
-        this.qualificationService.saveQualification(testQuali1);
-        this.qualificationService.saveQualification(testQuali2);
+        qualificationService.saveQualification(testQuali1);
+        qualificationService.saveQualification(testQuali2);
         var location = Location.builder().country("Germany").phone("+491256321").street("Straße 1").build();
-        this.locationService.createLocation(location);
+        locationService.createLocation(location);
         var jwt = MockMVCApiKey.getAccessToken();
         var trainer1 = AddTrainerDto.builder()
                 .username("it_test_trainer" + random.nextInt(5000))
@@ -52,7 +44,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 .email("test@test.test" + random.nextInt(5000))
                 .phone("+41241615")
                 .build();
-        this.trainerService.newTrainer(trainer1, jwt);
+        trainerService.newTrainer(trainer1, jwt);
         var price1 = Price.builder()
                 .price(BigDecimal.valueOf(10.0))
                 .name("Test Price 1")
@@ -113,7 +105,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
         var content = """
 [1]
 """;
-        this.mockMvc.perform(put("/api/v1//course/1/trainer")
+        this.mockMvc.perform(put("/api/v1/course/1/trainer")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content))
                 .andExpect(status().is(200))

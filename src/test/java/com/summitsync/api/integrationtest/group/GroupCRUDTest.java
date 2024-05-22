@@ -166,7 +166,6 @@ class GroupCRUDTest extends AbstractIntegrationTest {
 
     @Test
     @Order(4)
-    @Disabled
     void testCreateSecondGroupHappyPath() throws Exception {
         var content = """
 {

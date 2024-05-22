@@ -158,8 +158,9 @@ public class CourseService {
     }
 
     public Course addTrainer(Course course, Set<Trainer> trainers) {
-        course.getTrainers().addAll(trainers);
-
+        var oldTrainers = course.getTrainers();
+        oldTrainers.addAll(trainers);
+        course.setTrainers(oldTrainers);
         return this.repository.save(course);
     }
 

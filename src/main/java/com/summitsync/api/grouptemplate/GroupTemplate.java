@@ -28,12 +28,12 @@ public class GroupTemplate {
     private String description;
     private int numberOfDates;
     private int duration;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Location location;
     private String meetingPoint;
     private BigDecimal trainerPricerPerHour;
     private BigDecimal pricePerParticipant;
-    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "groupTemplates", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private Set<Qualification> requiredQualifications;
     private int participantsPerTrainer;
 

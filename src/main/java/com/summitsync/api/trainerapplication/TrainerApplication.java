@@ -17,11 +17,11 @@ public class TrainerApplication {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long applicationId;
-    @OneToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Trainer trainer;
-    @OneToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Group group;
-    @OneToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Course course;
     private AcceptStatus accepted;
 }

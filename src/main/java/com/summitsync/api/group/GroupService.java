@@ -82,7 +82,7 @@ public class GroupService {
     }
 
     public Group addTrainer(Group group, Set<Trainer> trainer) {
-        group.trainers.addAll(trainer);
+        group.getTrainers().addAll(trainer);
 
         return this.repository.save(group);
     }

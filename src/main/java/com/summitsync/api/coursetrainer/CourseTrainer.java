@@ -17,12 +17,10 @@ public class CourseTrainer {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long courseTrainerId;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "trainer_tId")
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Trainer trainer;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_cId")
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Course course;
-    @OneToOne()
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Status status;
 }
