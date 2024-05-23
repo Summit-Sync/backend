@@ -56,11 +56,8 @@ public class CoursePostDTO {
     private String notes;
     @NotBlank(message = "Title cannot be empty.")
     private String title;
-    @NotNull(message = "Participants cannot be empty")
     private List<ParticipantDto> participants;
-    @NotNull(message = "Trainers cannot be empty")
     private List<TrainerDto> trainers;
-    @NotNull(message = "Waitlist cannot be empty")
     private List<ParticipantDto> waitList;
 }
 
