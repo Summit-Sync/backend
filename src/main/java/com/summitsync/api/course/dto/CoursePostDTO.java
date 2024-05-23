@@ -5,8 +5,10 @@ import com.summitsync.api.date.EventDate;
 import com.summitsync.api.date.dto.EventDatePostDto;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.participant.Participant;
+import com.summitsync.api.participant.dto.ParticipantDto;
 import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.qualification.dto.QualificationDto;
+import com.summitsync.api.trainer.dto.TrainerDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -54,6 +56,12 @@ public class CoursePostDTO {
     private String notes;
     @NotBlank(message = "Title cannot be empty.")
     private String title;
+    @NotNull(message = "Participants cannot be empty")
+    private List<ParticipantDto> participants;
+    @NotNull(message = "Trainers cannot be empty")
+    private List<TrainerDto> trainers;
+    @NotNull(message = "Waitlist cannot be empty")
+    private List<ParticipantDto> waitList;
 }
 
 // PostCourseDTO: visible (boolean), acronym (string), description (String), dates (Date als string), duration(int),

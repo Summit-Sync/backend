@@ -33,7 +33,7 @@ public class ParticipantMapper {
                 .email(keycloakUser.getEmail())
                 .firstName(keycloakUser.getFirstName())
                 .name(keycloakUser.getLastName())
-                .status(participant.getStatus().getText())
+                .status(participant.getStatus().getStatusId())
                 .build();
     }
 
@@ -41,5 +41,14 @@ public class ParticipantMapper {
         var keycloakUser = this.keycloakRestService.getUser(participant.getSubjectId(), jwt);
 
         return this.mapKeycloakUserToParticipantDto(keycloakUser, participant);
+    }
+
+    public AddParticipantDto mapParticipantDtoToAddDto(ParticipantDto participant) {
+        return AddParticipantDto.builder()
+                .email(participant.getEmail())
+                .firstName(participant.getFirstName())
+                .name(participant.getName())
+                .status(participant.getStatus())
+                .build();
     }
 }

@@ -6,24 +6,32 @@ import com.summitsync.api.date.EventDate;
 import com.summitsync.api.date.EventDateService;
 import com.summitsync.api.location.LocationMapper;
 import com.summitsync.api.location.LocationService;
+import com.summitsync.api.participant.Participant;
 import com.summitsync.api.participant.ParticipantMapper;
+import com.summitsync.api.participant.ParticipantService;
 import com.summitsync.api.price.PriceMapper;
 import com.summitsync.api.price.PriceService;
 import com.summitsync.api.qualification.QualificationMapper;
 import com.summitsync.api.qualification.QualificationService;
+import com.summitsync.api.trainer.Trainer;
 import com.summitsync.api.trainer.TrainerMapper;
+import com.summitsync.api.trainer.TrainerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CourseMapper {
     private final ParticipantMapper participantMapper;
+    private final ParticipantService participantService;
     private final LocationMapper locationMapper;
     private final QualificationMapper qualificationMapper;
+    private final TrainerService trainerService;
     private final TrainerMapper trainerMapper;
     private final EventDateService eventDateService;
     private final LocationService locationService;
@@ -58,7 +66,7 @@ public class CourseMapper {
                 .build();
     }
 
-    public Course mapCoursePostDTOToCourse(CoursePostDTO dto) {
+    public Course mapCoursePostDTOToCourse(CoursePostDTO dto, JwtAuthenticationToken jwt) {
         var dates = new HashSet<EventDate>();
         if (dto.getDates() != null) {
             for (var date: dto.getDates()) {
@@ -68,6 +76,28 @@ public class CourseMapper {
                 var dbDate = this.eventDateService.create(eventDate);
                 dates.add(dbDate);
             }
+        }
+
+        Set<Participant> participants = new HashSet<>();
+        Set<Participant> waitList = new HashSet<>();
+        Set<Trainer> trainers = new HashSet<>();
+
+        for (var participant : dto.getParticipants()) {
+            if (participant.getId() == 0) {
+                this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
+            }
+            participants.add(this.participantService.findById(participant.getId()));
+        }
+
+        for (var participant : dto.getWaitList()) {
+            if (participant.getId() == 0) {
+                this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
+            }
+            waitList.add(this.participantService.findById(participant.getId()));
+        }
+
+        for (var trainer : dto.getTrainers()) {
+            trainers.add(this.trainerService.findById(trainer.getId()));
         }
 
         return Course.builder()
@@ -80,15 +110,15 @@ public class CourseMapper {
                 .dates(dates)
                 .duration(dto.getDuration())
                 .numberParticipants(dto.getNumberParticipants())
-                .participants(new HashSet<>())
-                .waitList(new HashSet<>())
+                .participants(participants)
+                .waitList(waitList)
                 .numberWaitlist(dto.getNumberWaitlist())
                 .coursePrices(dto.getPrices().stream().map(this.priceService::findById).collect(Collectors.toSet()))
                 .location(this.locationService.getLocationById(dto.getLocation()))
                 .meetingPoint(dto.getMeetingPoint())
                 .requiredQualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).collect(Collectors.toSet()))
                 .numberTrainer(dto.getNumberTrainers())
-                .trainers(new HashSet<>())
+                .trainers(trainers)
                 .title(dto.getTitle())
                 .notes(dto.getNotes())
                 .build();

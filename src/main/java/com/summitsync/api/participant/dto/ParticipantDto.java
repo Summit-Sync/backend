@@ -12,6 +12,6 @@ public class ParticipantDto {
     long id;
     String name;
     String firstName;
-    String status;
+    long status;
     String email;
 }

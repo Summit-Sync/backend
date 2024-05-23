@@ -30,7 +30,7 @@ public class CourseController {
 
     @PostMapping
     public ResponseEntity<CourseGetDTO> addCourse(@RequestBody @Valid CoursePostDTO course, JwtAuthenticationToken jwt) {
-        var createdCourse = this.service.create(this.mapper.mapCoursePostDTOToCourse(course));
+        var createdCourse = this.service.create(this.mapper.mapCoursePostDTOToCourse(course, jwt));
 
         return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(createdCourse, jwt.getToken().getTokenValue()));
     }
@@ -59,7 +59,7 @@ public class CourseController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CourseGetDTO> updateCourse(@RequestBody @Valid CourseUpdateDTO dto, @PathVariable long id, JwtAuthenticationToken jwt) {
-        Course updatedCourse = this.mapper.mapCoursePostDTOToCourse(dto);
+        Course updatedCourse = this.mapper.mapCoursePostDTOToCourse(dto, jwt);
         Course dbCourse = this.service.update(this.service.get(id), updatedCourse, dto.isCancelled(), dto.isFinished());
         CourseGetDTO response = this.mapper.mapCourseToCourseGetDTO(dbCourse, jwt.getToken().getTokenValue());
         return new ResponseEntity<>(response, HttpStatus.OK);

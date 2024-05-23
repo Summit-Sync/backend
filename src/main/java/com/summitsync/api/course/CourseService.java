@@ -43,6 +43,9 @@ public class CourseService {
     }
 
     public Course update(Course courseToUpdate, Course course, boolean cancelled, boolean finished) {
+        courseToUpdate.setParticipants(course.getParticipants());
+        courseToUpdate.setTrainers(course.getTrainers());
+        courseToUpdate.setWaitList(course.getWaitList());
         courseToUpdate.setVisible(course.isVisible());
         courseToUpdate.setCancelled(course.isCancelled());
         courseToUpdate.setFinished(course.isFinished());
