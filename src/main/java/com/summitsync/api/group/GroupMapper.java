@@ -12,6 +12,7 @@ import com.summitsync.api.grouptemplate.GroupTemplateService;
 import com.summitsync.api.keycloak.KeycloakRestService;
 import com.summitsync.api.location.LocationMapper;
 import com.summitsync.api.location.LocationService;
+import com.summitsync.api.price.Price;
 import com.summitsync.api.qualification.QualificationMapper;
 import com.summitsync.api.qualification.QualificationService;
 import com.summitsync.api.trainer.TrainerMapper;
@@ -83,6 +84,7 @@ public class GroupMapper {
            var savedEventDate = this.eventDateService.create(newEventDate);
            dates.add(savedEventDate);
         }
+
         return Group.builder()
                 .cancelled(false)
                 .acronym(dto.getAcronym())

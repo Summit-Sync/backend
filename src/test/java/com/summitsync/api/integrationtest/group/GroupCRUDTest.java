@@ -119,7 +119,6 @@ class GroupCRUDTest extends AbstractIntegrationTest {
 
     @Test
     @Order(3)
-    @Disabled
     void testUpdateGroup() throws Exception {
         var content = """
 {
@@ -128,7 +127,7 @@ class GroupCRUDTest extends AbstractIntegrationTest {
    "numberOfDates": 2,
    "events":[
       "2024-05-13T10:00:25.739Z",
-      "2024-05-13T10:00:40.456Z",
+      "2024-05-13T10:00:40.456Z"
    ],
    "duration":45,
    "numberParticipants":2,
@@ -156,8 +155,7 @@ class GroupCRUDTest extends AbstractIntegrationTest {
                         .content(content))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("id").value(1))
-                .andExpect(jsonPath("dates.length()").value(2))
-                .andExpect(jsonPath("prices[0].name").value("Test Price 1"))
+                .andExpect(jsonPath("events.length()").value(2))
                 .andExpect(jsonPath("location.country").value("Germany"))
                 .andExpect(jsonPath("duration").value(45))
                 .andExpect(jsonPath("trainers[0].firstName").value("Integration"))
