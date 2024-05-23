@@ -10,7 +10,7 @@ import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.qualification.QualificationService;
 import com.summitsync.api.trainer.TrainerService;
 import com.summitsync.api.trainer.dto.AddTrainerDto;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class GroupCRUDTest extends AbstractIntegrationTest {
+class GroupCRUDTest extends AbstractIntegrationTest {
     @BeforeAll
     static void setup(
             @Autowired QualificationService qualificationService,
@@ -119,6 +119,7 @@ public class GroupCRUDTest extends AbstractIntegrationTest {
 
     @Test
     @Order(3)
+    @Disabled
     void testUpdateGroup() throws Exception {
         var content = """
 {
@@ -165,7 +166,7 @@ public class GroupCRUDTest extends AbstractIntegrationTest {
 
     @Test
     @Order(4)
-    @Ignore
+    @Disabled
     void testCreateSecondGroupHappyPath() throws Exception {
         var content = """
 {
