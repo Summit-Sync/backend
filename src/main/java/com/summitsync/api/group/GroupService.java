@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -79,14 +81,29 @@ public class GroupService {
         return all;
     }
 
-    public void addTrainer(Group group, Trainer trainer) {
-        group.trainers.add(trainer);
+    public Group addTrainer(Group group, Set<Trainer> trainer) {
+        group.trainers.addAll(trainer);
 
-        this.repository.save(group);
+        return this.repository.save(group);
+    }
+
+    public Group removeTrainer(Group group, Long trainerId) {
+        var trainers = group.getTrainers();
+
+        var updatedTrainers = trainers
+                .stream()
+                .filter(
+                        t -> t.getTrainerId() != trainerId
+                )
+                .collect(Collectors.toSet());
+
+        group.setTrainers(updatedTrainers);
+        return this.repository.save(group);
     }
 
     public Group cancel(Group group) {
         group.setCancelled(true);
         return this.repository.save(group);
     }
+
 }

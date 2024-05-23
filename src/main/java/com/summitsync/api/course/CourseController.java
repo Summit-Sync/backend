@@ -121,7 +121,7 @@ public class CourseController {
     }
 
     @PutMapping("/{id}/trainer")
-    public ResponseEntity<CourseGetDTO> addTrainersToWaitlist(@PathVariable long id, @RequestBody Set<Long> trainerIds, JwtAuthenticationToken jwt) {
+    public ResponseEntity<CourseGetDTO> addTrainersToCourse(@PathVariable long id, @RequestBody Set<Long> trainerIds, JwtAuthenticationToken jwt) {
         var course = this.service.get(id);
 
         var updatedCourse = this.service.addTrainer(course, trainerIds.stream().map(this.trainerService::findById).collect(Collectors.toSet()));

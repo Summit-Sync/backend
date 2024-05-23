@@ -9,9 +9,7 @@ import com.summitsync.api.trainer.Trainer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +58,7 @@ public class TrainerApplicationService {
     public TrainerApplication acceptGroupApplication(Trainer trainer, Group group) {
         TrainerApplication application = getGroupApplications(trainer, group);
         application.setAccepted(AcceptStatus.Accepted);
-        this.groupService.addTrainer(group, trainer);
+        this.groupService.addTrainer(group, new HashSet<>(Collections.singletonList(trainer)));
         return this.repository.save(application);
     }
 

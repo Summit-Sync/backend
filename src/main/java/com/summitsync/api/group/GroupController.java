@@ -1,9 +1,11 @@
 package com.summitsync.api.group;
 
+import com.summitsync.api.contact.ContactService;
 import com.summitsync.api.date.EventDateService;
 import com.summitsync.api.group.dto.GroupGetDTO;
 import com.summitsync.api.group.dto.GroupPostDTO;
 import com.summitsync.api.grouptemplate.GroupTemplateMapper;
+import com.summitsync.api.trainer.TrainerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/group")
@@ -23,10 +27,13 @@ public class GroupController {
     private final GroupService service;
     private final GroupMapper mapper;
     private final EventDateService eventDateService;
+    private final TrainerService trainerService;
+    private final ContactService contactService;
 
     @PostMapping
     public ResponseEntity<GroupGetDTO> createGroup(@RequestBody @Valid GroupPostDTO dto, JwtAuthenticationToken jwt) {
         Group group = this.mapper.mapGroupPostDTOToGroup(dto);
+        contactService.saveContact(group.getContact());
         var createdGroup = this.service.create(group);
         return new ResponseEntity<>(this.mapper.mapGroupToGroupGetDto(createdGroup, jwt.getToken().getTokenValue()), HttpStatus.OK);
     }
@@ -67,6 +74,24 @@ public class GroupController {
     public ResponseEntity<GroupGetDTO> cancelGroup(@PathVariable long id, JwtAuthenticationToken jwt) {
         var group = this.service.get(id);
         var updatedGroup = this.service.cancel(group);
+
+        return ResponseEntity.ok(this.mapper.mapGroupToGroupGetDto(updatedGroup, jwt.getToken().getTokenValue()));
+    }
+
+    @PutMapping("/{id}/trainer")
+    public ResponseEntity<GroupGetDTO> addTrainerToGroup(@PathVariable long id, JwtAuthenticationToken jwt, @RequestBody Set<Long> trainers) {
+        var group = this.service.get(id);
+
+        var updatedGroup = this.service.addTrainer(group, trainers.stream().map(this.trainerService::findById).collect(Collectors.toSet()));
+
+        return ResponseEntity.ok(this.mapper.mapGroupToGroupGetDto(updatedGroup, jwt.getToken().getTokenValue()));
+    }
+
+    @DeleteMapping("/{id}/trainer/{trainerId}")
+    public ResponseEntity<GroupGetDTO> removeTrainerFromGroup(@PathVariable long id, @PathVariable long trainerId, JwtAuthenticationToken jwt) {
+        var group = this.service.get(id);
+
+        var updatedGroup = this.service.removeTrainer(group, trainerId);
 
         return ResponseEntity.ok(this.mapper.mapGroupToGroupGetDto(updatedGroup, jwt.getToken().getTokenValue()));
     }

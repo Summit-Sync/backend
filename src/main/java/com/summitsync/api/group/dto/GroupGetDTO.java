@@ -27,7 +27,7 @@ public class GroupGetDTO {
     int numberOfDates;
     int duration;
     ContactGetDto contact;
-    Set<LocalDateTime> dates;
+    Set<LocalDateTime> events;
     int numberParticipants;
     GetLocationDto location;
     String meetingPoint;

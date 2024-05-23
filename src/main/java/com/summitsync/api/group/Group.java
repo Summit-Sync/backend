@@ -37,12 +37,12 @@ public class Group {
     @OneToMany(cascade=CascadeType.ALL)
     Set<EventDate> dates;
     int numberParticipants;
-    @OneToOne
+    @ManyToOne
     Location location;
     String meetingPoint;
     BigDecimal trainerPricePerHour;
     BigDecimal pricePerParticipant;
-    @OneToMany
+    @ManyToMany
     Set<Qualification> qualifications;
     int participantsPerTrainer;
     @ManyToMany
