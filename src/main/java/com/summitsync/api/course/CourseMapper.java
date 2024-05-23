@@ -84,20 +84,22 @@ public class CourseMapper {
 
         for (var participant : dto.getParticipants()) {
             if (participant.getId() == 0) {
-                this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
+                var added = this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
+                participant.setId(added.getId());
             }
             participants.add(this.participantService.findById(participant.getId()));
         }
 
         for (var participant : dto.getWaitList()) {
             if (participant.getId() == 0) {
-                this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
+                var added = this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
+                participant.setId(added.getId());
             }
             waitList.add(this.participantService.findById(participant.getId()));
         }
 
         for (var trainer : dto.getTrainers()) {
-            trainers.add(this.trainerService.findById(trainer.getId()));
+            trainers.add(this.trainerService.findById(trainer));
         }
 
         return Course.builder()
@@ -113,7 +115,7 @@ public class CourseMapper {
                 .participants(participants)
                 .waitList(waitList)
                 .numberWaitlist(dto.getNumberWaitlist())
-                .coursePrices(dto.getPrices().stream().map(this.priceService::findById).collect(Collectors.toSet()))
+                .coursePrices(dto.getPrices().stream().map(this.priceMapper::mapPostPriceDtoToPrice).collect(Collectors.toSet()))
                 .location(this.locationService.getLocationById(dto.getLocation()))
                 .meetingPoint(dto.getMeetingPoint())
                 .requiredQualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).collect(Collectors.toSet()))

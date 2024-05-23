@@ -81,7 +81,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
    "numberTrainers":2,
    "numberWaitlist":2,
    "prices":[
-      1
+      {"name": "Test Price", "price": 12.3}
    ],
    "requiredQualifications":[
       1,
@@ -102,7 +102,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("id").value(1))
                 .andExpect(jsonPath("visible").value(false))
                 .andExpect(jsonPath("dates.length()").value(3))
-                .andExpect(jsonPath("prices[0].name").value("Test Price 1"))
+                .andExpect(jsonPath("prices[0].name").value("Test Price"))
                 .andExpect(jsonPath("location.country").value("Germany"))
                 .andExpect(jsonPath("notes").value("test"));
 
@@ -141,7 +141,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
    "numberTrainers":2,
    "numberWaitlist":2,
    "prices":[
-      1
+      {"name": "Test Price", "price": 12.3}
    ],
    "requiredQualifications":[
       1,
@@ -162,7 +162,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("visible").value(false))
                 .andExpect(jsonPath("canceled").value(false))
                 .andExpect(jsonPath("dates.length()").value(3))
-                .andExpect(jsonPath("prices[0].name").value("Test Price 1"))
+                .andExpect(jsonPath("prices[0].name").value("Test Price"))
                 .andExpect(jsonPath("location.country").value("Germany"))
                 .andExpect(jsonPath("notes").value("test updated"))
                 .andExpect(jsonPath("duration").value(35));
@@ -190,7 +190,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
    "numberTrainers":2,
    "numberWaitlist":2,
    "prices":[
-      1
+      {"name": "Test Price 2", "price": 12.3}
    ],
    "requiredQualifications":[
       1,
@@ -212,7 +212,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("acronym").value("kv2"))
                 .andExpect(jsonPath("visible").value(false))
                 .andExpect(jsonPath("dates.length()").value(3))
-                .andExpect(jsonPath("prices[0].name").value("Test Price 1"))
+                .andExpect(jsonPath("prices[0].name").value("Test Price 2"))
                 .andExpect(jsonPath("location.country").value("Germany"))
                 .andExpect(jsonPath("notes").value("test"));
 

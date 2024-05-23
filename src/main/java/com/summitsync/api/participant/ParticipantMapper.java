@@ -5,6 +5,8 @@ import com.summitsync.api.keycloak.dto.KeycloakAddUserRequest;
 import com.summitsync.api.keycloak.dto.KeycloakUser;
 import com.summitsync.api.participant.dto.AddParticipantDto;
 import com.summitsync.api.participant.dto.ParticipantDto;
+import com.summitsync.api.status.StatusMapper;
+import com.summitsync.api.status.dto.StatusPostDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.Map;
 @Service
 public class ParticipantMapper {
     private final KeycloakRestService keycloakRestService;
+    private final StatusMapper statusMapper;
     public KeycloakAddUserRequest mapAddParticipantDtoToKeycloakAddUserRequest(AddParticipantDto addParticipantDto) {
 
         var username = addParticipantDto.getFirstName() + "." + addParticipantDto.getName();
@@ -33,7 +36,7 @@ public class ParticipantMapper {
                 .email(keycloakUser.getEmail())
                 .firstName(keycloakUser.getFirstName())
                 .name(keycloakUser.getLastName())
-                .status(participant.getStatus().getStatusId())
+                .status(statusMapper.mapStatusToStatusGetDto(participant.getStatus()))
                 .build();
     }
 

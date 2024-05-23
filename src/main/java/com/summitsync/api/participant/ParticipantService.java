@@ -4,6 +4,7 @@ import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
 import com.summitsync.api.keycloak.KeycloakRestService;
 import com.summitsync.api.participant.dto.AddParticipantDto;
 import com.summitsync.api.participant.dto.ParticipantDto;
+import com.summitsync.api.status.Status;
 import com.summitsync.api.status.StatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,9 @@ public class ParticipantService {
     }
 
     public ParticipantDto newParticipant(AddParticipantDto addParticipantDto, String jwt) {
-        var status = this.statusService.findById(addParticipantDto.getStatus());
+        var newStatus = Status.builder().text(addParticipantDto.getStatus().getText()).build();
+        var status = this.statusService.saveStatus(newStatus);
+
         var keycloakAddUserResponse = this.keycloakRestService.addAndRetrieveUser(
                 this.participantMapper.mapAddParticipantDtoToKeycloakAddUserRequest(addParticipantDto),
                 jwt

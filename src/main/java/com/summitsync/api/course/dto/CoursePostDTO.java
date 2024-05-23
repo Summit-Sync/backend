@@ -6,6 +6,7 @@ import com.summitsync.api.date.dto.EventDatePostDto;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.participant.Participant;
 import com.summitsync.api.participant.dto.ParticipantDto;
+import com.summitsync.api.price.dto.PricePostDto;
 import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.qualification.dto.QualificationDto;
 import com.summitsync.api.trainer.dto.TrainerDto;
@@ -45,7 +46,7 @@ public class CoursePostDTO {
     @PositiveOrZero(message = "Number of Waitlist must be positive or zero.")
     private int numberWaitlist;
     @NotEmpty(message = "Prices cannot be empty.")
-    private List<Long> prices;
+    private List<PricePostDto> prices;
     private long location;
     @NotBlank(message = "Meeting Point cannot be empty.")
     private String meetingPoint;
@@ -57,7 +58,7 @@ public class CoursePostDTO {
     @NotBlank(message = "Title cannot be empty.")
     private String title;
     private List<ParticipantDto> participants;
-    private List<TrainerDto> trainers;
+    private List<Long> trainers;
     private List<ParticipantDto> waitList;
 }
 

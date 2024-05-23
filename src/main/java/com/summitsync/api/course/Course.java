@@ -39,7 +39,7 @@ public class Course {
     @ManyToMany
     private Set<Participant> waitList;
     private int numberWaitlist;
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     private Set<Price> coursePrices;
     @ManyToOne
     private Location location;
