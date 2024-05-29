@@ -3,8 +3,6 @@ package com.summitsync.api.trainer;
 import com.summitsync.api.keycloak.KeycloakRestService;
 import com.summitsync.api.keycloak.dto.KeycloakAddUserRequest;
 import com.summitsync.api.keycloak.dto.KeycloakUser;
-import com.summitsync.api.participant.Participant;
-import com.summitsync.api.participant.dto.ParticipantDto;
 import com.summitsync.api.qualification.QualificationMapper;
 import com.summitsync.api.trainer.dto.AddTrainerDto;
 import com.summitsync.api.trainer.dto.TrainerDto;
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -43,15 +40,20 @@ public class TrainerMapper {
 
     public TrainerDto mapKeycloakUserToTrainerDto(KeycloakUser keycloakUser, Trainer trainer) {
         var qualifications = trainer.getQualifications().stream().map(this.qualificationMapper::mapQualificationToQualificationDto).toList();
-        return TrainerDto.builder()
+
+        var builder =  TrainerDto.builder()
                 .id(trainer.getTrainerId())
                 .subjectId(keycloakUser.getId())
                 .firstName(keycloakUser.getFirstName())
                 .lastName(keycloakUser.getLastName())
                 .qualifications(qualifications)
-                .phone(keycloakUser.getAttributes().get("phone").getFirst())
-                .email(keycloakUser.getEmail())
-                .build();
+                .email(keycloakUser.getEmail());
+
+        if (keycloakUser.getAttributes() != null) {
+            builder.phone(keycloakUser.getAttributes().get("phone").getFirst());
+        }
+
+        return builder.build();
     }
 
     public KeycloakAddUserRequest mapUpdateTrainerDtoToKeycloakAddUserRequest(UpdateTrainerDto updateTrainerDto) {
