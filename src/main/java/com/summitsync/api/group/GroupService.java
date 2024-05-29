@@ -1,7 +1,5 @@
 package com.summitsync.api.group;
 
-import com.summitsync.api.date.EventDate;
-import com.summitsync.api.grouptemplate.GroupTemplate;
 import com.summitsync.api.grouptemplate.GroupTemplateService;
 import com.summitsync.api.trainer.Trainer;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +20,16 @@ public class GroupService {
     private final Logger log = LoggerFactory.getLogger(GroupService.class);
     private final GroupTemplateService templateService;
 
-    public Group create(Group group) { return this.repository.save(group); }
+    public Group create(Group group) {
+        group.setGroupNumber(generateGroupNumber(group.getAcronym()));
+        return this.repository.save(group);
+    }
+
+    private String generateGroupNumber(String acronym) {
+        var groups = this.repository.findByAcronymOrderByGroupNumberDesc(acronym);
+        int ret = groups.isEmpty() ? 1 : Integer.parseInt(groups.getFirst().getGroupNumber()) + 1;
+        return String.format("%03d", ret);
+    }
 
     public Group update(Group groupToUpdate, Group group) {
         groupToUpdate.setCancelled(group.isCancelled());
