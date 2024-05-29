@@ -45,7 +45,7 @@ public class CourseTemplateMapper {
         }
 
         if (dto.getPrice() != null && !dto.getPrice().isEmpty()) {
-            var prices = new HashSet<Price>();
+            var prices = new ArrayList<Price>();
             for (var pricePostDto: dto.getPrice()) {
                 var price = Price
                         .builder()
@@ -59,7 +59,7 @@ public class CourseTemplateMapper {
         }
 
         if (dto.getRequiredQualifications() != null && !dto.getRequiredQualifications().isEmpty()) {
-            courseTemplate.setQualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).collect(Collectors.toSet()));
+            courseTemplate.setQualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).toList());
         }
 
         return courseTemplate;

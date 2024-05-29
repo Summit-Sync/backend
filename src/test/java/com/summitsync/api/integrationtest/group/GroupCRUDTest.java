@@ -158,6 +158,7 @@ class GroupCRUDTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("events.length()").value(2))
                 .andExpect(jsonPath("location.country").value("Germany"))
                 .andExpect(jsonPath("duration").value(45))
+                .andExpect(jsonPath("groupNumber").value("001"))
                 .andExpect(jsonPath("trainers[0].firstName").value("Integration"))
                 .andExpect(jsonPath("trainers.length()").value(1));
     }
@@ -191,7 +192,7 @@ class GroupCRUDTest extends AbstractIntegrationTest {
    ],
    "participantsPerTrainer": 10,
    "trainers": [1],
-   "acronym": "t2"
+   "acronym": "ts"
 }
 """;
         this.mockMvc.perform(post("/api/v1/group")
@@ -199,7 +200,8 @@ class GroupCRUDTest extends AbstractIntegrationTest {
                         .content(content))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("id").value(2))
-                .andExpect(jsonPath("acronym").value("t2"))
+                .andExpect(jsonPath("acronym").value("ts"))
+                .andExpect(jsonPath("groupNumber").value("002"))
                 .andExpect(jsonPath("events.length()").value(1))
                 .andExpect(jsonPath("location.country").value("Germany"));
 
