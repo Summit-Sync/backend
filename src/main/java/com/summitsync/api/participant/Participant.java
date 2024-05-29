@@ -20,9 +20,9 @@ public class Participant {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long participantId;
     private String subjectId;
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "participants")
     private Set<Course> courses;
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "waitList")
     private List<Course> coursesWaitList;
     @OneToOne(fetch = FetchType.LAZY)
     private Status status;

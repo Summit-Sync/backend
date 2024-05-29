@@ -24,7 +24,7 @@ public class Price {
     private long courseTemplatePriceId;
     private BigDecimal price;
     private String name;
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "coursePrices")
     private List<Course> courses;
     @ManyToMany(mappedBy = "prices",cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<CourseTemplate> courseTemplates;

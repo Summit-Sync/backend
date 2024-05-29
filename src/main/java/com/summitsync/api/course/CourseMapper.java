@@ -21,7 +21,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -79,9 +81,9 @@ public class CourseMapper {
             }
         }
 
-        Set<Participant> participants = new HashSet<>();
-        Set<Participant> waitList = new HashSet<>();
-        Set<Trainer> trainers = new HashSet<>();
+        List<Participant> participants = new ArrayList<>();
+        List<Participant> waitList = new ArrayList<>();
+        List<Trainer> trainers = new ArrayList<>();
 
         for (var participant : dto.getParticipants()) {
             if (participant.getId() == 0) {
@@ -103,7 +105,7 @@ public class CourseMapper {
             trainers.add(this.trainerService.findById(trainer));
         }
 
-        var prices = new HashSet<Price>();
+        var prices = new ArrayList<Price>();
 
         for (var price : dto.getPrices()) {
             var mappedPrice = this.priceMapper.mapPostPriceDtoToPrice(price);
@@ -127,7 +129,7 @@ public class CourseMapper {
                 .coursePrices(prices)
                 .location(this.locationService.getLocationById(dto.getLocation()))
                 .meetingPoint(dto.getMeetingPoint())
-                .requiredQualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).collect(Collectors.toSet()))
+                .requiredQualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).toList())
                 .numberTrainer(dto.getNumberTrainers())
                 .trainers(trainers)
                 .title(dto.getTitle())

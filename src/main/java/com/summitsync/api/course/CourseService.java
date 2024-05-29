@@ -43,8 +43,11 @@ public class CourseService {
     }
 
     public Course update(Course courseToUpdate, Course course, boolean cancelled, boolean finished) {
-        courseToUpdate.setParticipants(course.getParticipants());
-        courseToUpdate.setTrainers(course.getTrainers());
+        var participants = new ArrayList<>(course.getParticipants());
+        courseToUpdate.setParticipants(participants);
+        var trainers = new ArrayList<>(course.getTrainers());
+        courseToUpdate.setTrainers(trainers);
+        var waitList = new ArrayList<>(course.getWaitList());
         courseToUpdate.setWaitList(course.getWaitList());
         courseToUpdate.setVisible(course.isVisible());
         courseToUpdate.setCancelled(course.isCancelled());
@@ -58,7 +61,8 @@ public class CourseService {
         courseToUpdate.setCoursePrices(course.getCoursePrices());
         courseToUpdate.setLocation(course.getLocation());
         courseToUpdate.setMeetingPoint(course.getMeetingPoint());
-        courseToUpdate.setRequiredQualifications(course.getRequiredQualifications());
+        var qualifications = new ArrayList<>(course.getRequiredQualifications());
+        courseToUpdate.setRequiredQualifications(qualifications);
         courseToUpdate.setNumberTrainer(course.getNumberTrainer());
         courseToUpdate.setNotes(course.getNotes());
         courseToUpdate.setTitle(course.getTitle());
@@ -112,7 +116,7 @@ public class CourseService {
                 .filter(
                         q -> q.getQualificationId() != qualification.getQualificationId()
                 )
-                .collect(Collectors.toSet());
+                .toList();
 
         course.setRequiredQualifications(updatedQualificationList);
         return this.repository.save(course);
@@ -132,7 +136,7 @@ public class CourseService {
                 .filter(
                         p -> p.getParticipantId() != participantId
                 )
-                .collect(Collectors.toSet());
+                .toList();
 
         course.setParticipants(updatedParticipants);
         return this.repository.save(course);
@@ -152,7 +156,7 @@ public class CourseService {
                 .filter(
                         p -> p.getParticipantId() != participantId
                 )
-                .collect(Collectors.toSet());
+                .toList();
 
         course.setParticipants(updatedParticipants);
         return this.repository.save(course);
@@ -173,7 +177,7 @@ public class CourseService {
                 .filter(
                         t -> t.getTrainerId() != trainerId
                 )
-                .collect(Collectors.toSet());
+                .toList();
 
         course.setTrainers(updatedTrainers);
         return this.repository.save(course);

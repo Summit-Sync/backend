@@ -152,8 +152,8 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content))
                 .andExpect(status().is(200))
-                .andExpect(jsonPath("trainers[1].firstName").value("Integration"))
-                .andExpect(jsonPath("trainers.length()").value(1));
+                .andExpect(jsonPath("trainers[?(@.firstName == 'Integration')].firstName").value("Integration"))
+                .andExpect(jsonPath("trainers.length()").value(2));
     }
 
     @Test
@@ -230,14 +230,13 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("location.country").value("Germany"))
                 .andExpect(jsonPath("notes").value("test updated"))
                 .andExpect(jsonPath("duration").value(35))
-                .andExpect(jsonPath("trainers[1].firstName").value("Integration"))
-                .andExpect(jsonPath("trainers[0].firstName").value("Integration2"))
+                .andExpect(jsonPath("trainers[?(@.firstName == 'Integration')].firstName").value("Integration"))
+                .andExpect(jsonPath("trainers[?(@.firstName == 'Integration2')].firstName").value("Integration2"))
                 .andExpect(jsonPath("waitList.length()").value(2))
                 .andExpect(jsonPath("participants.length()").value(2))
                 .andExpect(jsonPath("trainers.length()").value(2))
-                .andExpect(jsonPath("waitList[0].name").value(waitListParticipantName + "UPDATED"));
+                .andExpect(jsonPath(String.format("waitList[?(@.name == '%s')].name", waitListParticipantName + "UPDATED")).value(waitListParticipantName + "UPDATED"));
     }
-
     @Test
     @Order(4)
     void testCreateSecondCourseHappyPath() throws Exception {
@@ -285,9 +284,19 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("notes").value("test"));
 
     }
-
     @Test
     @Order(5)
+    void testGetAllCourses() throws Exception {
+        this.mockMvc.perform(get("/api/v1/course")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].trainers.length()").value(2))
+                .andExpect(jsonPath("$[0].waitList.length()").value(2))
+                .andExpect(jsonPath("$[0].participants.length()").value(2))
+                .andExpect(jsonPath("$[0].requiredQualifications.length()").value(2))
+                .andExpect(jsonPath("$[0].prices.length()").value(1));
+    }
+    @Test
+    @Order(6)
     void testDeleteCourse() throws Exception {
         this.mockMvc.perform(delete("/api/v1/course/1"))
                 .andExpect(status().is(204));

@@ -27,7 +27,7 @@ public class Trainer {
     private String subjectId;
     @ManyToMany(fetch = FetchType.LAZY)
     private Set<Qualification> qualifications = new HashSet<>();
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "trainers")
     private List<Course> courses;
     @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CourseTrainer> courseTrainers;
