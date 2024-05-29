@@ -88,7 +88,7 @@ public class CourseMapper {
                 var added = this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
                 participant.setId(added.getId());
             }
-            participants.add(this.participantService.findById(participant.getId()));
+            participants.add(this.participantService.getParticipantAndUpdate(participant, jwt.getToken().getTokenValue()));
         }
 
         for (var participant : dto.getWaitList()) {
@@ -96,7 +96,7 @@ public class CourseMapper {
                 var added = this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
                 participant.setId(added.getId());
             }
-            waitList.add(this.participantService.findById(participant.getId()));
+            waitList.add(this.participantService.getParticipantAndUpdate(participant, jwt.getToken().getTokenValue()));
         }
 
         for (var trainer : dto.getTrainers()) {

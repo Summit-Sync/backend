@@ -64,6 +64,7 @@ public class CourseService {
         courseToUpdate.setTitle(course.getTitle());
         courseToUpdate.setCancelled(cancelled);
         courseToUpdate.setFinished(finished);
+        courseToUpdate.setDescription(course.getDescription());
         return this.repository.save(courseToUpdate);
     }
 
