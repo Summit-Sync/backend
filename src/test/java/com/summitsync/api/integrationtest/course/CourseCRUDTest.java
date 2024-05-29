@@ -293,6 +293,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$[0].waitList.length()").value(2))
                 .andExpect(jsonPath("$[0].participants.length()").value(2))
                 .andExpect(jsonPath("$[0].requiredQualifications.length()").value(2))
+                .andExpect(jsonPath("$[0].dates.length()").value(1))
                 .andExpect(jsonPath("$[0].prices.length()").value(1));
     }
     @Test

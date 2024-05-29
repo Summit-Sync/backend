@@ -33,7 +33,12 @@ public class GroupTemplate {
     private String meetingPoint;
     private BigDecimal trainerPricerPerHour;
     private BigDecimal pricePerParticipant;
-    @ManyToMany(mappedBy = "groupTemplates", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "ss_grouptemplate_trainer_join",
+            joinColumns = @JoinColumn(name = "groupTemplateId"),
+            inverseJoinColumns = @JoinColumn(name = "trainerId")
+    )
     private Set<Qualification> requiredQualifications;
     private int participantsPerTrainer;
 

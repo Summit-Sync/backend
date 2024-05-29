@@ -108,7 +108,7 @@ class GroupCRUDTest extends AbstractIntegrationTest {
                         .content(content))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("id").value(1))
-                .andExpect(jsonPath("events.length()").value(3))
+                .andExpect(jsonPath("dates.length()").value(3))
                 .andExpect(jsonPath("requiredQualifications.length()").value(2))
                 .andExpect(jsonPath("location.country").value("Germany"));
 
@@ -172,7 +172,7 @@ class GroupCRUDTest extends AbstractIntegrationTest {
                         .content(content))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("id").value(1))
-                .andExpect(jsonPath("events.length()").value(2))
+                .andExpect(jsonPath("dates.length()").value(2))
                 .andExpect(jsonPath("location.country").value("Germany"))
                 .andExpect(jsonPath("duration").value(45))
                 .andExpect(jsonPath("groupNumber").value("001"))
@@ -219,7 +219,7 @@ class GroupCRUDTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("id").value(2))
                 .andExpect(jsonPath("acronym").value("ts"))
                 .andExpect(jsonPath("groupNumber").value("002"))
-                .andExpect(jsonPath("events.length()").value(1))
+                .andExpect(jsonPath("dates.length()").value(1))
                 .andExpect(jsonPath("location.country").value("Germany"));
 
     }
@@ -233,7 +233,7 @@ class GroupCRUDTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$[0].requiredQualifications.length()").value(2))
                 .andExpect(jsonPath("$[0].contact.firstName").value("asd"))
                 .andExpect(jsonPath("$[0].trainers.length()").value(2))
-                .andExpect(jsonPath("$[0].events.length()").value(2));
+                .andExpect(jsonPath("$[0].dates.length()").value(2));
     }
 
     @Test

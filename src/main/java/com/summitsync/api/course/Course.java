@@ -33,8 +33,8 @@ public class Course {
     private String courseNumber;
     private String acronym;
     private String description;
-    @OneToMany(mappedBy = "course", cascade = CascadeType.PERSIST)
-    private Set<EventDate> dates;
+    @OneToMany(cascade = CascadeType.PERSIST)
+    private List<EventDate> dates;
     private int duration;
     private int numberParticipants;
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)

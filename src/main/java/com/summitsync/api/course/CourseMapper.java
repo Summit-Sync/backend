@@ -70,7 +70,7 @@ public class CourseMapper {
     }
 
     public Course mapCoursePostDTOToCourse(CoursePostDTO dto, JwtAuthenticationToken jwt) {
-        var dates = new HashSet<EventDate>();
+        var dates = new ArrayList<EventDate>();
         if (dto.getDates() != null) {
             for (var date: dto.getDates()) {
                 var eventDate = new EventDate();

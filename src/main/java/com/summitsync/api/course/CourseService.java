@@ -48,13 +48,14 @@ public class CourseService {
         var trainers = new ArrayList<>(course.getTrainers());
         courseToUpdate.setTrainers(trainers);
         var waitList = new ArrayList<>(course.getWaitList());
-        courseToUpdate.setWaitList(course.getWaitList());
+        courseToUpdate.setWaitList(waitList);
         courseToUpdate.setVisible(course.isVisible());
         courseToUpdate.setCancelled(course.isCancelled());
         courseToUpdate.setFinished(course.isFinished());
         courseToUpdate.setCourseNumber(course.getCourseNumber());
         courseToUpdate.setAcronym(course.getAcronym());
-        courseToUpdate.setDates(course.getDates());
+        var dates = new ArrayList<>(course.getDates());
+        courseToUpdate.setDates(dates);
         courseToUpdate.setDuration(course.getDuration());
         courseToUpdate.setNumberParticipants(course.getNumberParticipants());
         courseToUpdate.setNumberWaitlist(course.getNumberWaitlist());
