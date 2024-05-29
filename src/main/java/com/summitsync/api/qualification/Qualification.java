@@ -24,7 +24,7 @@ public class Qualification {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long qualificationId;
     private String name;
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "qualifications")
     private List<Trainer> trainers;
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "requiredQualifications")
     private List<Course> courses;

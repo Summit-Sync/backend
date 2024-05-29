@@ -95,16 +95,19 @@ public class TrainerService {
     }
 
     public TrainerDto updateTrainer(Trainer trainer, UpdateTrainerDto updateTrainerDto, String jwt) {
-        var qualifications = new HashSet<Qualification>();
-        for (var qualification: updateTrainerDto.getQualifications()) {
-            qualifications.add(this.getQualificationService().findById(qualification.getId()));
+        var qualifications = new ArrayList<Qualification>();
+        if (updateTrainerDto.getQualifications() != null) {
+            for (var qualification: updateTrainerDto.getQualifications()) {
+                qualifications.add(this.getQualificationService().findById(qualification.getId()));
+            }
         }
 
         trainer.setQualifications(qualifications);
+        var updatedTrainer = this.trainerRepository.save(trainer);
         var keycloakAddUser = this.trainerMapper.mapUpdateTrainerDtoToKeycloakAddUserRequest(updateTrainerDto);
 
-        var keycloakUser = this.keycloakRestService.updateUser(trainer.getSubjectId(), keycloakAddUser, jwt);
-        return this.trainerMapper.mapKeycloakUserToTrainerDto(keycloakUser, trainer);
+        var keycloakUser = this.keycloakRestService.updateUser(updatedTrainer.getSubjectId(), keycloakAddUser, jwt);
+        return this.trainerMapper.mapKeycloakUserToTrainerDto(keycloakUser, updatedTrainer);
     }
 
     private TrainerDto trainerDtoFromTrainer(Trainer trainer, String jwt) {

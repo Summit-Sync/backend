@@ -26,7 +26,12 @@ public class Trainer {
     private long trainerId;
     private String subjectId;
     @ManyToMany(fetch = FetchType.LAZY)
-    private Set<Qualification> qualifications = new HashSet<>();
+    @JoinTable(
+            name = "ss_trainer_qualification_join",
+            joinColumns = @JoinColumn(name = "trainerid"),
+            inverseJoinColumns = @JoinColumn(name = "qualificationId")
+    )
+    private List<Qualification> qualifications = new ArrayList<>();
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "trainers")
     private List<Course> courses;
     @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
