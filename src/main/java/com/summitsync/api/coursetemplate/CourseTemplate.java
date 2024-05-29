@@ -28,12 +28,12 @@ public class CourseTemplate {
     private int duration;
     private int numberParticipants;
     private int numberWaitlist;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private Location location;
     private String meetingPoint;
-    @ManyToMany(mappedBy = "courseTemplates", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "courseTemplates", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private Set<Price> prices;
-    @ManyToMany(mappedBy = "courseTemplates", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "courseTemplates", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private Set<Qualification> qualifications;
     private int numberTrainer;
 }
