@@ -28,7 +28,7 @@ public class Qualification {
     private List<Trainer> trainers;
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "requiredQualifications")
     private List<Course> courses;
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToMany(mappedBy = "qualifications", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private List<Group> groups;
     @ManyToMany(mappedBy = "qualifications", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private List<CourseTemplate> courseTemplates;

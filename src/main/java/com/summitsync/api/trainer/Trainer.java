@@ -36,7 +36,7 @@ public class Trainer {
     private List<Course> courses;
     @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CourseTrainer> courseTrainers;
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "trainers", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Group> groups;
     @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TrainerApplication> trainerApplications;

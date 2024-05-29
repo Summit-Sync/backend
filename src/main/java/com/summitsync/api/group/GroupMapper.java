@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -74,7 +75,7 @@ public class GroupMapper {
 
     }
     public Group mapGroupPostDTOToGroup(GroupPostDTO dto) {
-        Set<EventDate> dates = new HashSet<>();
+        var dates = new ArrayList<EventDate>();
         for (var d : dto.getEvents()) {
            var newEventDate = EventDate.builder()
                    .startTime(d)
@@ -99,9 +100,9 @@ public class GroupMapper {
                 .meetingPoint(dto.getMeetingPoint())
                 .trainerPricePerHour(dto.getTrainerPricePerHour())
                 .pricePerParticipant(dto.getPricePerParticipant())
-                .qualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).collect(Collectors.toSet()))
+                .qualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).toList())
                 .participantsPerTrainer(dto.getParticipantsPerTrainer())
-                .trainers(dto.getTrainers().stream().map(this.trainerService::findById).collect(Collectors.toSet()))
+                .trainers(dto.getTrainers().stream().map(this.trainerService::findById).toList())
                 .totalPrice(new BigDecimal("0.0"))
                 .build();
     }

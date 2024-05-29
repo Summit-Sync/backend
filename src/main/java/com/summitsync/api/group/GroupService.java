@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -39,17 +40,20 @@ public class GroupService {
         groupToUpdate.setNumberOfDates(group.getNumberOfDates());
         groupToUpdate.setDuration(group.getDuration());
         groupToUpdate.setContact(group.getContact());
-        groupToUpdate.setDates(group.getDates());
+        var dates = new ArrayList<>(group.getDates());
+        groupToUpdate.setDates(dates);
         groupToUpdate.setNumberParticipants(group.getNumberParticipants());
         groupToUpdate.setLocation(group.getLocation());
         groupToUpdate.setMeetingPoint(group.getMeetingPoint());
         groupToUpdate.setTrainerPricePerHour(group.getTrainerPricePerHour());
         groupToUpdate.setPricePerParticipant(group.getPricePerParticipant());
-        groupToUpdate.setQualifications(group.getQualifications());
+        var qualifications = new ArrayList<>(group.getQualifications());
+        groupToUpdate.setQualifications(qualifications);
         groupToUpdate.setParticipantsPerTrainer(group.getParticipantsPerTrainer());
-        groupToUpdate.setTrainers(group.getTrainers());
+        var trainers = new ArrayList<>(group.getTrainers());
+        groupToUpdate.setTrainers(trainers);
 
-        return groupToUpdate;
+        return this.repository.save(groupToUpdate);
     }
 
     private void delete(Group group) {
@@ -89,7 +93,9 @@ public class GroupService {
     }
 
     public Group addTrainer(Group group, Set<Trainer> trainer) {
-        group.getTrainers().addAll(trainer);
+        var oldTrainers = group.getTrainers();
+        oldTrainers.addAll(trainer);
+        group.setTrainers(oldTrainers);
 
         return this.repository.save(group);
     }
@@ -102,7 +108,7 @@ public class GroupService {
                 .filter(
                         t -> t.getTrainerId() != trainerId
                 )
-                .collect(Collectors.toSet());
+                .toList();
 
         group.setTrainers(updatedTrainers);
         return this.repository.save(group);

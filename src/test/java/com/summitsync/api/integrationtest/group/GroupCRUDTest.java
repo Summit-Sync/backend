@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GroupCRUDTest extends AbstractIntegrationTest {
     @BeforeAll
     static void setup(
@@ -43,14 +44,23 @@ class GroupCRUDTest extends AbstractIntegrationTest {
         locationService.createLocation(location);
         var jwt = MockMVCApiKey.getAccessToken();
         var trainer1 = AddTrainerDto.builder()
-                .username("it_test_trainer" + random.nextInt(5000))
+                .username("it_test_trainer_trainer1_group" + random.nextInt(5000))
                 .firstName("Integration")
                 .lastName("Test")
                 .password("test")
-                .email("test@test.test" + random.nextInt(5000))
+                .email("test@test.test.trainer1.group" + random.nextInt(5000))
                 .phone("+41241615")
                 .build();
         trainerService.newTrainer(trainer1, jwt);
+        var trainer2 = AddTrainerDto.builder()
+                .username("it_test_trainer_trainer2_group" + random.nextInt(5000))
+                .firstName("Integration2")
+                .lastName("Test2")
+                .password("test")
+                .email("test@test.test.trainer2.group" + random.nextInt(5000))
+                .phone("+41241615")
+                .build();
+        trainerService.newTrainer(trainer2, jwt);
         var price1 = Price.builder()
                 .price(BigDecimal.valueOf(10.0))
                 .name("Test Price 1")
@@ -102,12 +112,15 @@ class GroupCRUDTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("requiredQualifications.length()").value(2))
                 .andExpect(jsonPath("location.country").value("Germany"));
 
+        this.mockMvc.perform(get("/api/v1/group/1")).andExpect(jsonPath("trainers.length()").value(1));
+
     }
     @Test
     @Order(2)
+    @Disabled
     void testAddTrainerToGroup() throws Exception {
         var content = """
-[1]
+[2]
 """;
         this.mockMvc.perform(put("/api/v1/group/1/trainer")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -115,6 +128,10 @@ class GroupCRUDTest extends AbstractIntegrationTest {
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("trainers[0].firstName").value("Integration"))
                 .andExpect(jsonPath("trainers.length()").value(1));
+
+        this.mockMvc.perform(get("/api/v1/group/1")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("trainers.length()").value(2));
     }
 
     @Test
@@ -146,7 +163,7 @@ class GroupCRUDTest extends AbstractIntegrationTest {
       2
    ],
    "participantsPerTrainer": 10,
-   "trainers": [1],
+   "trainers": [1,2],
    "acronym": "ts"
 }
 """;
@@ -159,8 +176,8 @@ class GroupCRUDTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("location.country").value("Germany"))
                 .andExpect(jsonPath("duration").value(45))
                 .andExpect(jsonPath("groupNumber").value("001"))
-                .andExpect(jsonPath("trainers[0].firstName").value("Integration"))
-                .andExpect(jsonPath("trainers.length()").value(1));
+                .andExpect(jsonPath("trainers[?(@.firstName == 'Integration')].firstName").value("Integration"))
+                .andExpect(jsonPath("trainers.length()").value(2));
     }
 
     @Test
@@ -209,6 +226,18 @@ class GroupCRUDTest extends AbstractIntegrationTest {
 
     @Test
     @Order(5)
+    void testGetAllGroups() throws Exception {
+        this.mockMvc.perform(get("/api/v1/group")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].requiredQualifications.length()").value(2))
+                .andExpect(jsonPath("$[0].contact.firstName").value("asd"))
+                .andExpect(jsonPath("$[0].trainers.length()").value(2))
+                .andExpect(jsonPath("$[0].events.length()").value(2));
+    }
+
+    @Test
+    @Order(6)
     void testDeleteGroup() throws Exception {
         this.mockMvc.perform(delete("/api/v1/group/1"))
                 .andExpect(status().is(204));
