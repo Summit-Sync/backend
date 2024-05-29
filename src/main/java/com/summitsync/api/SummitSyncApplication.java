@@ -2,13 +2,12 @@ package com.summitsync.api;
 
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.EventDateTime;
-import com.summitsync.api.mail.GoogleCalendar;
+import com.summitsync.api.googlecalendar.GoogleCalendar;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Date;
 
 @SpringBootApplication
 public class SummitSyncApplication {
