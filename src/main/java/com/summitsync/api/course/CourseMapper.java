@@ -9,6 +9,7 @@ import com.summitsync.api.location.LocationService;
 import com.summitsync.api.participant.Participant;
 import com.summitsync.api.participant.ParticipantMapper;
 import com.summitsync.api.participant.ParticipantService;
+import com.summitsync.api.price.Price;
 import com.summitsync.api.price.PriceMapper;
 import com.summitsync.api.price.PriceService;
 import com.summitsync.api.qualification.QualificationMapper;
@@ -20,7 +21,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -67,7 +70,7 @@ public class CourseMapper {
     }
 
     public Course mapCoursePostDTOToCourse(CoursePostDTO dto, JwtAuthenticationToken jwt) {
-        var dates = new HashSet<EventDate>();
+        var dates = new ArrayList<EventDate>();
         if (dto.getDates() != null) {
             for (var date: dto.getDates()) {
                 var eventDate = new EventDate();
@@ -78,26 +81,36 @@ public class CourseMapper {
             }
         }
 
-        Set<Participant> participants = new HashSet<>();
-        Set<Participant> waitList = new HashSet<>();
-        Set<Trainer> trainers = new HashSet<>();
+        List<Participant> participants = new ArrayList<>();
+        List<Participant> waitList = new ArrayList<>();
+        List<Trainer> trainers = new ArrayList<>();
 
         for (var participant : dto.getParticipants()) {
             if (participant.getId() == 0) {
-                this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
+                var added = this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
+                participant.setId(added.getId());
             }
-            participants.add(this.participantService.findById(participant.getId()));
+            participants.add(this.participantService.getParticipantAndUpdate(participant, jwt.getToken().getTokenValue()));
         }
 
         for (var participant : dto.getWaitList()) {
             if (participant.getId() == 0) {
-                this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
+                var added = this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
+                participant.setId(added.getId());
             }
-            waitList.add(this.participantService.findById(participant.getId()));
+            waitList.add(this.participantService.getParticipantAndUpdate(participant, jwt.getToken().getTokenValue()));
         }
 
         for (var trainer : dto.getTrainers()) {
-            trainers.add(this.trainerService.findById(trainer.getId()));
+            trainers.add(this.trainerService.findById(trainer));
+        }
+
+        var prices = new ArrayList<Price>();
+
+        for (var price : dto.getPrices()) {
+            var mappedPrice = this.priceMapper.mapPostPriceDtoToPrice(price);
+            var savedPrice = this.priceService.create(mappedPrice);
+            prices.add(savedPrice);
         }
 
         return Course.builder()
@@ -113,10 +126,10 @@ public class CourseMapper {
                 .participants(participants)
                 .waitList(waitList)
                 .numberWaitlist(dto.getNumberWaitlist())
-                .coursePrices(dto.getPrices().stream().map(this.priceService::findById).collect(Collectors.toSet()))
+                .coursePrices(prices)
                 .location(this.locationService.getLocationById(dto.getLocation()))
                 .meetingPoint(dto.getMeetingPoint())
-                .requiredQualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).collect(Collectors.toSet()))
+                .requiredQualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).toList())
                 .numberTrainer(dto.getNumberTrainers())
                 .trainers(trainers)
                 .title(dto.getTitle())

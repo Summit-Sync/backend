@@ -5,6 +5,7 @@ import com.summitsync.api.qualification.Qualification;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -13,6 +14,7 @@ import java.util.List;
 @Data
 public class GroupTemplatePostDTO {
     @NotBlank(message = "Acronym cannot be empty.")
+    @Size(max = 3, min = 2, message = "acronym has to be 2 or 3 long")
     private String acronym;
     @NotBlank(message = "Title cannot be empty.")
     private String title;

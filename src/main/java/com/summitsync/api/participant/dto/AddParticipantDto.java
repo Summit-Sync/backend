@@ -1,5 +1,7 @@
 package com.summitsync.api.participant.dto;
 
+import com.summitsync.api.status.dto.StatusGetDto;
+import com.summitsync.api.status.dto.StatusPostDto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,6 +10,6 @@ import lombok.Data;
 public class AddParticipantDto {
     String name;
     String firstName;
-    long status;
+    StatusGetDto status;
     String email;
 }

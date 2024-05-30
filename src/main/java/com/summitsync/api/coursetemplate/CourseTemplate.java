@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -28,13 +29,23 @@ public class CourseTemplate {
     private int duration;
     private int numberParticipants;
     private int numberWaitlist;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private Location location;
     private String meetingPoint;
-    @OneToMany
-    private Set<Price> prices;
-    @OneToMany
-    private Set<Qualification> qualifications;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "ss_coursetemplate_price",
+            joinColumns = @JoinColumn(name = "courseTemplateId"),
+            inverseJoinColumns = @JoinColumn(name = "courseTemplatePriceId")
+    )
+    private List<Price> prices;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "ss_coursetemplate_qualifications",
+            joinColumns = @JoinColumn(name = "courseTemplateId"),
+            inverseJoinColumns = @JoinColumn(name = "qualificationId")
+    )
+    private List<Qualification> qualifications;
     private int numberTrainer;
 }
 

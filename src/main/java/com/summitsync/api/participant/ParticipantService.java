@@ -4,6 +4,8 @@ import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
 import com.summitsync.api.keycloak.KeycloakRestService;
 import com.summitsync.api.participant.dto.AddParticipantDto;
 import com.summitsync.api.participant.dto.ParticipantDto;
+import com.summitsync.api.status.Status;
+import com.summitsync.api.status.StatusMapper;
 import com.summitsync.api.status.StatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import java.util.HashSet;
 public class ParticipantService {
     private final ParticipantRepository participantRepository;
     private final StatusService statusService;
+    private final StatusMapper statusMapper;
     private final KeycloakRestService keycloakRestService;
     private final ParticipantMapper participantMapper;
 
@@ -36,7 +39,9 @@ public class ParticipantService {
     }
 
     public ParticipantDto newParticipant(AddParticipantDto addParticipantDto, String jwt) {
-        var status = this.statusService.findById(addParticipantDto.getStatus());
+        var newStatus = Status.builder().text(addParticipantDto.getStatus().getText()).build();
+        var status = this.statusService.saveStatus(newStatus);
+
         var keycloakAddUserResponse = this.keycloakRestService.addAndRetrieveUser(
                 this.participantMapper.mapAddParticipantDtoToKeycloakAddUserRequest(addParticipantDto),
                 jwt
@@ -57,5 +62,22 @@ public class ParticipantService {
 
         this.keycloakRestService.deleteUser(participant.getSubjectId(), jwt);
         this.participantRepository.delete(participant);
+    }
+
+
+    public Participant getParticipantAndUpdate(ParticipantDto participantDto, String jwt) {
+        var participant = this.findById(participantDto.getId());
+
+        if (!participantDto.getStatus().getText().equals(participant.getStatus().getText())) {
+            var status = Status.builder().text(participantDto.getStatus().getText()).build();
+            var dbStatus = this.statusService.saveStatus(status);
+            participant.setStatus(dbStatus);
+        }
+
+        var addTrainer = this.participantMapper.mapParticipantDtoToAddDto(participantDto);
+        var keycloakAddRequest = this.participantMapper.mapAddParticipantDtoToKeycloakAddUserRequest(addTrainer);
+
+        var keycloakUser = this.keycloakRestService.updateUser(participant.getSubjectId(), keycloakAddRequest, jwt);
+        return this.participantRepository.save(participant);
     }
 }

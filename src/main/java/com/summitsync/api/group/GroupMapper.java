@@ -1,22 +1,17 @@
 package com.summitsync.api.group;
 
 import com.summitsync.api.contact.ContactMapper;
-import com.summitsync.api.contact.ContactRepository;
 import com.summitsync.api.contact.ContactService;
 import com.summitsync.api.date.EventDate;
 import com.summitsync.api.date.EventDateMapper;
 import com.summitsync.api.date.EventDateService;
-import com.summitsync.api.date.dto.EventDateGetDto;
-import com.summitsync.api.date.dto.EventDatePostDto;
 import com.summitsync.api.group.dto.GroupGetDTO;
 import com.summitsync.api.group.dto.GroupPostDTO;
-import com.summitsync.api.grouptemplate.GroupTemplate;
 import com.summitsync.api.grouptemplate.GroupTemplateMapper;
 import com.summitsync.api.grouptemplate.GroupTemplateService;
 import com.summitsync.api.keycloak.KeycloakRestService;
 import com.summitsync.api.location.LocationMapper;
 import com.summitsync.api.location.LocationService;
-import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.qualification.QualificationMapper;
 import com.summitsync.api.qualification.QualificationService;
 import com.summitsync.api.trainer.TrainerMapper;
@@ -28,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -80,8 +74,8 @@ public class GroupMapper {
 
     }
     public Group mapGroupPostDTOToGroup(GroupPostDTO dto) {
-        Set<EventDate> dates = new HashSet<>();
-        for (var d : dto.getDates()) {
+        var dates = new ArrayList<EventDate>();
+        for (var d : dto.getEvents()) {
            var newEventDate = EventDate.builder()
                    .startTime(d)
                    .durationInMinutes(dto.getDuration())
@@ -90,6 +84,7 @@ public class GroupMapper {
            var savedEventDate = this.eventDateService.create(newEventDate);
            dates.add(savedEventDate);
         }
+
         return Group.builder()
                 .cancelled(false)
                 .acronym(dto.getAcronym())
@@ -97,16 +92,16 @@ public class GroupMapper {
                 .description(dto.getDescription())
                 .numberOfDates(dto.getNumberOfDates())
                 .duration(dto.getDuration())
-                .contact(this.contactService.findById(dto.getContact()))
+                .contact(this.contactMapper.mapContactPostDtoToContact(dto.getContact()))
                 .dates(dates)
                 .numberParticipants(dto.getNumberParticipants())
                 .location(this.locationService.getLocationById(dto.getLocation()))
                 .meetingPoint(dto.getMeetingPoint())
                 .trainerPricePerHour(dto.getTrainerPricePerHour())
                 .pricePerParticipant(dto.getPricePerParticipant())
-                .qualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).collect(Collectors.toSet()))
+                .qualifications(dto.getRequiredQualifications().stream().map(this.qualificationService::findById).toList())
                 .participantsPerTrainer(dto.getParticipantsPerTrainer())
-                .trainers(dto.getTrainers().stream().map(this.trainerService::findById).collect(Collectors.toSet()))
+                .trainers(dto.getTrainers().stream().map(this.trainerService::findById).toList())
                 .totalPrice(new BigDecimal("0.0"))
                 .build();
     }

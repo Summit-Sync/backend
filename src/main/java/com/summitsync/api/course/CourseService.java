@@ -32,38 +32,39 @@ public class CourseService {
     }
 
     private String generateCourseNumber(String acronym) {
-        var allCoursesWithAcronym = this.repository.findAll().stream().filter(course -> Objects.equals(course.getAcronym(), acronym)).toList();
-        if (allCoursesWithAcronym.isEmpty()) {
-            return acronym + "001";
-        }
-        var highestNumber = allCoursesWithAcronym.stream().sorted(Comparator.comparing(Course::getCourseNumber)).toList().reversed().getFirst();
-        var numberPartFromHighest = Integer.parseInt(highestNumber.getCourseNumber().split(acronym)[1]);
-        var nextNumber = numberPartFromHighest + 1;
-        return acronym + String.format("%03d", nextNumber);
+        var courses = this.repository.findByAcronymOrderByCourseNumberDesc(acronym);
+        int ret = courses.isEmpty() ? 1 : Integer.parseInt(courses.getFirst().getCourseNumber()) + 1;
+        return String.format("%03d", ret);
     }
 
     public Course update(Course courseToUpdate, Course course, boolean cancelled, boolean finished) {
-        courseToUpdate.setParticipants(course.getParticipants());
-        courseToUpdate.setTrainers(course.getTrainers());
-        courseToUpdate.setWaitList(course.getWaitList());
+        var participants = new ArrayList<>(course.getParticipants());
+        courseToUpdate.setParticipants(participants);
+        var trainers = new ArrayList<>(course.getTrainers());
+        courseToUpdate.setTrainers(trainers);
+        var waitList = new ArrayList<>(course.getWaitList());
+        courseToUpdate.setWaitList(waitList);
         courseToUpdate.setVisible(course.isVisible());
         courseToUpdate.setCancelled(course.isCancelled());
         courseToUpdate.setFinished(course.isFinished());
         courseToUpdate.setCourseNumber(course.getCourseNumber());
         courseToUpdate.setAcronym(course.getAcronym());
-        courseToUpdate.setDates(course.getDates());
+        var dates = new ArrayList<>(course.getDates());
+        courseToUpdate.setDates(dates);
         courseToUpdate.setDuration(course.getDuration());
         courseToUpdate.setNumberParticipants(course.getNumberParticipants());
         courseToUpdate.setNumberWaitlist(course.getNumberWaitlist());
         courseToUpdate.setCoursePrices(course.getCoursePrices());
         courseToUpdate.setLocation(course.getLocation());
         courseToUpdate.setMeetingPoint(course.getMeetingPoint());
-        courseToUpdate.setRequiredQualifications(course.getRequiredQualifications());
+        var qualifications = new ArrayList<>(course.getRequiredQualifications());
+        courseToUpdate.setRequiredQualifications(qualifications);
         courseToUpdate.setNumberTrainer(course.getNumberTrainer());
         courseToUpdate.setNotes(course.getNotes());
         courseToUpdate.setTitle(course.getTitle());
         courseToUpdate.setCancelled(cancelled);
         courseToUpdate.setFinished(finished);
+        courseToUpdate.setDescription(course.getDescription());
         return this.repository.save(courseToUpdate);
     }
 
@@ -111,7 +112,7 @@ public class CourseService {
                 .filter(
                         q -> q.getQualificationId() != qualification.getQualificationId()
                 )
-                .collect(Collectors.toSet());
+                .toList();
 
         course.setRequiredQualifications(updatedQualificationList);
         return this.repository.save(course);
@@ -131,7 +132,7 @@ public class CourseService {
                 .filter(
                         p -> p.getParticipantId() != participantId
                 )
-                .collect(Collectors.toSet());
+                .toList();
 
         course.setParticipants(updatedParticipants);
         return this.repository.save(course);
@@ -151,15 +152,16 @@ public class CourseService {
                 .filter(
                         p -> p.getParticipantId() != participantId
                 )
-                .collect(Collectors.toSet());
+                .toList();
 
         course.setParticipants(updatedParticipants);
         return this.repository.save(course);
     }
 
     public Course addTrainer(Course course, Set<Trainer> trainers) {
-        course.getTrainers().addAll(trainers);
-
+        var oldTrainers = course.getTrainers();
+        oldTrainers.addAll(trainers);
+        course.setTrainers(oldTrainers);
         return this.repository.save(course);
     }
 
@@ -171,7 +173,7 @@ public class CourseService {
                 .filter(
                         t -> t.getTrainerId() != trainerId
                 )
-                .collect(Collectors.toSet());
+                .toList();
 
         course.setTrainers(updatedTrainers);
         return this.repository.save(course);

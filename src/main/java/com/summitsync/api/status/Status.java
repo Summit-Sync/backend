@@ -1,5 +1,6 @@
 package com.summitsync.api.status;
 
+import com.summitsync.api.coursetrainer.CourseTrainer;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,4 +18,6 @@ public class Status {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     long statusId;
     String text;
+    @OneToOne(mappedBy = "status", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private CourseTrainer courseTrainer;
 }

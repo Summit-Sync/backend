@@ -1,7 +1,9 @@
 package com.summitsync.api.qualification;
 
 import com.summitsync.api.course.Course;
+import com.summitsync.api.coursetemplate.CourseTemplate;
 import com.summitsync.api.group.Group;
+import com.summitsync.api.grouptemplate.GroupTemplate;
 import com.summitsync.api.trainer.Trainer;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,10 +24,14 @@ public class Qualification {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long qualificationId;
     private String name;
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "qualifications")
     private List<Trainer> trainers;
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "requiredQualifications")
     private List<Course> courses;
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "qualifications", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private List<Group> groups;
+    @ManyToMany(mappedBy = "qualifications", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    private List<CourseTemplate> courseTemplates;
+    @ManyToMany(mappedBy = "requiredQualifications", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    private List<GroupTemplate> groupTemplates;
 }

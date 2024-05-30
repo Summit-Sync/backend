@@ -1,7 +1,5 @@
 package com.summitsync.api.group;
 
-import com.summitsync.api.date.EventDate;
-import com.summitsync.api.grouptemplate.GroupTemplate;
 import com.summitsync.api.grouptemplate.GroupTemplateService;
 import com.summitsync.api.trainer.Trainer;
 import lombok.RequiredArgsConstructor;
@@ -9,8 +7,11 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -20,7 +21,16 @@ public class GroupService {
     private final Logger log = LoggerFactory.getLogger(GroupService.class);
     private final GroupTemplateService templateService;
 
-    public Group create(Group group) { return this.repository.save(group); }
+    public Group create(Group group) {
+        group.setGroupNumber(generateGroupNumber(group.getAcronym()));
+        return this.repository.save(group);
+    }
+
+    private String generateGroupNumber(String acronym) {
+        var groups = this.repository.findByAcronymOrderByGroupNumberDesc(acronym);
+        int ret = groups.isEmpty() ? 1 : Integer.parseInt(groups.getFirst().getGroupNumber()) + 1;
+        return String.format("%03d", ret);
+    }
 
     public Group update(Group groupToUpdate, Group group) {
         groupToUpdate.setCancelled(group.isCancelled());
@@ -30,17 +40,20 @@ public class GroupService {
         groupToUpdate.setNumberOfDates(group.getNumberOfDates());
         groupToUpdate.setDuration(group.getDuration());
         groupToUpdate.setContact(group.getContact());
-        groupToUpdate.setDates(group.getDates());
+        var dates = new ArrayList<>(group.getDates());
+        groupToUpdate.setDates(dates);
         groupToUpdate.setNumberParticipants(group.getNumberParticipants());
         groupToUpdate.setLocation(group.getLocation());
         groupToUpdate.setMeetingPoint(group.getMeetingPoint());
         groupToUpdate.setTrainerPricePerHour(group.getTrainerPricePerHour());
         groupToUpdate.setPricePerParticipant(group.getPricePerParticipant());
-        groupToUpdate.setQualifications(group.getQualifications());
+        var qualifications = new ArrayList<>(group.getQualifications());
+        groupToUpdate.setQualifications(qualifications);
         groupToUpdate.setParticipantsPerTrainer(group.getParticipantsPerTrainer());
-        groupToUpdate.setTrainers(group.getTrainers());
+        var trainers = new ArrayList<>(group.getTrainers());
+        groupToUpdate.setTrainers(trainers);
 
-        return groupToUpdate;
+        return this.repository.save(groupToUpdate);
     }
 
     private void delete(Group group) {
@@ -79,14 +92,31 @@ public class GroupService {
         return all;
     }
 
-    public void addTrainer(Group group, Trainer trainer) {
-        group.trainers.add(trainer);
+    public Group addTrainer(Group group, Set<Trainer> trainer) {
+        var oldTrainers = group.getTrainers();
+        oldTrainers.addAll(trainer);
+        group.setTrainers(oldTrainers);
 
-        this.repository.save(group);
+        return this.repository.save(group);
+    }
+
+    public Group removeTrainer(Group group, Long trainerId) {
+        var trainers = group.getTrainers();
+
+        var updatedTrainers = trainers
+                .stream()
+                .filter(
+                        t -> t.getTrainerId() != trainerId
+                )
+                .toList();
+
+        group.setTrainers(updatedTrainers);
+        return this.repository.save(group);
     }
 
     public Group cancel(Group group) {
         group.setCancelled(true);
         return this.repository.save(group);
     }
+
 }
