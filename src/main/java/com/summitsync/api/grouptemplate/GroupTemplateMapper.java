@@ -37,6 +37,7 @@ public class GroupTemplateMapper {
                 .trainerPricerPerHour(dto.getTrainerPricePerHour())
                 .requiredQualifications(qualifications)
                 .participantsPerTrainer(dto.getParticipantsPerTrainer())
+                .pricePerParticipant(dto.getPricePerParticipant())
                 .build();
     }
 
