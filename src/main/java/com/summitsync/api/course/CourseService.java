@@ -32,14 +32,9 @@ public class CourseService {
     }
 
     private String generateCourseNumber(String acronym) {
-        var allCoursesWithAcronym = this.repository.findAll().stream().filter(course -> Objects.equals(course.getAcronym(), acronym)).toList();
-        if (allCoursesWithAcronym.isEmpty()) {
-            return acronym + "001";
-        }
-        var highestNumber = allCoursesWithAcronym.stream().sorted(Comparator.comparing(Course::getCourseNumber)).toList().reversed().getFirst();
-        var numberPartFromHighest = Integer.parseInt(highestNumber.getCourseNumber().split(acronym)[1]);
-        var nextNumber = numberPartFromHighest + 1;
-        return acronym + String.format("%03d", nextNumber);
+        var courses = this.repository.findByAcronymOrderByCourseNumberDesc(acronym);
+        int ret = courses.isEmpty() ? 1 : Integer.parseInt(courses.getFirst().getCourseNumber()) + 1;
+        return String.format("%03d", ret);
     }
 
     public Course update(Course courseToUpdate, Course course, boolean cancelled, boolean finished) {
