@@ -44,7 +44,7 @@ public class CourseService {
     private String generateCourseNumber(String acronym) {
         var courses = this.repository.findByAcronymOrderByCourseNumberDesc(acronym);
         int ret = courses.isEmpty() ? 1 : Integer.parseInt(courses.getFirst().getCourseNumber()) + 1;
-        return String.format("%03d", ret);
+        return acronym + String.format("%03d", ret);
     }
 
     public Course update(Course courseToUpdate, Course course, boolean cancelled, boolean finished) {

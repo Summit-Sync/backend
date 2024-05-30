@@ -1,5 +1,6 @@
 package com.summitsync.api.integrationtest.coursetemplate;
 
+import com.summitsync.api.TestSummitSyncApplication;
 import com.summitsync.api.integrationtest.testcontainers.AbstractIntegrationTest;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.location.LocationService;
@@ -8,13 +9,13 @@ import com.summitsync.api.qualification.QualificationService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TestCreateCourseTemplate extends AbstractIntegrationTest {
@@ -22,20 +23,31 @@ public class TestCreateCourseTemplate extends AbstractIntegrationTest {
     private QualificationService qualificationService;
     @Autowired
     private LocationService locationService;
-    @BeforeEach
+    private long quali1Id;
+    private long quali2Id;
+    private long locationId;
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
+    @BeforeAll
     void setup() {
         var testQuali1 = Qualification.builder().name("Erste Hilfe").build();
         var testQuali2 = Qualification.builder().name("Zweite Hilfe").build();
-        this.qualificationService.saveQualification(testQuali1);
-        this.qualificationService.saveQualification(testQuali2);
+        this.quali1Id = this.qualificationService.saveQualification(testQuali1).getQualificationId();
+        this.quali2Id = this.qualificationService.saveQualification(testQuali2).getQualificationId();
         var location = Location.builder().country("Germany").phone("+491256321").street("Straße 1").build();
-        this.locationService.createLocation(location);
+        this.locationId = this.locationService.createLocation(location).getLocationId();
+    }
+
+    @AfterAll
+    void cleanup() {
+        TestSummitSyncApplication.cleanAllTables(jdbcTemplate);
     }
 
     @Test
     @Order(1)
     void testCreateCourseTemplateHappyPath() throws Exception {
-        var content = """
+        var content = String.format("""
 {
     "acronym": "EKA",
     "title": "Course Title",
@@ -46,10 +58,10 @@ public class TestCreateCourseTemplate extends AbstractIntegrationTest {
     "numberWaitlist": 8,
     "meetingPoint": "Big Hall",
     "numberTrainers": 2,
-    "requiredQualifications": [1, 2],
-    "location": 1
+    "requiredQualifications": [%d, %d],
+    "location": %d
 }
-                """;
+                """, this.quali1Id, this.quali2Id, this.locationId);
 
         this.mockMvc
                 .perform(post("/api/v1/template/course")
@@ -106,7 +118,7 @@ public class TestCreateCourseTemplate extends AbstractIntegrationTest {
     @Test
     @Order(3)
     void updateCourse() throws Exception {
-        var content = """
+        var content = String.format("""
 {
     "acronym": "EKB",
     "title": "Course Title",
@@ -117,8 +129,8 @@ public class TestCreateCourseTemplate extends AbstractIntegrationTest {
     "numberWaitlist": 8,
     "meetingPoint": "Big Hall",
     "numberTrainers": 4,
-    "requiredQualifications": [1],
-    "location": 1,
+    "requiredQualifications": [%d],
+    "location": %d,
     "price": [{
         "name": "ASD",
         "price": 123.4
@@ -128,7 +140,7 @@ public class TestCreateCourseTemplate extends AbstractIntegrationTest {
         "price": 125.4
     }]
 }
-                """;
+                """, this.quali1Id, this.locationId);
     this.mockMvc.perform(put("/api/v1/template/course/1")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))

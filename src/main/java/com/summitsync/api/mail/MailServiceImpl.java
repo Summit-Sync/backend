@@ -14,14 +14,10 @@ import java.io.File;
 
 @Service
 public class MailServiceImpl implements MailService {
-
-    private final JavaMailSender mailSender;
+    @Autowired
+    private JavaMailSender mailSender;
     @Value("${spring.mail.username}")
     private String sender;
-
-    public MailServiceImpl(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
 
     @Override
     public String sendMail(MailDetail mailDetail) {

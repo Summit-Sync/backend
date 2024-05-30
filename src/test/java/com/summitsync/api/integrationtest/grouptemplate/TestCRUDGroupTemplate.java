@@ -1,5 +1,6 @@
 package com.summitsync.api.integrationtest.grouptemplate;
 
+import com.summitsync.api.TestSummitSyncApplication;
 import com.summitsync.api.integrationtest.testcontainers.AbstractIntegrationTest;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.location.LocationService;
@@ -8,6 +9,7 @@ import com.summitsync.api.qualification.QualificationService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -15,7 +17,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TestCRUDGroupTemplate extends AbstractIntegrationTest {
@@ -23,36 +24,49 @@ public class TestCRUDGroupTemplate extends AbstractIntegrationTest {
     private QualificationService qualificationService;
     @Autowired
     private LocationService locationService;
-    @BeforeEach
+    private long quali1Id;
+    private long quali2Id;
+    private long locationId;
+    private long location2Id;
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
+    @BeforeAll
     void setup() {
         var testQuali1 = Qualification.builder().name("Erste Hilfe").build();
         var testQuali2 = Qualification.builder().name("Zweite Hilfe").build();
-        this.qualificationService.saveQualification(testQuali1);
-        this.qualificationService.saveQualification(testQuali2);
+        this.quali1Id = this.qualificationService.saveQualification(testQuali1).getQualificationId();
+        this.quali2Id = this.qualificationService.saveQualification(testQuali2).getQualificationId();
         var location = Location.builder().country("Germany").phone("+491256321").street("Straße 1").build();
-        this.locationService.createLocation(location);
+        this.locationId = this.locationService.createLocation(location).getLocationId();
         var location2 = Location.builder().country("Germany2").phone("+491256321").street("Straße 1").build();
-        this.locationService.createLocation(location2);
+        this.location2Id = this.locationService.createLocation(location2).getLocationId();
+    }
+
+
+    @AfterAll
+    void cleanup() {
+        TestSummitSyncApplication.cleanAllTables(jdbcTemplate);
     }
 
     @Test
     @Order(1)
     void testCreateCourseTemplateHappyPath() throws Exception {
-        var content = """
+        var content = String.format("""
 {
     "acronym": "ACR",
     "title": "Group Template Title",
     "description": "Group Template description",
     "numberOfDates": 4,
     "duration": 120,
-    "location": 1,
+    "location": %d,
     "meetingPoint": "Meeting Point for Group",
     "trainerPricePerHour": 35.3,
     "pricePerParticipant": 25.3,
-    "requiredQualificationList": [1,2],
+    "requiredQualificationList": [%d,%d],
     "participantsPerTrainer": 2
 }
-                """;
+                """, this.locationId, this.quali1Id, this.quali2Id);
 
         this.mockMvc
                 .perform(post("/api/v1/template/group")
@@ -96,21 +110,21 @@ public class TestCRUDGroupTemplate extends AbstractIntegrationTest {
 
     @Test
     void createGroupTemplateInvalidAcronymLength() throws Exception {
-        var content = """
+        var content = String.format("""
 {
     "acronym": "ACRAAAAAAAAA",
     "title": "Group Template Title",
     "description": "Group Template description",
     "numberOfDates": 4,
     "duration": 120,
-    "location": 1,
+    "location": %d,
     "meetingPoint": "Meeting Point for Group",
     "trainerPricePerHour": 35.3,
     "pricePerParticipant": 25.3,
-    "requiredQualificationList": [1,2],
+    "requiredQualificationList": [%d,%d],
     "participantsPerTrainer": 2
 }
-                """;
+                """, this.locationId, this.quali1Id, this.quali2Id);
 
 
         this.mockMvc
@@ -124,21 +138,21 @@ public class TestCRUDGroupTemplate extends AbstractIntegrationTest {
     @Test
     @Order(3)
     void updateCourse() throws Exception {
-        var content = """
+        var content = String.format("""
 {
     "acronym": "BCR",
     "title": "Group Template Title UPDATED",
     "description": "Group Template description",
     "numberOfDates": 2,
     "duration": 130,
-    "location": 1,
+    "location": %d,
     "meetingPoint": "Meeting Point for Group UPDATED",
     "trainerPricePerHour": 45.3,
     "pricePerParticipant": 45.3,
-    "requiredQualificationList": [1],
+    "requiredQualificationList": [%d],
     "participantsPerTrainer": 1
 }
-                """;
+                """, this.locationId, this.quali1Id);
         this.mockMvc.perform(put("/api/v1/template/group/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))

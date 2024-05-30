@@ -21,8 +21,8 @@ public class GroupPostDTO {
     @NotNull(message = "Number of Dates cannot be empty.")
     @PositiveOrZero(message = "Number of Dates must be positive or zero.")
     int numberOfDates;
-    @NotNull(message = "Events cannot be empty.")
-    List<LocalDateTime> events;
+    @NotNull(message = "Dates cannot be empty.")
+    List<LocalDateTime> dates;
     @NotNull(message = "Duration cannot be empty.")
     @PositiveOrZero(message = "Duration must be positive or zero.")
     int duration;
