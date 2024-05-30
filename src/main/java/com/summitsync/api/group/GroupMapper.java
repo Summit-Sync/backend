@@ -75,7 +75,7 @@ public class GroupMapper {
     }
     public Group mapGroupPostDTOToGroup(GroupPostDTO dto) {
         var dates = new ArrayList<EventDate>();
-        for (var d : dto.getEvents()) {
+        for (var d : dto.getDates()) {
            var newEventDate = EventDate.builder()
                    .startTime(d)
                    .durationInMinutes(dto.getDuration())
