@@ -23,6 +23,7 @@ public class Qualification {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long qualificationId;
+    @Column(unique = true)
     private String name;
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "qualifications")
     private List<Trainer> trainers;

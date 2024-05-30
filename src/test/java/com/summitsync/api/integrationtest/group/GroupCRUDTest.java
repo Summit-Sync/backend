@@ -1,6 +1,7 @@
 package com.summitsync.api.integrationtest.group;
 
 import com.summitsync.api.MockMVCApiKey;
+import com.summitsync.api.TestSummitSyncApplication;
 import com.summitsync.api.integrationtest.testcontainers.AbstractIntegrationTest;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.location.LocationService;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.math.BigDecimal;
@@ -24,12 +26,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GroupCRUDTest extends AbstractIntegrationTest {
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
+    private long quali1Id;
+    private long quali2Id;
+    private long locationId;
+    private long trainer1Id;
+    private long trainer2Id;
+    private long price1Id;
     @BeforeAll
-    static void setup(
+    void setup(
             @Autowired QualificationService qualificationService,
             @Autowired LocationService locationService,
             @Autowired TrainerService trainerService,
@@ -38,10 +48,10 @@ class GroupCRUDTest extends AbstractIntegrationTest {
         var random = new Random();
         var testQuali1 = Qualification.builder().name("Erste Hilfe").build();
         var testQuali2 = Qualification.builder().name("Zweite Hilfe").build();
-        qualificationService.saveQualification(testQuali1);
-        qualificationService.saveQualification(testQuali2);
+        this.quali1Id = qualificationService.saveQualification(testQuali1).getQualificationId();
+        this.quali2Id = qualificationService.saveQualification(testQuali2).getQualificationId();
         var location = Location.builder().country("Germany").phone("+491256321").street("Straße 1").build();
-        locationService.createLocation(location);
+        this.locationId = locationService.createLocation(location).getLocationId();
         var jwt = MockMVCApiKey.getAccessToken();
         var trainer1 = AddTrainerDto.builder()
                 .username("it_test_trainer_trainer1_group" + random.nextInt(5000))
@@ -51,7 +61,7 @@ class GroupCRUDTest extends AbstractIntegrationTest {
                 .email("test@test.test.trainer1.group" + random.nextInt(5000))
                 .phone("+41241615")
                 .build();
-        trainerService.newTrainer(trainer1, jwt);
+        this.trainer1Id = trainerService.newTrainer(trainer1, jwt).getId();
         var trainer2 = AddTrainerDto.builder()
                 .username("it_test_trainer_trainer2_group" + random.nextInt(5000))
                 .firstName("Integration2")
@@ -60,24 +70,30 @@ class GroupCRUDTest extends AbstractIntegrationTest {
                 .email("test@test.test.trainer2.group" + random.nextInt(5000))
                 .phone("+41241615")
                 .build();
-        trainerService.newTrainer(trainer2, jwt);
+        this.trainer2Id = trainerService.newTrainer(trainer2, jwt).getId();
         var price1 = Price.builder()
                 .price(BigDecimal.valueOf(10.0))
                 .name("Test Price 1")
                 .build();
 
-        priceService.create(price1);
+        this.price1Id = priceService.create(price1).getCourseTemplatePriceId();
+    }
+
+
+    @AfterAll
+    void cleanup() {
+        TestSummitSyncApplication.cleanAllTables(jdbcTemplate);
     }
 
     @Test
     @Order(1)
     void testCreateGroupHappyPath() throws Exception {
-        var content = """
+        var content = String.format("""
 {
    "title":"Test Gruppe1",
    "description":"kvBeschreibrung",
    "numberOfDates": 3,
-   "events":[
+   "dates":[
       "2024-05-13T10:00:25.739Z",
       "2024-05-13T10:00:40.456Z",
       "2024-08-01T09:00:00.000Z"
@@ -90,19 +106,19 @@ class GroupCRUDTest extends AbstractIntegrationTest {
         "email": "e@mail.com",
         "phone": "1234"
    },
-   "location":1,
+   "location":%d,
    "meetingPoint":"kvTreffpunkt",
    "trainerPricePerHour": "123.4",
    "pricePerParticipant": "123.4",
    "requiredQualifications":[
-      1,
-      2
+      %d,
+      %d
    ],
    "participantsPerTrainer": 10,
-   "trainers": [1],
+   "trainers": [%d],
    "acronym": "ts"
 }
-""";
+""", this.locationId, this.quali1Id, this.quali2Id, this.trainer1Id);
         this.mockMvc.perform(post("/api/v1/group")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
@@ -119,9 +135,9 @@ class GroupCRUDTest extends AbstractIntegrationTest {
     @Order(2)
     @Disabled
     void testAddTrainerToGroup() throws Exception {
-        var content = """
-[2]
-""";
+        var content = String.format("""
+[%d]
+""", this.trainer2Id);
         this.mockMvc.perform(put("/api/v1/group/1/trainer")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
@@ -137,12 +153,12 @@ class GroupCRUDTest extends AbstractIntegrationTest {
     @Test
     @Order(3)
     void testUpdateGroup() throws Exception {
-        var content = """
+        var content = String.format("""
 {
    "title":"Test Gruppe1",
    "description":"kvBeschreibrungUpdated",
    "numberOfDates": 2,
-   "events":[
+   "dates":[
       "2024-05-13T10:00:25.739Z",
       "2024-05-13T10:00:40.456Z"
    ],
@@ -154,19 +170,19 @@ class GroupCRUDTest extends AbstractIntegrationTest {
         "email": "e@mail.com",
         "phone": "1234"
    },
-   "location":1,
+   "location":%d,
    "meetingPoint":"kvTreffpunkt",
    "trainerPricePerHour": "123.4",
    "pricePerParticipant": "123.4",
    "requiredQualifications":[
-      1,
-      2
+      %d,
+      %d
    ],
    "participantsPerTrainer": 10,
-   "trainers": [1,2],
+   "trainers": [%d,%d],
    "acronym": "ts"
 }
-""";
+""", this.locationId, this.quali1Id, this.quali2Id, this.trainer1Id, this.trainer2Id);
         this.mockMvc.perform(put("/api/v1/group/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
@@ -183,12 +199,12 @@ class GroupCRUDTest extends AbstractIntegrationTest {
     @Test
     @Order(4)
     void testCreateSecondGroupHappyPath() throws Exception {
-        var content = """
+        var content = String.format("""
 {
    "title":"Test Gruppe2",
    "description":"kvBeschreibrung",
    "numberOfDates": 1,
-   "events":[
+   "dates":[
       "2024-08-01T09:00:00.000Z"
    ],
    "duration":5,
@@ -199,19 +215,19 @@ class GroupCRUDTest extends AbstractIntegrationTest {
         "email": "e@mail.com",
         "phone": "1234"
    },
-   "location":1,
+   "location":%d,
    "meetingPoint":"kvTreffpunkt",
    "trainerPricePerHour": "123.4",
    "pricePerParticipant": "123.4",
    "requiredQualifications":[
-      1,
-      2
+      %d,
+      %d
    ],
    "participantsPerTrainer": 10,
-   "trainers": [1],
+   "trainers": [%d],
    "acronym": "ts"
 }
-""";
+""", this.locationId, this.quali1Id, this.quali2Id, this.trainer1Id);
         this.mockMvc.perform(post("/api/v1/group")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))

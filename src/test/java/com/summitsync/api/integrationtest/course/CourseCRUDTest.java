@@ -1,6 +1,7 @@
 package com.summitsync.api.integrationtest.course;
 
 import com.summitsync.api.MockMVCApiKey;
+import com.summitsync.api.TestSummitSyncApplication;
 import com.summitsync.api.integrationtest.testcontainers.AbstractIntegrationTest;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.location.LocationService;
@@ -13,6 +14,7 @@ import com.summitsync.api.trainer.dto.AddTrainerDto;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
@@ -23,7 +25,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CourseCRUDTest extends AbstractIntegrationTest {
@@ -37,15 +38,25 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
     String participantName2 = RandomStringUtils.randomAlphabetic(8);
     String waitListParticipantFirstName2 = RandomStringUtils.randomAlphabetic(8);
     String waitListParticipantName2 = RandomStringUtils.randomAlphabetic(8);
+
+    private long qualiId1;
+    private long qualiId2;
+    private long locationId1;
+    private long trainerId1;
+    private long trainerId2;
+    private long price1Id;
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
     @BeforeAll
     void setup(@Autowired QualificationService qualificationService, @Autowired LocationService locationService, @Autowired TrainerService trainerService, @Autowired PriceService priceService) {
         var random = new Random();
         var testQuali1 = Qualification.builder().name("Erste Hilfe").build();
         var testQuali2 = Qualification.builder().name("Zweite Hilfe").build();
-        qualificationService.saveQualification(testQuali1);
-        qualificationService.saveQualification(testQuali2);
+        this.qualiId1 = qualificationService.saveQualification(testQuali1).getQualificationId();
+        this.qualiId2 = qualificationService.saveQualification(testQuali2).getQualificationId();
         var location = Location.builder().country("Germany").phone("+491256321").street("Straße 1").build();
-        locationService.createLocation(location);
+        this.locationId1 = locationService.createLocation(location).getLocationId();
         var jwt = MockMVCApiKey.getAccessToken();
         var trainer1 = AddTrainerDto.builder()
                 .username("it_test_trainer" + random.nextInt(50000))
@@ -55,7 +66,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 .email("test@test.test" + random.nextInt(50000))
                 .phone("+41241615")
                 .build();
-        trainerService.newTrainer(trainer1, jwt);
+        this.trainerId1 = trainerService.newTrainer(trainer1, jwt).getId();
         var trainer2 = AddTrainerDto.builder()
                 .username("it_test_trainer" + random.nextInt(50000))
                 .firstName("Integration2")
@@ -64,13 +75,18 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 .email("test@test.test" + random.nextInt(50000))
                 .phone("+41241615")
                 .build();
-        trainerService.newTrainer(trainer2, jwt);
+        this.trainerId2 = trainerService.newTrainer(trainer2, jwt).getId();
         var price1 = Price.builder()
                 .price(BigDecimal.valueOf(10.0))
                 .name("Test Price 1")
                 .build();
 
-        priceService.create(price1);
+        this.price1Id = priceService.create(price1).getCourseTemplatePriceId();
+    }
+
+    @AfterAll
+    void cleanup() {
+        TestSummitSyncApplication.cleanAllTables(jdbcTemplate);
     }
 
     @Test
@@ -91,7 +107,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
    ],
    "description":"kvBeschreibrung",
    "duration":40,
-   "location":1,
+   "location":%d,
    "meetingPoint":"kvTreffpunkt",
    "notes":"test",
    "numberParticipants":2,
@@ -101,8 +117,8 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
       {"name": "Test Price", "price": 12.3}
    ],
    "requiredQualifications":[
-      1,
-      2
+      %d,
+      %d
    ],
    "title":"kvTitle",
    "visible":false,
@@ -113,9 +129,12 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
    "participants": [
    {"id": 0, "name": "%s", "firstName": "%s", "email": "%s@%s.com", "status": {"text": "text"}}
    ],
-   "trainers": [2]
+   "trainers": [%d]
 }
 """,
+                this.locationId1,
+                this.qualiId1,
+                this.qualiId2,
                 waitListParticipantName,
                 waitListParticipantFirstName,
                 waitListParticipantName,
@@ -123,7 +142,8 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 participantName,
                 participantFirstName,
                 participantName,
-                participantFirstName);
+                participantFirstName,
+                this.trainerId2);
 
                 this.mockMvc.perform(post("/api/v1/course")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -145,9 +165,9 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
             @Test
             @Order(2)
             void testAddTrainerToCourse() throws Exception {
-                var content = """
-[1]
-""";
+                var content = String.format("""
+[%d]
+""", trainerId1);
         this.mockMvc.perform(put("/api/v1/course/1/trainer")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content))
@@ -172,7 +192,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
    ],
    "description":"descriptionUpdated",
    "duration":35,
-   "location":1,
+   "location":%d,
    "meetingPoint":"kvTreffpunktUpdated",
    "notes":"test updated",
    "numberParticipants":2,
@@ -182,8 +202,8 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
       {"name": "Test Price", "price": 12.3}
    ],
    "requiredQualifications":[
-      1,
-      2
+      %d,
+      %d
    ],
    "title":"kvTitle",
    "visible":false,
@@ -195,9 +215,12 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
    {"id": 1, "name": "%s", "firstName": "%s", "email": "%s@%s.com", "status": {"text": "text"}},
    {"id": 0, "name": "%s", "firstName": "%s", "email": "%s@%s.com", "status": {"text": "text"}}
    ],
-   "trainers": [1,2]
+   "trainers": [%d,%d]
 }
 """,
+                this.locationId1,
+                this.qualiId1,
+                this.qualiId2,
                 waitListParticipantName + "UPDATED",
                 waitListParticipantFirstName,
                 waitListParticipantName,
@@ -213,7 +236,9 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 participantName2,
                 participantFirstName2,
                 participantName2,
-                participantFirstName2);
+                participantFirstName2,
+                this.trainerId1,
+                this.trainerId2);
         this.mockMvc.perform(put("/api/v1/course/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
@@ -240,7 +265,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
     @Test
     @Order(4)
     void testCreateSecondCourseHappyPath() throws Exception {
-        var content = """
+        var content = String.format("""
 {
    "acronym":"kv2",
    "dates":[
@@ -250,7 +275,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
    ],
    "description":"kvBeschreibrung",
    "duration":40,
-   "location":1,
+   "location":%d,
    "meetingPoint":"kvTreffpunkt",
    "notes":"test",
    "numberParticipants":2,
@@ -260,8 +285,8 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
       {"name": "Test Price 2", "price": 12.3}
    ],
    "requiredQualifications":[
-      1,
-      2
+      %d,
+      %d
    ],
    "title":"kvTitle",
    "visible":false,
@@ -270,7 +295,10 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
    "participants": [],
    "trainers": []
 }
-""";
+""",
+                this.locationId1,
+                this.qualiId1,
+                this.qualiId2);
         this.mockMvc.perform(post("/api/v1/course")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
