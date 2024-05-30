@@ -3,6 +3,8 @@ package com.summitsync.api.course;
 import com.summitsync.api.course.dto.CourseGetDTO;
 import com.summitsync.api.course.dto.CoursePostDTO;
 import com.summitsync.api.course.dto.CourseUpdateDTO;
+import com.summitsync.api.mail.MailDetail;
+import com.summitsync.api.mail.MailService;
 import com.summitsync.api.participant.ParticipantService;
 import com.summitsync.api.qualification.QualificationService;
 import com.summitsync.api.trainer.TrainerService;
@@ -27,6 +29,7 @@ public class CourseController {
     private final QualificationService qualificationService;
     private final ParticipantService participantService;
     private final TrainerService trainerService;
+    private final MailService mailService;
 
     @PostMapping
     public ResponseEntity<CourseGetDTO> addCourse(@RequestBody @Valid CoursePostDTO course, JwtAuthenticationToken jwt) {
@@ -152,6 +155,15 @@ public class CourseController {
         var updatedCourse = this.service.publish(course, published);
 
         return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(updatedCourse, jwt.getToken().getTokenValue()));
+    }
+
+    @GetMapping("/test")
+    public void test() {
+        MailDetail detail = new MailDetail();
+        detail.setRecipient("allessparen@gmail.com");
+        detail.setMsgBody("Das ist der innere Text");
+        detail.setSubject("Der Titel");
+        mailService.sendMail(detail);
     }
 
 }

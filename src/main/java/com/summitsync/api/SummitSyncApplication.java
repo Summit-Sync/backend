@@ -1,13 +1,12 @@
 package com.summitsync.api;
 
-import com.summitsync.api.mail.Mailing;
+import com.summitsync.api.mail.MailDetail;
+import com.summitsync.api.mail.MailService;
+import com.summitsync.api.mail.MailServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
-import java.util.Properties;
-import javax.mail.Session;
+import org.springframework.mail.javamail.JavaMailSender;
 
 @SpringBootApplication
 public class SummitSyncApplication {
@@ -16,4 +15,6 @@ public class SummitSyncApplication {
 		SpringApplication.run(SummitSyncApplication.class, args);
 
 	}
+
+
 }
