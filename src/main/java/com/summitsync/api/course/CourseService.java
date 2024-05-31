@@ -3,6 +3,7 @@ package com.summitsync.api.course;
 import com.summitsync.api.course.dto.CourseGetDTO;
 import com.summitsync.api.coursetemplate.CourseTemplate;
 import com.summitsync.api.coursetemplate.CourseTemplateService;
+import com.summitsync.api.date.EventDate;
 import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
 import com.summitsync.api.mail.MailDetail;
 import com.summitsync.api.mail.MailService;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,7 +49,33 @@ public class CourseService {
         return acronym + String.format("%03d", ret);
     }
 
-    public Course update(Course courseToUpdate, Course course, boolean cancelled, boolean finished) {
+    public Course update(Course courseToUpdate, Course course, boolean cancelled, boolean finished, String jwt) {
+        List<EventDate> originalDates = courseToUpdate.getDates();
+        List<EventDate> newDates = course.getDates();
+
+        boolean dateChanged = false;
+
+        if (originalDates.size() != newDates.size()) {
+            dateChanged = true;
+        } else {
+            Map<Long, EventDate> originalDatesMap = originalDates.stream()
+                    .collect(Collectors.toMap(EventDate::getEventDateId, Function.identity()));
+
+            for (EventDate newDate : newDates) {
+                EventDate originalDate = originalDatesMap.get(newDate.getEventDateId());
+                if (originalDate == null || !newDate.getStartTime().equals(originalDate.getStartTime()) ||
+                        newDate.getDurationInMinutes() != originalDate.getDurationInMinutes()) {
+                    dateChanged = true;
+                    break;
+                }
+            }
+        }
+
+        if (dateChanged) {
+            SendReminderEmailForParticipant(course, jwt);
+            SendReminderEmailForTrainer(course, jwt);
+        }
+
         var participants = new ArrayList<>(course.getParticipants());
         courseToUpdate.setParticipants(participants);
         var trainers = new ArrayList<>(course.getTrainers());
@@ -200,8 +228,10 @@ public class CourseService {
         return result;
     }
 
-    public Course cancel(Course course, boolean canceling) {
+    public Course cancel(Course course, boolean canceling, String jwt) {
         course.setCancelled(canceling);
+        SendCancelEmailForParticipants(course, jwt);
+        SendCancelEmailForTrainer(course, jwt);
         return this.repository.save(course);
     }
 
@@ -246,7 +276,53 @@ public class CourseService {
                             "am " + startDate + " findet dein Kurs " + course.getAcronym() + " um " + startTime + " statt.\n" +
                             "Viel Spaß dabei ;).\n" +
                             "\n" +
-                            "sportliche Grüße\n" +
+                            "sportliche Grüße,\n" +
+                            "Dein Kursmanager");
+            mailService.sendMail(detail);
+        }
+    }
+
+    private void SendCancelEmailForParticipants(Course course, String jwt) {
+        for (Participant p: course.getParticipants()) {
+            MailDetail detail = new MailDetail();
+            ParticipantDto participantDto = participantMapper.mapParticipantToParticipantDto(p, jwt);
+            detail.setRecipient(participantDto.getEmail());
+            var start = course.getDates().getFirst().getStartTime();
+            String startDate = start.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+            String startTime = start.format(DateTimeFormatter.ofPattern("HH:mm"));
+            detail.setSubject("Absage Kurs " + course.getAcronym() + " am " + startDate + startTime);
+            detail.setMsgBody(
+                    "Hallo " + participantDto.getName() + ",\n" +
+                            "\n" +
+                            "Leider muss dein Kurs" + course.getAcronym() + " am " + startDate + " um " + startTime + " ausfallen.\n" +
+                            "Solltest du deine Kursgebühren zurück erstattet haben wollen, melde dich bitte bei uns unter: kurse@kletterzentrum-bremen.de oder ruf uns an unter: +49421 51429053\n" +
+                            "\n" +
+                            "Andernfalls suche dir gerne einen neuen Kurstermin, für den wir dir deine aktuelle Kursgebühr anrechnen.\n" +
+                            "\n" +
+                            "Wir entschuldigen uns für die entstandenen Unannehmlichkeiten und hoffen dich bald wieder im Unterwegs Kletterzentrum Bremen begrüßen zu dürfen.\n" +
+                            "\n" +
+                            "Wir freuen uns auf dich!\n" +
+                            "Dein Kletterzentrums Team");
+            mailService.sendMail(detail);
+        }
+    }
+    private void SendCancelEmailForTrainer(Course course, String jwt) {
+        for (Trainer t: course.getTrainers()) {
+            MailDetail detail = new MailDetail();
+            TrainerDto trainerDto = trainerMapper.mapTrainerToTrainerDto(t, jwt);
+            detail.setRecipient(trainerDto.getEmail());
+            var start = course.getDates().getFirst().getStartTime();
+            String startDate = start.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+            String startTime = start.format(DateTimeFormatter.ofPattern("HH:mm"));
+            detail.setSubject("Absage Kurs " + course.getAcronym() + " am " + startDate + startTime);
+            detail.setMsgBody(
+                    "Hallo " + trainerDto.getFirstName() + " " + trainerDto.getLastName() + ",\n" +
+                            "\n" +
+                            "Leider muss dein Kurs " + course.getAcronym() + " am " + startDate + " um " + startTime + " ausfallen.\n" +
+                            "\n" +
+                            "Wir entschuldigen uns für die entstandenen Unannehmlichkeiten und hoffen du freust dich schon auf deinen nächsten Kurs.\n" +
+                            "\n" +
+                            "sportliche Grüße,\n" +
                             "Dein Kursmanager");
             mailService.sendMail(detail);
         }

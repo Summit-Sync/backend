@@ -63,7 +63,7 @@ public class CourseController {
     @PutMapping("/{id}")
     public ResponseEntity<CourseGetDTO> updateCourse(@RequestBody @Valid CourseUpdateDTO dto, @PathVariable long id, JwtAuthenticationToken jwt) {
         Course updatedCourse = this.mapper.mapCoursePostDTOToCourse(dto, jwt);
-        Course dbCourse = this.service.update(this.service.get(id), updatedCourse, dto.isCancelled(), dto.isFinished());
+        Course dbCourse = this.service.update(this.service.get(id), updatedCourse, dto.isCancelled(), dto.isFinished(), jwt.getToken().getTokenValue());
         CourseGetDTO response = this.mapper.mapCourseToCourseGetDTO(dbCourse, jwt.getToken().getTokenValue());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -143,7 +143,7 @@ public class CourseController {
     @PutMapping("/{id}/cancel")
     public ResponseEntity<CourseGetDTO> cancelCourse(@PathVariable long id, JwtAuthenticationToken jwt, @RequestBody boolean canceled) {
         var course = this.service.get(id);
-        var updatedCourse = this.service.cancel(course, canceled);
+        var updatedCourse = this.service.cancel(course, canceled, jwt.getToken().getTokenValue());
 
         return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(updatedCourse, jwt.getToken().getTokenValue()));
     }
@@ -155,15 +155,6 @@ public class CourseController {
         var updatedCourse = this.service.publish(course, published);
 
         return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(updatedCourse, jwt.getToken().getTokenValue()));
-    }
-
-    @GetMapping("/test")
-    public void test() {
-        MailDetail detail = new MailDetail();
-        detail.setRecipient("allessparen@gmail.com");
-        detail.setMsgBody("Das ist der innere Text");
-        detail.setSubject("Der Titel");
-        mailService.sendMail(detail);
     }
 
 }
