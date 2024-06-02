@@ -34,7 +34,7 @@ public class CourseService {
     private String generateCourseNumber(String acronym) {
         var courses = this.repository.findByAcronymOrderByCourseNumberDesc(acronym);
         int ret = courses.isEmpty() ? 1 : Integer.parseInt(courses.getFirst().getCourseNumber()) + 1;
-        return acronym + String.format("%03d", ret);
+        return String.format("%03d", ret);
     }
 
     public Course update(Course courseToUpdate, Course course, boolean cancelled, boolean finished, String jwt) {
@@ -72,7 +72,6 @@ public class CourseService {
         courseToUpdate.setVisible(course.isVisible());
         courseToUpdate.setCancelled(course.isCancelled());
         courseToUpdate.setFinished(course.isFinished());
-        courseToUpdate.setCourseNumber(course.getCourseNumber());
         courseToUpdate.setAcronym(course.getAcronym());
         //TODO only update removed and new dates
         var dates = new ArrayList<>(course.getDates());
@@ -91,6 +90,9 @@ public class CourseService {
         courseToUpdate.setCancelled(cancelled);
         courseToUpdate.setFinished(finished);
         courseToUpdate.setDescription(course.getDescription());
+        if (!courseToUpdate.getAcronym().equals(course.getAcronym())) {
+            courseToUpdate.setCourseNumber(this.generateCourseNumber(courseToUpdate.getAcronym()));
+        }
         return this.repository.save(courseToUpdate);
     }
 
