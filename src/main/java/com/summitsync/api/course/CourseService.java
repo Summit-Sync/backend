@@ -1,9 +1,11 @@
 package com.summitsync.api.course;
 
+import com.summitsync.api.calendar.CalendarService;
 import com.summitsync.api.course.dto.CourseGetDTO;
 import com.summitsync.api.date.EventDate;
 import com.summitsync.api.date.EventDateService;
 import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
+import com.summitsync.api.keycloak.KeycloakRestService;
 import com.summitsync.api.mail.MailService;
 import com.summitsync.api.participant.Participant;
 import com.summitsync.api.qualification.Qualification;
@@ -16,6 +18,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -28,6 +31,8 @@ public class CourseService {
     private final MailService mailService;
     private final EventDateService eventDateService;
     private final QualificationService qualificationService;
+    private final CalendarService calendarService;
+    private final KeycloakRestService keycloakRestService;
 
     @Transactional
     public Course create(Course course) {
@@ -46,7 +51,15 @@ public class CourseService {
         for(Qualification q: qualificationList){
             course.getRequiredQualifications().add(qualificationService.findById(q.getQualificationId()));
         }
-        return this.repository.save(course);
+
+        var dbCourse = this.repository.save(course);
+
+        try {
+            dbCourse.createEvents(this.calendarService, this.keycloakRestService);
+        } catch (IOException e) {
+            log.warn("Failed to create calendar events for course {}", course.getAcronym(), e);
+        }
+        return dbCourse;
     }
 
     private String generateCourseNumber(String acronym) {
@@ -66,6 +79,18 @@ public class CourseService {
         courseToUpdate.setCancelled(course.isCancelled());
         courseToUpdate.setFinished(course.isFinished());
         courseToUpdate.setAcronym(course.getAcronym());
+
+        try {
+            courseToUpdate.occurrencesModification(
+                    CourseMapper.mapEventDatesListToCalendarEventDateSetList(courseToUpdate.getDates()),
+                    CourseMapper.mapEventDatesListToCalendarEventDateSetList(course.getDates()),
+                    this.calendarService,
+                    this.keycloakRestService
+            );
+        } catch (IOException e) {
+            log.warn("Failed to modify calendar events for group {}", course.getAcronym(), e);
+        }
+
         boolean updatedDateList=updateDatesList(courseToUpdate.getDates(),course.getDates());
         courseToUpdate.setDuration(course.getDuration());
         courseToUpdate.setNumberParticipants(course.getNumberParticipants());
@@ -85,14 +110,27 @@ public class CourseService {
             courseToUpdate.setCourseNumber(this.generateCourseNumber(courseToUpdate.getAcronym()));
         }
         courseToUpdate = this.repository.save(courseToUpdate);
+
         if(updatedDateList){
             mailService.sendCourseChangeMail(courseToUpdate, jwt);
         }
+
+        try {
+            courseToUpdate.updateEvents(calendarService, keycloakRestService);
+        } catch (IOException e) {
+            log.warn("Failed to update calendar events for course {}", courseToUpdate.getAcronym(), e);
+        }
+
         return courseToUpdate;
     }
 
     public Course deleteById(long id) {
         Course course = this.findById(id);
+        try {
+            course.deleteEvents(this.calendarService);
+        } catch (IOException e) {
+            log.warn("Failed to delete calendar events for course {}", course.getAcronym(), e);
+        }
         this.repository.deleteById(id);
         return course;
     }

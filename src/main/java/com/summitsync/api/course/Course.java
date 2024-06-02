@@ -1,7 +1,10 @@
 package com.summitsync.api.course;
 
+import com.summitsync.api.calendar.CalendarEvent;
+import com.summitsync.api.calendar.CalendarEventDateSet;
 import com.summitsync.api.coursetrainer.CourseTrainer;
 import com.summitsync.api.date.EventDate;
+import com.summitsync.api.keycloak.KeycloakRestService;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.participant.Participant;
 import com.summitsync.api.price.Price;
@@ -14,6 +17,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +27,7 @@ import java.util.Set;
 @Data
 @Builder
 @Table(name = "SS_Course")
-public class Course {
+public class Course implements CalendarEvent {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long courseId;
@@ -83,6 +87,56 @@ public class Course {
     private List<CourseTrainer> courseTrainers;
     @OneToMany(mappedBy = "course", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<TrainerApplication> applications;
+
+    @Override
+    public List<CalendarEventDateSet> occurrences() {
+        return CourseMapper.mapEventDatesListToCalendarEventDateSetList(this.dates);
+    }
+
+    @Override
+    public String eventDescription(CalendarEventDateSet calendarEventDateSet) {
+        return this.notes;
+    }
+
+    @Override
+    public String eventTitle(CalendarEventDateSet calendarEventDateSet, KeycloakRestService keycloakRestService) {
+        String trainerNames = "";
+        if (!this.trainers.isEmpty()) {
+            trainerNames = String.join(" ", this.trainers.stream()
+                    .map(trainer -> {
+                        return keycloakRestService.getUser(trainer.getSubjectId(), keycloakRestService.getJwt()).getFirstName();
+                    })
+                    .toList());
+        }
+        var acronym = "Kurs";
+        if (this.acronym != null) {
+            acronym = this.acronym;
+        }
+        return acronym.toUpperCase() + this.courseNumber + " " + trainerNames;
+    }
+
+    @Override
+    public long eventId() {
+        return this.courseId;
+    }
+
+    @Override
+    public String eventIdPrefix() {
+        return "c";
+    }
+
+    @Override
+    public String eventLocation() {
+        if (this.meetingPoint == null)
+            return "";
+
+        return this.meetingPoint;
+    }
+
+    @Override
+    public String eventColorId() {
+        return "1";
+    }
 }
 
 

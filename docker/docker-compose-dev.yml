@@ -26,6 +26,8 @@ services:
       - REDIS_HOST=redis
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
+      - KEYCLOAK_SYSTEM_USER_CLIENT_ID=summit-sync-backend-system-user
+      - KEYCLOAK_SYSTEM_USER_PASSWORD=KMy5FqqXWMmzycFNXx5Fl0DS7t5ftSsn
     depends_on:
       db:
         condition: service_healthy
