@@ -1,28 +1,18 @@
 package com.summitsync.api.course;
 
 import com.summitsync.api.course.dto.CourseGetDTO;
-import com.summitsync.api.coursetemplate.CourseTemplate;
-import com.summitsync.api.coursetemplate.CourseTemplateService;
 import com.summitsync.api.date.EventDate;
 import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
-import com.summitsync.api.mail.MailDetail;
 import com.summitsync.api.mail.MailService;
 import com.summitsync.api.participant.Participant;
-import com.summitsync.api.participant.ParticipantMapper;
-import com.summitsync.api.participant.dto.ParticipantDto;
 import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.trainer.Trainer;
-import com.summitsync.api.trainer.TrainerMapper;
-import com.summitsync.api.trainer.dto.TrainerDto;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -35,8 +25,6 @@ public class CourseService {
     private final CourseRepository repository;
     private final CourseMapper mapper;
     private final MailService mailService;
-    private final ParticipantMapper participantMapper;
-    private final TrainerMapper trainerMapper;
 
     public Course create(Course course) {
         course.setCourseNumber(this.generateCourseNumber(course.getAcronym()));
@@ -72,8 +60,7 @@ public class CourseService {
         }
 
         if (dateChanged) {
-            SendReminderEmailForParticipant(course, jwt);
-            SendReminderEmailForTrainer(course, jwt);
+            mailService.sendCourseChangeMail(course, jwt);
         }
 
         var participants = new ArrayList<>(course.getParticipants());
@@ -87,6 +74,7 @@ public class CourseService {
         courseToUpdate.setFinished(course.isFinished());
         courseToUpdate.setCourseNumber(course.getCourseNumber());
         courseToUpdate.setAcronym(course.getAcronym());
+        //TODO only update removed and new dates
         var dates = new ArrayList<>(course.getDates());
         courseToUpdate.setDates(dates);
         courseToUpdate.setDuration(course.getDuration());
@@ -238,47 +226,5 @@ public class CourseService {
     public Course publish(Course course, boolean published) {
         course.setVisible(published);
         return this.repository.save(course);
-    }
-
-    private void SendReminderEmailForParticipant(Course course, String jwt) {
-        for (Participant p: course.getParticipants()) {
-            MailDetail detail = new MailDetail();
-            ParticipantDto participantDto = participantMapper.mapParticipantToParticipantDto(p, jwt);
-            detail.setRecipient(participantDto.getEmail());
-            var start = course.getDates().getFirst().getStartTime();
-            String startDate = start.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-            String startTime = start.format(DateTimeFormatter.ofPattern("HH:mm"));
-            detail.setSubject("Erinnerung für Kurs " + course.getAcronym() + " am " + startDate + startTime);
-            detail.setMsgBody(
-                    "Hallo " + participantDto.getName() + ",\n" +
-                    "\n" +
-                    "am " + startDate + " findet dein Kurs " + course.getAcronym() + " um " + startTime + " statt.\n" +
-                    "Bitte finde dich ein paar Minuten früher bei uns ein, damit wir pünktlich mit dem Kurs starten können.\n" +
-                    "\n" +
-                    "Wir freuen uns auf dich!\n" +
-                    "Dein Kletterzentrums Team");
-            mailService.sendMail(detail);
-        }
-    }
-
-    private void SendReminderEmailForTrainer(Course course, String jwt) {
-        for (Trainer t: course.getTrainers()) {
-            MailDetail detail = new MailDetail();
-            TrainerDto trainerDto = trainerMapper.mapTrainerToTrainerDto(t, jwt);
-            detail.setRecipient(trainerDto.getEmail());
-            var start = course.getDates().getFirst().getStartTime();
-            String startDate = start.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-            String startTime = start.format(DateTimeFormatter.ofPattern("HH:mm"));
-            detail.setSubject("Erinnerung für Kurs " + course.getAcronym() + " am " + startDate + startTime);
-            detail.setMsgBody(
-                    "Hallo " + trainerDto.getFirstName() + " " + trainerDto.getLastName() + ",\n" +
-                            "\n" +
-                            "am " + startDate + " findet dein Kurs " + course.getAcronym() + " um " + startTime + " statt.\n" +
-                            "Viel Spaß dabei ;).\n" +
-                            "\n" +
-                            "sportliche Grüße,\n" +
-                            "Dein Kursmanager");
-            mailService.sendMail(detail);
-        }
     }
 }
