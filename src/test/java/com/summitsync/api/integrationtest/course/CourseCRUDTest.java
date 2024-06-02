@@ -2,8 +2,8 @@ package com.summitsync.api.integrationtest.course;
 
 import com.jayway.jsonpath.JsonPath;
 import com.summitsync.api.MockMVCApiKey;
-import com.summitsync.api.TestSummitSyncApplication;
 import com.summitsync.api.integrationtest.testcontainers.AbstractIntegrationTest;
+import com.summitsync.api.integrationtest.testcontainers.PostgresContextInitializer;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.location.LocationService;
 import com.summitsync.api.price.Price;
@@ -16,7 +16,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
 import java.math.BigDecimal;
@@ -90,7 +89,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
 
     @AfterAll
     void cleanup() {
-        TestSummitSyncApplication.cleanAllTables(jdbcTemplate);
+        PostgresContextInitializer.cleanAllTables(jdbcTemplate);
     }
 
     @Test
@@ -98,14 +97,14 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
     void testCreateCourseHappyPath() throws Exception {
         var content = String.format("""
 {
-   "acronym":"kv",
+   "acronym":"kj",
    "dates":[
-      "2024-05-13T10:00:25.739Z",
-      "2024-05-13T10:00:40.456Z",
-      "2024-08-01T09:00:00.000Z"
+      "2024-06-10T13:00:25.739Z",
+      "2024-06-11T13:00:40.456Z",
+      "2024-06-12T13:00:00.000Z"
    ],
    "description":"kvBeschreibrung",
-   "duration":40,
+   "duration":90,
    "location":%d,
    "meetingPoint":"kvTreffpunkt",
    "notes":"test",
@@ -160,6 +159,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                         .andExpect(jsonPath("participants[0].name").value(participantName))
                         .andExpect(jsonPath("participants[0].phone").value("123"))
                         .andExpect(jsonPath("waitList[0].firstName").value(waitListParticipantFirstName))
+                        .andExpect(jsonPath("courseNumber").value("001"))
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
@@ -189,7 +189,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
 {
    "acronym":"kj",
    "dates":[
-      "2024-05-13T10:00:25.739Z"
+      "2024-06-14T13:00:25.739Z"
    ],
    "description":"descriptionUpdated",
    "duration":35,
@@ -264,6 +264,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("waitList.length()").value(2))
                 .andExpect(jsonPath("participants.length()").value(2))
                 .andExpect(jsonPath("trainers.length()").value(2))
+                .andExpect(jsonPath("courseNumber").value("001"))
                 .andExpect(jsonPath(String.format("waitList[?(@.name == '%s')].name", waitListParticipantName + "UPDATED")).value(waitListParticipantName + "UPDATED"));
     }
     @Test
@@ -271,7 +272,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
     void testCreateSecondCourseHappyPath() throws Exception {
         var content = String.format("""
 {
-   "acronym":"kv2",
+   "acronym":"kj",
    "dates":[
       "2024-05-13T10:00:25.739Z",
       "2024-05-13T10:00:40.456Z",
@@ -308,12 +309,13 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                         .content(content))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("id").value(2))
-                .andExpect(jsonPath("acronym").value("kv2"))
+                .andExpect(jsonPath("acronym").value("kj"))
                 .andExpect(jsonPath("visible").value(false))
                 .andExpect(jsonPath("dates.length()").value(3))
                 .andExpect(jsonPath("prices[0].name").value("Test Price 2"))
                 .andExpect(jsonPath("location.country").value("Germany"))
-                .andExpect(jsonPath("notes").value("test"));
+                .andExpect(jsonPath("notes").value("test"))
+                .andExpect(jsonPath("courseNumber").value("002"));
 
     }
     @Test

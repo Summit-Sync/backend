@@ -72,6 +72,7 @@ public class GroupMapper {
                 .trainers(trainerDtos)
                 .totalPrice(group.getTotalPrice())
                 .cancelled(group.isCancelled())
+                .notes(group.getNotes())
                 .build();
 
     }
@@ -101,6 +102,7 @@ public class GroupMapper {
                 .participantsPerTrainer(dto.getParticipantsPerTrainer())
                 .trainers(dto.getTrainers().stream().map(this.trainerService::findById).toList())
                 .totalPrice(new BigDecimal("0.0"))
+                .notes(dto.getNotes())
                 .build();
     }
 

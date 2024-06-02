@@ -1,5 +1,6 @@
 package com.summitsync.api.course;
 
+import com.summitsync.api.calendar.CalendarEventDateSet;
 import com.summitsync.api.course.dto.CourseGetDTO;
 import com.summitsync.api.course.dto.CoursePostDTO;
 import com.summitsync.api.date.EventDate;
@@ -81,33 +82,40 @@ public class CourseMapper {
         List<Participant> participants = new ArrayList<>();
         List<Participant> waitList = new ArrayList<>();
         List<Trainer> trainers = new ArrayList<>();
-
-        for (var participant : dto.getParticipants()) {
-            if (participant.getId() == 0) {
-                var added = this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
-                participant.setId(added.getId());
+        if (dto.getParticipants() != null) {
+            for (var participant : dto.getParticipants()) {
+                if (participant.getId() == 0) {
+                    var added = this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
+                    participant.setId(added.getId());
+                }
+                participants.add(this.participantService.getParticipantAndUpdate(participant, jwt.getToken().getTokenValue()));
             }
-            participants.add(this.participantService.getParticipantAndUpdate(participant, jwt.getToken().getTokenValue()));
         }
 
-        for (var participant : dto.getWaitList()) {
-            if (participant.getId() == 0) {
-                var added = this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
-                participant.setId(added.getId());
+        if (dto.getWaitList() != null) {
+            for (var participant : dto.getWaitList()) {
+                if (participant.getId() == 0) {
+                    var added = this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
+                    participant.setId(added.getId());
+                }
+                waitList.add(this.participantService.getParticipantAndUpdate(participant, jwt.getToken().getTokenValue()));
             }
-            waitList.add(this.participantService.getParticipantAndUpdate(participant, jwt.getToken().getTokenValue()));
         }
 
-        for (var trainer : dto.getTrainers()) {
-            trainers.add(this.trainerService.findById(trainer));
+        if (dto.getTrainers() != null) {
+            for (var trainer : dto.getTrainers()) {
+                trainers.add(this.trainerService.findById(trainer));
+            }
         }
 
         var prices = new ArrayList<Price>();
 
-        for (var price : dto.getPrices()) {
-            var mappedPrice = this.priceMapper.mapPostPriceDtoToPrice(price);
-            var savedPrice = this.priceService.create(mappedPrice);
-            prices.add(savedPrice);
+        if (dto.getPrices() != null) {
+            for (var price : dto.getPrices()) {
+                var mappedPrice = this.priceMapper.mapPostPriceDtoToPrice(price);
+                var savedPrice = this.priceService.create(mappedPrice);
+                prices.add(savedPrice);
+            }
         }
 
         return Course.builder()
@@ -131,6 +139,21 @@ public class CourseMapper {
                 .trainers(trainers)
                 .title(dto.getTitle())
                 .notes(dto.getNotes())
+                .build();
+    }
+
+    public static List<CalendarEventDateSet> mapEventDatesListToCalendarEventDateSetList(List<EventDate> eventDates) {
+        return eventDates.stream()
+                .map(CourseMapper::mapEventDateToCalendarEventDateSetList)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public static CalendarEventDateSet mapEventDateToCalendarEventDateSetList(EventDate date) {
+        var startTime = date.getStartTime();
+        var endTime = startTime.plusMinutes(date.getDurationInMinutes());
+        return CalendarEventDateSet.builder()
+                .startTime(startTime)
+                .endTime(endTime)
                 .build();
     }
 }

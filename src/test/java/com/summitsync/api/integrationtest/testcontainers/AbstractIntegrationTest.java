@@ -9,7 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("it")
+@ActiveProfiles("test")
 @ContextConfiguration(initializers = PostgresContextInitializer.class)
 public class AbstractIntegrationTest {
     @Autowired

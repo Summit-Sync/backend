@@ -51,6 +51,7 @@ public class GroupPostDTO {
     @NotBlank(message = "Acronym cannot be empty")
     @Length(max = 2, message = "Acronym cant be longer than 2")
     String acronym;
+    String notes;
 }
 
 // PostGroupDTO: title (string), description (string), numberOfDates (int), Array of eventDateObj (date (date)), duration (int),

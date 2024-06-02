@@ -7,6 +7,7 @@ import com.summitsync.api.date.EventDateService;
 import com.summitsync.api.group.Group;
 import com.summitsync.api.group.GroupService;
 import com.summitsync.api.integrationtest.testcontainers.AbstractIntegrationTest;
+import com.summitsync.api.integrationtest.testcontainers.PostgresContextInitializer;
 import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.qualification.QualificationRepository;
 import com.summitsync.api.trainer.Trainer;
@@ -14,6 +15,8 @@ import com.summitsync.api.trainer.TrainerRepository;
 import com.summitsync.api.utility.ScheduledServices;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +42,8 @@ public class TestScheduledTasks extends AbstractIntegrationTest {
     private Trainer trainer2;
     private Trainer trainer3;
 
+    @Autowired
+    JdbcTemplate jdbcTemplate;
     @BeforeAll
     void setup(){
         Qualification testQuali1 = qualificationRepository.save(Qualification.builder().name("Erste Hilfe").build());
@@ -90,6 +95,11 @@ public class TestScheduledTasks extends AbstractIntegrationTest {
         groupService.create(Group.builder().dates(List.of(date4g)).qualifications(List.of(testQuali1)).trainers(new ArrayList<>()).participantsPerTrainer(1).numberParticipants(2).build());
         // group has enough trainers
         groupService.create(Group.builder().dates(List.of(date2c, date4h)).qualifications(List.of(testQuali1)).trainers(new ArrayList<>()).participantsPerTrainer(1).numberParticipants(0).build());
+    }
+
+    @AfterAll
+    void cleanup() {
+        PostgresContextInitializer.cleanAllTables(jdbcTemplate);
     }
 
     @Test

@@ -1,7 +1,7 @@
 package com.summitsync.api.integrationtest.grouptemplate;
 
-import com.summitsync.api.TestSummitSyncApplication;
 import com.summitsync.api.integrationtest.testcontainers.AbstractIntegrationTest;
+import com.summitsync.api.integrationtest.testcontainers.PostgresContextInitializer;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.location.LocationService;
 import com.summitsync.api.qualification.Qualification;
@@ -10,7 +10,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.DirtiesContext;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -46,7 +45,7 @@ public class TestCRUDGroupTemplate extends AbstractIntegrationTest {
 
     @AfterAll
     void cleanup() {
-        TestSummitSyncApplication.cleanAllTables(jdbcTemplate);
+        PostgresContextInitializer.cleanAllTables(jdbcTemplate);
     }
 
     @Test

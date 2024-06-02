@@ -37,4 +37,5 @@ public class GroupGetDTO {
     int participantsPerTrainer;
     Set<TrainerDto> trainers;
     BigDecimal totalPrice;
+    String notes;
 }

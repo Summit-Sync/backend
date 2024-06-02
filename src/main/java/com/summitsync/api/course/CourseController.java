@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

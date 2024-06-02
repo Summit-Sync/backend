@@ -1,8 +1,12 @@
 package com.summitsync.api.group;
 
+import com.summitsync.api.calendar.CalendarEvent;
+import com.summitsync.api.calendar.CalendarEventDateSet;
 import com.summitsync.api.contact.Contact;
+import com.summitsync.api.course.CourseMapper;
 import com.summitsync.api.date.EventDate;
 import com.summitsync.api.grouptemplate.GroupTemplate;
+import com.summitsync.api.keycloak.KeycloakRestService;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.trainer.Trainer;
@@ -22,7 +26,7 @@ import java.util.List;
 @Data
 @Builder
 @Table(name = "SS_Group")
-public class Group {
+public class Group implements CalendarEvent {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long groupId;
@@ -61,4 +65,54 @@ public class Group {
     private BigDecimal totalPrice;
     @OneToMany(mappedBy = "group", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<TrainerApplication> applications;
+    private String notes;
+
+    @Override
+    public List<CalendarEventDateSet> occurrences() {
+        return CourseMapper.mapEventDatesListToCalendarEventDateSetList(this.dates);
+    }
+
+    @Override
+    public String eventDescription(CalendarEventDateSet calendarEventDateSet) {
+        return this.notes;
+    }
+
+    @Override
+    public String eventTitle(CalendarEventDateSet calendarEventDateSet, KeycloakRestService keycloakRestService) {
+        String trainerNames = "";
+        if (!this.trainers.isEmpty()) {
+            trainerNames = String.join(" ", this.trainers.stream()
+                    .map(trainer -> keycloakRestService.getUser(trainer.getSubjectId(), keycloakRestService.getJwt()).getFirstName())
+                    .toList());
+        }
+
+        var acronym = "Gruppe";
+        if (this.acronym != null) {
+            acronym = this.acronym;
+        }
+        return acronym.toUpperCase() + this.groupNumber + " " + trainerNames;
+    }
+
+    @Override
+    public long eventId() {
+        return this.groupId;
+    }
+
+    @Override
+    public String eventIdPrefix() {
+        return "g";
+    }
+
+    @Override
+    public String eventLocation() {
+        if (this.meetingPoint == null)
+            return "";
+
+        return this.meetingPoint;
+    }
+
+    @Override
+    public String eventColorId() {
+        return "2";
+    }
 }

@@ -1,7 +1,11 @@
 package com.summitsync.api.group;
 
+import com.summitsync.api.calendar.CalendarService;
+import com.summitsync.api.course.CourseMapper;
 import com.summitsync.api.date.EventDate;
 import com.summitsync.api.date.EventDateService;
+import com.summitsync.api.grouptemplate.GroupTemplateService;
+import com.summitsync.api.keycloak.KeycloakRestService;
 import com.summitsync.api.mail.MailService;
 import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.qualification.QualificationService;
@@ -13,8 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -23,10 +27,10 @@ public class GroupService {
     private final GroupRepository repository;
     private final MailService mailService;
     private final Logger log = LoggerFactory.getLogger(GroupService.class);
-
-    private final EventDateService eventDateService;
-
+    private final CalendarService calendarService;
     private final QualificationService qualificationService;
+    private final KeycloakRestService keycloakRestService;
+    private final EventDateService eventDateService;
 
     @Transactional
     public Group create(Group group) {
@@ -42,7 +46,14 @@ public class GroupService {
         for(Qualification q: qualificationList){
             group.getQualifications().add(qualificationService.findById(q.getQualificationId()));
         }
-        return this.repository.save(group);
+
+        var dbGroup = this.repository.save(group);
+        try {
+            dbGroup.createEvents(this.calendarService, this.keycloakRestService);
+        } catch (IOException e) {
+            log.warn("Failed to create calendar events for group {}", group.getAcronym(), e);
+        }
+        return dbGroup;
     }
 
     private String generateGroupNumber(String acronym) {
@@ -57,8 +68,21 @@ public class GroupService {
         groupToUpdate.setTitle(group.getTitle());
         groupToUpdate.setDescription(group.getDescription());
         groupToUpdate.setNumberOfDates(group.getNumberOfDates());
+        groupToUpdate.setNotes(group.getNotes());
         groupToUpdate.setDuration(group.getDuration());
         groupToUpdate.setContact(group.getContact());
+
+        try {
+            groupToUpdate.occurrencesModification(
+                    CourseMapper.mapEventDatesListToCalendarEventDateSetList(groupToUpdate.getDates()),
+                    CourseMapper.mapEventDatesListToCalendarEventDateSetList(group.getDates()),
+                    this.calendarService,
+                    this.keycloakRestService
+            );
+        } catch (IOException e) {
+            log.warn("Failed to modify calendar events for group {}", group.getAcronym(), e);
+        }
+
         boolean updatedDates = updateDatesList(groupToUpdate.getDates(), group.getDates());
         groupToUpdate.setNumberParticipants(group.getNumberParticipants());
         groupToUpdate.setLocation(group.getLocation());
@@ -75,6 +99,11 @@ public class GroupService {
         if(updatedDates){
             mailService.sendGroupChangeMail(groupToUpdate, jwt);
         }
+        try {
+            groupToUpdate.updateEvents(calendarService, keycloakRestService);
+        } catch (IOException e) {
+            log.warn("Failed to update calendar events for course {}", groupToUpdate.getAcronym(), e);
+        }
         return groupToUpdate;
     }
 
@@ -85,12 +114,21 @@ public class GroupService {
     public Group deleteById(long id) {
         Optional<Group> data = this.findById(id);
         if (data.isEmpty()) {
-            log.info("Group with id {} does not exist", id);
+            groupNotFoundMessage(id);
             throw new RuntimeException("Group with id" + id + " does not exist");
         }
         Group dbGroup = data.get();
+        try {
+            dbGroup.deleteEvents(this.calendarService);
+        } catch (IOException e) {
+            log.warn("Failed to delete calendar events for group {}", dbGroup.getAcronym(), e);
+        }
         delete(dbGroup);
         return dbGroup;
+    }
+
+    private void groupNotFoundMessage(long id) {
+        log.info("Group with id {} does not exist", id);
     }
 
     private Optional<Group> findById(long id) {
@@ -100,7 +138,7 @@ public class GroupService {
     public Group get(long id) {
         Optional<Group> data = this.findById(id);
         if (data.isEmpty()) {
-            log.info("Group with id {} does not exist", id);
+            groupNotFoundMessage(id);
             throw new RuntimeException("Group with id " + id + " does not exist");
         }
         return data.get();

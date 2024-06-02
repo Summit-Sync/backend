@@ -14,6 +14,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -31,7 +32,7 @@ public class GroupController {
     private final ContactService contactService;
 
     @PostMapping
-    public ResponseEntity<GroupGetDTO> createGroup(@RequestBody @Valid GroupPostDTO dto, JwtAuthenticationToken jwt) {
+    public ResponseEntity<GroupGetDTO> createGroup(@RequestBody @Valid GroupPostDTO dto, JwtAuthenticationToken jwt)  {
         Group group = this.mapper.mapGroupPostDTOToGroup(dto);
         contactService.saveContact(group.getContact());
         var createdGroup = this.service.create(group);
@@ -62,7 +63,7 @@ public class GroupController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GroupGetDTO> updateGroup(@RequestBody @Valid GroupPostDTO dto, @PathVariable long id, JwtAuthenticationToken jwt) {
+    public ResponseEntity<GroupGetDTO> updateGroup(@RequestBody @Valid GroupPostDTO dto, @PathVariable long id, JwtAuthenticationToken jwt) throws IOException {
         var group = this.mapper.mapGroupPostDTOToGroup(dto);
         var groupToUpdate = this.service.get(id);
         Group dbGroup = this.service.update(groupToUpdate, group, jwt.getToken().getTokenValue());
