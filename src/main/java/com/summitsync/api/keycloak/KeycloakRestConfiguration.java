@@ -11,4 +11,6 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class KeycloakRestConfiguration {
     private String restEndpoint;
+    private String systemUserUsername;
+    private String systemUserPassword;
 }

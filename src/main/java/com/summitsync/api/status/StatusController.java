@@ -1,5 +1,6 @@
 package com.summitsync.api.status;
 
+import com.summitsync.api.keycloak.KeycloakRestService;
 import com.summitsync.api.status.dto.StatusGetDto;
 import com.summitsync.api.status.dto.StatusPostDto;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 public class StatusController {
     private final StatusMapper statusMapper;
     private final StatusService statusService;
+    private final KeycloakRestService keycloakRestService;
 
     @PostMapping
     public StatusGetDto newStatus(@RequestBody StatusPostDto statusPostDto) {

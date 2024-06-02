@@ -2,6 +2,7 @@ package com.summitsync.api.keycloak;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.summitsync.api.bff.AccessTokenResponseDto;
 import com.summitsync.api.exceptionhandler.KeycloakApiException;
 import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
 import com.summitsync.api.keycloak.dto.KeycloakAddUserRequest;
@@ -13,9 +14,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -23,10 +26,43 @@ public class KeycloakRestService {
     @Value("${summitsync.keycloak.rest-endpoint}")
     private String apiBase;
 
+    @Value("${summitsync.bff.token-endpoint}")
+    private String tokenEndpoint;
+    @Value("${summitsync.keycloak.system-user-username}")
+    private String systemAccountClientId;
+    @Value("${summitsync.keycloak.system-user-password}")
+    private String systemAccountPassword;
+
     private final RestClient restClient;
+    private Optional<String> accessToken = Optional.empty();
+    private LocalDateTime expiresAt;
 
     public KeycloakRestService() {
         this.restClient = RestClient.create();
+    }
+
+    public String getJwt() {
+        if (accessToken.isPresent() && expiresAt.isAfter(LocalDateTime.now())) {
+            return accessToken.get();
+        }
+
+        var body = new LinkedMultiValueMap<String, String>();
+        body.add("grant_type", "client_credentials");
+        body.add("client_id", systemAccountClientId);
+        body.add("client_secret", systemAccountPassword);
+        var res = restClient.post()
+                .uri(tokenEndpoint)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(body)
+                .retrieve()
+                .body(HashMap.class);
+        var accessToken = (String) res.get("access_token");
+        var expiresIn = ((Number) res.get("expires_in")).longValue();
+        this.expiresAt = LocalDateTime.now().plusSeconds(expiresIn);
+        this.accessToken = Optional.of(accessToken);
+
+        return accessToken;
     }
 
     private <B> RestClient.ResponseSpec rawRequest(HttpMethod method, String uri, String jwt, B body) {
