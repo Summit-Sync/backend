@@ -160,7 +160,7 @@ class GroupCRUDTest extends AbstractIntegrationTest {
    "numberOfDates": 2,
    "dates":[
       "2024-05-13T10:00:25.739Z",
-      "2024-05-13T10:00:40.456Z"
+      "2024-05-14T10:00:40.456Z"
    ],
    "duration":45,
    "numberParticipants":2,

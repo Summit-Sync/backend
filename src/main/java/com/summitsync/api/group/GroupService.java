@@ -1,5 +1,6 @@
 package com.summitsync.api.group;
 
+import com.summitsync.api.date.EventDate;
 import com.summitsync.api.grouptemplate.GroupTemplateService;
 import com.summitsync.api.mail.MailService;
 import com.summitsync.api.trainer.Trainer;
@@ -8,10 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -33,7 +31,7 @@ public class GroupService {
         return String.format("%03d", ret);
     }
 
-    public Group update(Group groupToUpdate, Group group) {
+    public Group update(Group groupToUpdate, Group group, String jwt) {
         groupToUpdate.setCancelled(group.isCancelled());
         groupToUpdate.setAcronym(group.getAcronym());
         groupToUpdate.setTitle(group.getTitle());
@@ -41,9 +39,7 @@ public class GroupService {
         groupToUpdate.setNumberOfDates(group.getNumberOfDates());
         groupToUpdate.setDuration(group.getDuration());
         groupToUpdate.setContact(group.getContact());
-        //TODO only update removed or new dates
-        var dates = new ArrayList<>(group.getDates());
-        groupToUpdate.setDates(dates);
+        boolean updatedDates = updateDatesList(groupToUpdate.getDates(), group.getDates());
         groupToUpdate.setNumberParticipants(group.getNumberParticipants());
         groupToUpdate.setLocation(group.getLocation());
         groupToUpdate.setMeetingPoint(group.getMeetingPoint());
@@ -55,7 +51,11 @@ public class GroupService {
         var trainers = new ArrayList<>(group.getTrainers());
         groupToUpdate.setTrainers(trainers);
 
-        return this.repository.save(groupToUpdate);
+        groupToUpdate = this.repository.save(groupToUpdate);
+        if(updatedDates){
+            mailService.sendGroupChangeMail(groupToUpdate, jwt);
+        }
+        return groupToUpdate;
     }
 
     private void delete(Group group) {
@@ -121,6 +121,42 @@ public class GroupService {
         Group canceledGroup = this.repository.save(group);
         mailService.sendGroupCancelMail(canceledGroup, jwt);
         return canceledGroup;
+    }
+
+    public boolean updateDatesList(List<EventDate>oldDates, List<EventDate>newDates){
+        boolean removedDates=removeUnusedOrUpdatedDates(oldDates, newDates);
+        boolean addedNewDates=addNewDates(oldDates,newDates);
+        return removedDates||addedNewDates;
+    }
+
+    private boolean addNewDates(List<EventDate> oldDates, List<EventDate>newDates){
+        return oldDates.addAll(newDates);
+    }
+
+    public boolean removeUnusedOrUpdatedDates(List<EventDate> oldDates, List<EventDate>newDates){
+        boolean removedOldDate = false;
+        Iterator<EventDate> iterator=oldDates.iterator();
+        while (iterator.hasNext()){
+            EventDate oldDate = iterator.next();
+            if(checkIfDateIsUnusedOrUpdated(oldDate, newDates)){
+                removedOldDate=true;
+                iterator.remove();
+            }
+        }
+        return removedOldDate;
+    }
+
+    private boolean checkIfDateIsUnusedOrUpdated(EventDate oldDate, List<EventDate>newDates){
+        for(EventDate newDate: newDates){
+            // Check if oldDate has same startTime as newDate in list of newDates
+            // and the duration of the new date is the same as in the old date
+            if(newDate.getStartTime().isEqual(oldDate.getStartTime()) && newDate.getDurationInMinutes() == oldDate.getDurationInMinutes()){
+                // If oldDate equals date in newDates, remove the element from newDates
+                newDates.remove(newDate);
+                return false;
+            }
+        }
+        return true;
     }
 
 }

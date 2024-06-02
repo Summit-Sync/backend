@@ -65,7 +65,7 @@ public class GroupController {
     public ResponseEntity<GroupGetDTO> updateGroup(@RequestBody @Valid GroupPostDTO dto, @PathVariable long id, JwtAuthenticationToken jwt) {
         var group = this.mapper.mapGroupPostDTOToGroup(dto);
         var groupToUpdate = this.service.get(id);
-        Group dbGroup = this.service.update(groupToUpdate, group);
+        Group dbGroup = this.service.update(groupToUpdate, group, jwt.getToken().getTokenValue());
         GroupGetDTO response = this.mapper.mapGroupToGroupGetDto(dbGroup, jwt.getToken().getTokenValue());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
