@@ -1,6 +1,7 @@
 package com.summitsync.api.group;
 
 import com.summitsync.api.grouptemplate.GroupTemplateService;
+import com.summitsync.api.mail.MailService;
 import com.summitsync.api.trainer.Trainer;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
@@ -18,8 +19,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GroupService {
     private final GroupRepository repository;
+    private final MailService mailService;
     private final Logger log = LoggerFactory.getLogger(GroupService.class);
-    private final GroupTemplateService templateService;
 
     public Group create(Group group) {
         group.setGroupNumber(generateGroupNumber(group.getAcronym()));
@@ -40,6 +41,7 @@ public class GroupService {
         groupToUpdate.setNumberOfDates(group.getNumberOfDates());
         groupToUpdate.setDuration(group.getDuration());
         groupToUpdate.setContact(group.getContact());
+        //TODO only update removed or new dates
         var dates = new ArrayList<>(group.getDates());
         groupToUpdate.setDates(dates);
         groupToUpdate.setNumberParticipants(group.getNumberParticipants());
@@ -114,9 +116,11 @@ public class GroupService {
         return this.repository.save(group);
     }
 
-    public Group cancel(Group group) {
+    public Group cancel(Group group, String jwt) {
         group.setCancelled(true);
-        return this.repository.save(group);
+        Group canceledGroup = this.repository.save(group);
+        mailService.sendGroupCancelMail(canceledGroup, jwt);
+        return canceledGroup;
     }
 
 }

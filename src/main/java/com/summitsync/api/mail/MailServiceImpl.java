@@ -1,24 +1,23 @@
 package com.summitsync.api.mail;
 
+import com.summitsync.api.contact.Contact;
 import com.summitsync.api.course.Course;
+import com.summitsync.api.group.Group;
 import com.summitsync.api.participant.Participant;
 import com.summitsync.api.participant.ParticipantMapper;
 import com.summitsync.api.participant.dto.ParticipantDto;
 import com.summitsync.api.trainer.Trainer;
 import com.summitsync.api.trainer.TrainerMapper;
 import com.summitsync.api.trainer.dto.TrainerDto;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -26,7 +25,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class MailServiceImpl implements MailService {
-    @Autowired
+
+    private static final Logger log = LoggerFactory.getLogger(MailServiceImpl.class);
     private final JavaMailSender mailSender;
     @Value("${spring.mail.username}")
     private String sender;
@@ -93,10 +93,74 @@ public class MailServiceImpl implements MailService {
             
             Wir freuen uns auf dich
             Dein Kletterzentrum Team""";
+    private static final String CANCEL_MAIL_GROUP_CONTACT = """
+            Hallo %s %s,
+
+            Leider muss deine Gruppe %s am %s um %s ausfallen.
+            Solltest du deine Gruppengebühren zurück erstattet haben wollen, melde dich bitte bei uns unter: kurse@kletterzentrum-bremen.de oder ruf uns an unter: +49421 51429053
+
+            Andernfalls suche dir gerne einen neuen Gruppentermin, für den wir dir deine aktuelle Gruppengebühr anrechnen.
+
+            Wir entschuldigen uns für die entstandenen Unannehmlichkeiten und hoffen dich bald wieder im Unterwegs Kletterzentrum Bremen begrüßen zu dürfen.
+
+            Wir freuen uns auf euch!
+            Dein Kletterzentrums Team""";
+    private static final String CANCEL_MAIL_GROUP_TRAINER = """
+            Hallo %s %s,
+
+            Leider muss deine Gruppe %s am %s um %s ausfallen.
+
+            Wir entschuldigen uns für die entstandenen Unannehmlichkeiten und hoffen du freust dich schon auf deine nächste Gruppe.
+
+            Sportliche Grüße
+            Dein Kursmanager""";
+
+    private static final String REMINDER_MAIL_GROUP_TRAINER = """
+            Hallo %s %s
+            
+            am %s findet deine Gruppe %s um %s statt.
+            Viel Spaß dabei ;).
+
+            Sportliche Grüße
+            Dein Kursmanager""";
+
+    private static final String REMINDER_MAIL_GROUP_CONTACT = """
+            Hallo %s %s,
+
+            am %s findet deine Gruppe %s um %s statt.
+            Bitte finde dich ein paar Minuten früher bei uns ein, damit wir pünktlich mit der Gruppe starten können.
+
+            Wir freuen uns auf euch!
+            Dein Kletterzentrums Team""";
+
+    private static final String UPDATE_MAIL_GROUP_TRAINER = """
+            Hallo %s %s,
+            
+            Bei deiner Gruppe %s hat sich etwas verändert.
+            Die Gruppe findet nun am %s um %s statt.
+            
+            Viel Spaß dabei ;)
+            
+            Sportliche Grüße
+            Dein Kursmanager
+            """;
+    private static final String UPDATE_MAIL_GROUP_CONTACT = """
+            Hallo %s %s,
+            
+            bei deiner Gruppe %s hat sich etwas verändert.
+            Die Gruppe findet nun am %s um %s statt.
+            
+            Bitte finde dich ein paar Minuten früher bei uns ein, damit wir pünktlich mit der Gruppe starten können.
+            
+            Wir freuen uns auf euch!
+            Dein Kletterzentrum Team""";
     private static final String CANCEL_MAIL_SUBJECT_COURSE ="Absage Kurs %s am %s %s";
     private static final String REMINDER_MAIL_SUBJECT_COURSE = "Erinnerung für Kurs %s am %s %s";
-
     private static final String UPDATE_MAIL_SUBJECT_COURSE = "Änderungen bei Kurs %s am %s %s";
+    private static final String CANCEL_MAIL_SUBJECT_GROUP ="Absage Gruppe %s am %s %s";
+    private static final String REMINDER_MAIL_SUBJECT_GROUP = "Erinnerung für Gruppe %s am %s %s";
+
+    private static final String UPDATE_MAIL_SUBJECT_GROUP = "Änderungen bei Gruppe %s am %s %s";
 
 
 
@@ -122,36 +186,8 @@ public class MailServiceImpl implements MailService {
 
         // Catch block to handle the exceptions
         catch (Exception e) {
-            System.out.println(e.getMessage());
+            log.warn(e.getMessage());
             return "Error while Sending email!!!";
-        }
-    }
-
-    @Override
-    public String sendMailWithAttachment(MailDetail mailDetail) {
-        // Creating a Mime Message
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper mimeMessageHelper;
-
-        try {
-
-            mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-            mimeMessageHelper.setFrom(sender);
-            mimeMessageHelper.setTo(mailDetail.getRecipient());
-            mimeMessageHelper.setSubject(mailDetail.getSubject());
-            mimeMessageHelper.setText(mailDetail.getMsgBody());
-
-            // Adding the file attachment
-            FileSystemResource file = new FileSystemResource(new File(mailDetail.getAttachment()));
-
-            mimeMessageHelper.addAttachment(file.getFilename(), file);
-
-            // Sending the email with attachment
-            mailSender.send(mimeMessage);
-            return "Email has been sent successfully...";
-
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
         }
     }
     @Override
@@ -160,8 +196,8 @@ public class MailServiceImpl implements MailService {
         String startTime = start.format(DateTimeFormatter.ofPattern("HH:mm"));
         String startDate = start.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 
-        sendCancelMailForTrainers(course.getTrainers(), jwt, startDate, startTime, course.getAcronym());
-        sendCancelMailForParticipants(course.getParticipants(),jwt, startDate, startTime, course.getAcronym());
+        sendCourseCancelMailForTrainers(course.getTrainers(), jwt, startDate, startTime, course.getAcronym());
+        sendCourseCancelMailForParticipants(course.getParticipants(),jwt, startDate, startTime, course.getAcronym());
     }
 
     @Override
@@ -170,8 +206,8 @@ public class MailServiceImpl implements MailService {
         String startTime = start.format(DateTimeFormatter.ofPattern("HH:mm"));
         String startDate = start.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 
-        sendChangeMailForTrainers(course.getTrainers(),jwt, startDate, startTime, course.getAcronym());
-        sendChangeMailForParticipants(course.getParticipants(), jwt, startDate, startTime, course.getAcronym());
+        sendCourseChangeMailForTrainers(course.getTrainers(),jwt, startDate, startTime, course.getAcronym());
+        sendCourseChangeMailForParticipants(course.getParticipants(), jwt, startDate, startTime, course.getAcronym());
     }
 
     @Override
@@ -184,67 +220,140 @@ public class MailServiceImpl implements MailService {
         sendCourseReminderMailForParticipants(course.getParticipants(), jwt, startDate, startTime, course.getAcronym());
     }
 
+    @Override
+    public void sendGroupCancelMail(Group group, String jwt) {
+        LocalDateTime start = group.getDates().getFirst().getStartTime();
+        String startTime = start.format(DateTimeFormatter.ofPattern("HH:mm"));
+        String startDate = start.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+
+        sendGroupCancelMailForTrainers(group.getTrainers(), jwt, startDate, startTime, group.getAcronym());
+        sendGroupCancelMailForContact(group.getContact(), startDate, startTime, group.getAcronym());
+    }
+
+    @Override
+    public void sendGroupReminderMail(Group group, String jwt) {
+        LocalDateTime start = group.getDates().getFirst().getStartTime();
+        String startTime = start.format(DateTimeFormatter.ofPattern("HH:mm"));
+        String startDate = start.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+
+        sendGroupReminderMailForTrainers(group.getTrainers(), jwt, startDate, startTime, group.getAcronym());
+        sendGroupReminderMailForContact(group.getContact(), startDate, startTime, group.getAcronym());
+    }
+
+    @Override
+    public void sendGroupChangeMail(Group group, String jwt) {
+        LocalDateTime start = group.getDates().getFirst().getStartTime();
+        String startTime = start.format(DateTimeFormatter.ofPattern("HH:mm"));
+        String startDate = start.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+
+        sendGroupUpdateMailForTrainers(group.getTrainers(), jwt, startDate, startTime, group.getAcronym());
+        sendGroupUpdateMailForContact(group.getContact(), startDate, startTime, group.getAcronym());
+    }
+
+    private void sendGroupReminderMailForTrainers(List<Trainer> trainerList, String jwt, String startDate, String startTime, String acronym){
+        for (Trainer t: trainerList) {
+            MailDetail detail = generateTrainerMailDetails(t, jwt, REMINDER_MAIL_SUBJECT_GROUP, acronym, startDate, startTime, REMINDER_MAIL_GROUP_TRAINER);
+            sendMail(detail);
+        }
+    }
+
+    private void sendGroupReminderMailForContact(Contact contact, String startDate, String startTime, String acronym){
+        MailDetail detail = generateContactMailDetails(contact, REMINDER_MAIL_SUBJECT_GROUP, acronym, startDate, startTime, REMINDER_MAIL_GROUP_CONTACT);
+        if (detail == null) return;
+        sendMail(detail);
+    }
+
+    private static MailDetail generateContactMailDetails(Contact contact, String reminderMailSubjectGroup, String acronym, String startDate, String startTime, String reminderMailGroupContact) {
+        if(StringUtils.hasLength(contact.getEmail())){
+            log.warn("Contact could not be informed, because they did not enter an email");
+            return null;
+        }
+        MailDetail detail = new MailDetail();
+        detail.setRecipient(contact.getEmail());
+        detail.setSubject(String.format(reminderMailSubjectGroup, acronym, startDate, startTime));
+        detail.setMsgBody(String.format(reminderMailGroupContact, contact.getFirstName(), contact.getLastName(), acronym, startDate, startTime));
+        return detail;
+    }
+
+    private void sendGroupCancelMailForTrainers(List<Trainer> trainerList, String jwt, String startDate, String startTime, String acronym){
+        for (Trainer t: trainerList) {
+            MailDetail detail = generateTrainerMailDetails(t, jwt, CANCEL_MAIL_SUBJECT_GROUP, acronym, startDate, startTime, CANCEL_MAIL_GROUP_TRAINER);
+            sendMail(detail);
+        }
+    }
+
+    private void sendGroupCancelMailForContact(Contact contact, String startDate, String startTime, String acronym){
+        MailDetail detail = generateContactMailDetails(contact, CANCEL_MAIL_SUBJECT_GROUP, acronym, startDate, startTime, CANCEL_MAIL_GROUP_CONTACT);
+        if (detail == null) return;
+        sendMail(detail);
+    }
+    private void sendGroupUpdateMailForTrainers(List<Trainer> trainerList, String jwt, String startDate, String startTime, String acronym){
+        for (Trainer t: trainerList) {
+            MailDetail detail = generateTrainerMailDetails(t, jwt, UPDATE_MAIL_SUBJECT_GROUP, acronym, startDate, startTime, UPDATE_MAIL_GROUP_TRAINER);
+            sendMail(detail);
+        }
+    }
+
+    private void sendGroupUpdateMailForContact(Contact contact, String startDate, String startTime, String acronym){
+        MailDetail detail = generateContactMailDetails(contact, UPDATE_MAIL_SUBJECT_GROUP, acronym, startDate, startTime, UPDATE_MAIL_GROUP_CONTACT);
+        if (detail == null) return;
+        sendMail(detail);
+    }
+
     private void sendCourseReminderMailForTrainers(List<Trainer> trainerList, String jwt, String startDate, String startTime, String acronym){
         for (Trainer t: trainerList) {
-            MailDetail detail = new MailDetail();
-            TrainerDto trainerDto = trainerMapper.mapTrainerToTrainerDto(t, jwt);
-            detail.setRecipient(trainerDto.getEmail());
-            detail.setSubject(String.format(REMINDER_MAIL_SUBJECT_COURSE,acronym, startDate, startTime));
-            detail.setMsgBody(String.format(REMINDER_MAIL_COURSE_TRAINER, trainerDto.getFirstName(),trainerDto.getLastName(), startDate, acronym, startTime));
+            MailDetail detail = generateTrainerMailDetails(t, jwt, REMINDER_MAIL_SUBJECT_COURSE, acronym, startDate, startTime, REMINDER_MAIL_COURSE_TRAINER);
             sendMail(detail);
         }
     }
-
     private void sendCourseReminderMailForParticipants(List<Participant> participantList, String jwt, String startDate, String startTime, String acronym) {
         for (Participant p: participantList) {
-            MailDetail detail = new MailDetail();
-            ParticipantDto participantDto = participantMapper.mapParticipantToParticipantDto(p, jwt);
-            detail.setRecipient(participantDto.getEmail());
-            detail.setSubject(String.format(REMINDER_MAIL_SUBJECT_COURSE,acronym,startDate,startTime));
-            detail.setMsgBody(String.format(REMINDER_MAIL_COURSE_PARTICIPANT,participantDto.getName(),startDate,acronym,startTime));
+            MailDetail detail = generateParticipantMailDetails(p, jwt, REMINDER_MAIL_SUBJECT_COURSE, acronym, startDate, startTime, REMINDER_MAIL_COURSE_PARTICIPANT);
             sendMail(detail);
         }
     }
-    private void sendCancelMailForTrainers(List<Trainer> trainerList, String jwt, String startDate, String startTime, String acronym){
+    private void sendCourseCancelMailForTrainers(List<Trainer> trainerList, String jwt, String startDate, String startTime, String acronym){
         for (Trainer t: trainerList) {
-            MailDetail detail = new MailDetail();
-            TrainerDto trainerDto = trainerMapper.mapTrainerToTrainerDto(t, jwt);
-            detail.setRecipient(trainerDto.getEmail());
-            detail.setSubject(String.format(CANCEL_MAIL_SUBJECT_COURSE,acronym,startDate,startTime));
-            detail.setMsgBody(String.format(CANCEL_MAIL_COURSE_TRAINER,trainerDto.getFirstName(), trainerDto.getLastName(), acronym, startDate, startTime));
+            MailDetail detail = generateTrainerMailDetails(t, jwt, CANCEL_MAIL_SUBJECT_COURSE, acronym, startDate, startTime, CANCEL_MAIL_COURSE_TRAINER);
             sendMail(detail);
         }
     }
 
-    private void sendCancelMailForParticipants(List<Participant>participantList, String jwt, String startDate, String startTime, String acronym){
+    private void sendCourseCancelMailForParticipants(List<Participant>participantList, String jwt, String startDate, String startTime, String acronym){
         for (Participant p: participantList) {
-            MailDetail detail = new MailDetail();
-            ParticipantDto participantDto = participantMapper.mapParticipantToParticipantDto(p, jwt);
-            detail.setRecipient(participantDto.getEmail());
-            detail.setSubject(String.format(CANCEL_MAIL_SUBJECT_COURSE, acronym, startDate, startTime));
-            detail.setMsgBody(String.format(CANCEL_MAIL_COURSE_PARTICIPANT, participantDto.getName(), acronym, startDate, startTime));
+            MailDetail detail = generateParticipantMailDetails(p, jwt, CANCEL_MAIL_SUBJECT_COURSE, acronym, startDate, startTime, CANCEL_MAIL_COURSE_PARTICIPANT);
             sendMail(detail);
         }
     }
 
-    private void sendChangeMailForTrainers(List<Trainer> trainerList, String jwt, String startDate, String startTime, String acronym){
+    private void sendCourseChangeMailForTrainers(List<Trainer> trainerList, String jwt, String startDate, String startTime, String acronym){
         for (Trainer t: trainerList) {
-            MailDetail detail = new MailDetail();
-            TrainerDto trainerDto = trainerMapper.mapTrainerToTrainerDto(t, jwt);
-            detail.setRecipient(trainerDto.getEmail());
-            detail.setSubject(String.format(UPDATE_MAIL_SUBJECT_COURSE,acronym,startDate,startTime));
-            detail.setMsgBody(String.format(UPDATE_MAIL_COURSE_TRAINER,trainerDto.getFirstName(),trainerDto.getLastName(),acronym,startDate,startTime));
+            MailDetail detail = generateTrainerMailDetails(t, jwt, UPDATE_MAIL_SUBJECT_COURSE, acronym, startDate, startTime, UPDATE_MAIL_COURSE_TRAINER);
             sendMail(detail);
         }
     }
-    private void sendChangeMailForParticipants(List<Participant>participantList, String jwt, String startDate, String startTime, String acronym) {
+    private void sendCourseChangeMailForParticipants(List<Participant>participantList, String jwt, String startDate, String startTime, String acronym) {
         for (Participant p: participantList) {
-            MailDetail detail = new MailDetail();
-            ParticipantDto participantDto = participantMapper.mapParticipantToParticipantDto(p, jwt);
-            detail.setRecipient(participantDto.getEmail());
-            detail.setSubject(String.format(UPDATE_MAIL_SUBJECT_COURSE, acronym, startDate, startTime));
-            detail.setMsgBody(String.format(UPDATE_MAIL_COURSE_PARTICIPANT, participantDto.getName(), acronym, startDate, startTime));
+            MailDetail detail = generateParticipantMailDetails(p, jwt, UPDATE_MAIL_SUBJECT_COURSE, acronym, startDate, startTime, UPDATE_MAIL_COURSE_PARTICIPANT);
             sendMail(detail);
         }
+    }
+
+    private MailDetail generateParticipantMailDetails(Participant p, String jwt, String updateMailSubjectCourse, String acronym, String startDate, String startTime, String updateMailCourseParticipant) {
+        MailDetail detail = new MailDetail();
+        ParticipantDto participantDto = participantMapper.mapParticipantToParticipantDto(p, jwt);
+        detail.setRecipient(participantDto.getEmail());
+        detail.setSubject(String.format(updateMailSubjectCourse, acronym, startDate, startTime));
+        detail.setMsgBody(String.format(updateMailCourseParticipant, participantDto.getName(), acronym, startDate, startTime));
+        return detail;
+    }
+
+    private MailDetail generateTrainerMailDetails(Trainer t, String jwt, String cancelMailSubjectGroup, String acronym, String startDate, String startTime, String cancelMailGroupTrainer) {
+        MailDetail detail = new MailDetail();
+        TrainerDto trainerDto = trainerMapper.mapTrainerToTrainerDto(t, jwt);
+        detail.setRecipient(trainerDto.getEmail());
+        detail.setSubject(String.format(cancelMailSubjectGroup, acronym, startDate, startTime));
+        detail.setMsgBody(String.format(cancelMailGroupTrainer,trainerDto.getFirstName(), trainerDto.getLastName(), acronym, startDate, startTime));
+        return detail;
     }
 }

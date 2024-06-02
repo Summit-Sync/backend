@@ -73,7 +73,7 @@ public class GroupController {
     @PutMapping("/{id}/cancel")
     public ResponseEntity<GroupGetDTO> cancelGroup(@PathVariable long id, JwtAuthenticationToken jwt) {
         var group = this.service.get(id);
-        var updatedGroup = this.service.cancel(group);
+        var updatedGroup = this.service.cancel(group, jwt.getToken().getTokenValue());
 
         return ResponseEntity.ok(this.mapper.mapGroupToGroupGetDto(updatedGroup, jwt.getToken().getTokenValue()));
     }

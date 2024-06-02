@@ -38,31 +38,6 @@ public class CourseService {
     }
 
     public Course update(Course courseToUpdate, Course course, boolean cancelled, boolean finished, String jwt) {
-        List<EventDate> originalDates = courseToUpdate.getDates();
-        List<EventDate> newDates = course.getDates();
-
-        boolean dateChanged = false;
-
-        if (originalDates.size() != newDates.size()) {
-            dateChanged = true;
-        } else {
-            Map<Long, EventDate> originalDatesMap = originalDates.stream()
-                    .collect(Collectors.toMap(EventDate::getEventDateId, Function.identity()));
-
-            for (EventDate newDate : newDates) {
-                EventDate originalDate = originalDatesMap.get(newDate.getEventDateId());
-                if (originalDate == null || !newDate.getStartTime().equals(originalDate.getStartTime()) ||
-                        newDate.getDurationInMinutes() != originalDate.getDurationInMinutes()) {
-                    dateChanged = true;
-                    break;
-                }
-            }
-        }
-
-        if (dateChanged) {
-            mailService.sendCourseChangeMail(course, jwt);
-        }
-
         var participants = new ArrayList<>(course.getParticipants());
         courseToUpdate.setParticipants(participants);
         var trainers = new ArrayList<>(course.getTrainers());
@@ -73,9 +48,7 @@ public class CourseService {
         courseToUpdate.setCancelled(course.isCancelled());
         courseToUpdate.setFinished(course.isFinished());
         courseToUpdate.setAcronym(course.getAcronym());
-        //TODO only update removed and new dates
-        var dates = new ArrayList<>(course.getDates());
-        courseToUpdate.setDates(dates);
+        boolean updatedDateList=updateDatesList(courseToUpdate.getDates(),course.getDates());
         courseToUpdate.setDuration(course.getDuration());
         courseToUpdate.setNumberParticipants(course.getNumberParticipants());
         courseToUpdate.setNumberWaitlist(course.getNumberWaitlist());
@@ -93,7 +66,11 @@ public class CourseService {
         if (!courseToUpdate.getAcronym().equals(course.getAcronym())) {
             courseToUpdate.setCourseNumber(this.generateCourseNumber(courseToUpdate.getAcronym()));
         }
-        return this.repository.save(courseToUpdate);
+        Course updatedCourse = this.repository.save(courseToUpdate);
+        if(updatedDateList){
+            mailService.sendCourseChangeMail(courseToUpdate, jwt);
+        }
+        return updatedCourse;
     }
 
     public Course deleteById(long id) {
@@ -228,5 +205,41 @@ public class CourseService {
     public Course publish(Course course, boolean published) {
         course.setVisible(published);
         return this.repository.save(course);
+    }
+
+    public boolean updateDatesList(List<EventDate>oldDates, List<EventDate>newDates){
+        boolean removedDates=removeUnusedOrUpdatedDates(oldDates, newDates);
+        boolean addedNewDates=addNewDates(oldDates,newDates);
+        return removedDates||addedNewDates;
+    }
+
+    private boolean addNewDates(List<EventDate> oldDates, List<EventDate>newDates){
+        return oldDates.addAll(newDates);
+    }
+
+    public boolean removeUnusedOrUpdatedDates(List<EventDate> oldDates, List<EventDate>newDates){
+        boolean removedOldDate = false;
+        Iterator<EventDate>iterator=oldDates.iterator();
+        while (iterator.hasNext()){
+            EventDate oldDate = iterator.next();
+            if(checkIfDateIsUnusedOrUpdated(oldDate, newDates)){
+                removedOldDate=true;
+                iterator.remove();
+            }
+        }
+        return removedOldDate;
+    }
+
+    private boolean checkIfDateIsUnusedOrUpdated(EventDate oldDate, List<EventDate>newDates){
+        for(EventDate newDate: newDates){
+            // Check if oldDate has same startTime as newDate in list of newDates
+            // and the duration of the new date is the same as in the old date
+            if(newDate.getStartTime().isEqual(oldDate.getStartTime()) && newDate.getDurationInMinutes() == oldDate.getDurationInMinutes()){
+                // If oldDate equals date in newDates, remove the element from newDates
+                newDates.remove(newDate);
+                return false;
+            }
+        }
+        return true;
     }
 }
