@@ -30,6 +30,8 @@ public class MailServiceImpl implements MailService {
     private final JavaMailSender mailSender;
     @Value("${spring.mail.username}")
     private String sender;
+    @Value("${summitsync.mail.enabled}")
+    private boolean enabled;
     private final TrainerMapper trainerMapper;
     private final ParticipantMapper participantMapper;
     private static final String CANCEL_MAIL_COURSE_PARTICIPANT = """
@@ -167,6 +169,9 @@ public class MailServiceImpl implements MailService {
 
     @Override
     public String sendMail(MailDetail mailDetail) {
+        if (!enabled) {
+            return "";
+        }
         // Try block to check for exceptions handling
         try {
 

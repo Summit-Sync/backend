@@ -195,8 +195,8 @@ public class CourseService {
         return result;
     }
 
-    public Course cancel(Course course, boolean canceling, String jwt) {
-        course.setCancelled(canceling);
+    public Course cancel(Course course, String jwt) {
+        course.setCancelled(!course.isCancelled());
         Course canceledCourse=this.repository.save(course);
         mailService.sendCourseCancelMail(canceledCourse, jwt);
         return canceledCourse;

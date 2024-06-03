@@ -141,9 +141,9 @@ public class CourseController {
     }
 
     @PutMapping("/{id}/cancel")
-    public ResponseEntity<CourseGetDTO> cancelCourse(@PathVariable long id, JwtAuthenticationToken jwt, @RequestBody boolean canceled) {
+    public ResponseEntity<CourseGetDTO> cancelCourse(@PathVariable long id, JwtAuthenticationToken jwt) {
         var course = this.service.get(id);
-        var updatedCourse = this.service.cancel(course, canceled, jwt.getToken().getTokenValue());
+        var updatedCourse = this.service.cancel(course, jwt.getToken().getTokenValue());
 
         return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(updatedCourse, jwt.getToken().getTokenValue()));
     }
