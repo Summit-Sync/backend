@@ -70,6 +70,7 @@ public class GroupMapper {
                 .participantsPerTrainer(group.getParticipantsPerTrainer())
                 .trainers(trainerDtos)
                 .totalPrice(group.getTotalPrice())
+                .cancelled(group.isCancelled())
                 .build();
 
     }

@@ -117,7 +117,7 @@ public class GroupService {
     }
 
     public Group cancel(Group group, String jwt) {
-        group.setCancelled(true);
+        group.setCancelled(!group.isCancelled());
         Group canceledGroup = this.repository.save(group);
         mailService.sendGroupCancelMail(canceledGroup, jwt);
         return canceledGroup;
