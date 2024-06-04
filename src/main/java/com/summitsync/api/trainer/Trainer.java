@@ -7,6 +7,7 @@ import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.trainerapplication.TrainerApplication;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -19,6 +20,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Builder
 @Table(name = "SS_Trainer")
 public class Trainer {
     @Id

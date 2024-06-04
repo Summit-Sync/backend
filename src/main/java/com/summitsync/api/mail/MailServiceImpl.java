@@ -2,6 +2,7 @@ package com.summitsync.api.mail;
 
 import com.summitsync.api.contact.Contact;
 import com.summitsync.api.course.Course;
+import com.summitsync.api.date.EventDate;
 import com.summitsync.api.group.Group;
 import com.summitsync.api.participant.Participant;
 import com.summitsync.api.participant.ParticipantMapper;
@@ -18,9 +19,12 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -156,6 +160,19 @@ public class MailServiceImpl implements MailService {
             
             Wir freuen uns auf euch!
             Dein Kletterzentrum Team""";
+
+    private static final String OPEN_TRAINER_SPOT = """
+            Hallo %s %s,
+            
+            es werden noch Trainer für folgende Kurse und Gruppen in der nächsten Woche gesucht.
+            
+            %s
+            
+            Wenn du Interesse es, melde dich bitte bei mir.
+            
+            Sportliche Grüße
+            Dein Kursmanager
+            """;
     private static final String CANCEL_MAIL_SUBJECT_COURSE ="Absage Kurs %s am %s %s";
     private static final String REMINDER_MAIL_SUBJECT_COURSE = "Erinnerung für Kurs %s am %s %s";
     private static final String UPDATE_MAIL_SUBJECT_COURSE = "Änderungen bei Kurs %s am %s %s";
@@ -163,6 +180,8 @@ public class MailServiceImpl implements MailService {
     private static final String REMINDER_MAIL_SUBJECT_GROUP = "Erinnerung für Gruppe %s am %s %s";
 
     private static final String UPDATE_MAIL_SUBJECT_GROUP = "Änderungen bei Gruppe %s am %s %s";
+
+    private static final String OPEN_SPORT_MAIL_SUBJECT = "Offene Trainerstellen";
 
 
 
@@ -253,6 +272,25 @@ public class MailServiceImpl implements MailService {
 
         sendGroupUpdateMailForTrainers(group.getTrainers(), jwt, startDate, startTime, group.getAcronym());
         sendGroupUpdateMailForContact(group.getContact(), startDate, startTime, group.getAcronym());
+    }
+
+    @Override
+    public void sendOpenTrainerSpotTrainerMail(List<Trainer> trainerList, Map<Trainer, List<Course>> courseMap, Map<Trainer, List<Group>> groupMap, String jwt) {
+        for(Trainer trainer: trainerList){
+            MailDetail detail=new MailDetail();
+            detail.setSubject(OPEN_SPORT_MAIL_SUBJECT);
+            TrainerDto trainerDto = trainerMapper.mapTrainerToTrainerDto(trainer, jwt);
+            detail.setRecipient(trainerDto.getEmail());
+            StringBuilder mailBody=new StringBuilder();
+            for(Course course:courseMap.get(trainer)){
+                mailBody.append("- ").append(course.getAcronym()).append(course.getCourseNumber()).append(": ").append(getMailDatesForCourse(course.getDates())).append(System.lineSeparator());
+            }
+            for(Group group: groupMap.get(trainer)){
+                mailBody.append("- ").append(group.getAcronym()).append(group.getGroupNumber()).append(": ").append(getMailDatesForGroup(group.getDates())).append(System.lineSeparator());
+            }
+            detail.setMsgBody(String.format(OPEN_TRAINER_SPOT,trainerDto.getFirstName(), trainerDto.getLastName(), mailBody));
+            sendMail(detail);
+        }
     }
 
     private void sendGroupReminderMailForTrainers(List<Trainer> trainerList, String jwt, String startDate, String startTime, String acronym){
@@ -360,5 +398,39 @@ public class MailServiceImpl implements MailService {
         detail.setSubject(String.format(cancelMailSubjectGroup, acronym, startDate, startTime));
         detail.setMsgBody(String.format(cancelMailGroupTrainer,trainerDto.getFirstName(), trainerDto.getLastName(), acronym, startDate, startTime));
         return detail;
+    }
+
+    private String getMailDatesForCourse(List<EventDate>dates){
+        StringBuilder sb=new StringBuilder();
+        LocalDate start=LocalDate.now().plusDays(6);
+        LocalDate end=LocalDate.now().plusDays(15);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.uuuu HH:mm:ss", Locale.GERMAN);
+        for(EventDate date:dates){
+            if(date.getStartTime().toLocalDate().isBefore(end) && date.getStartTime().toLocalDate().isAfter(start)){
+                if(sb.isEmpty()){
+                    sb.append(date.getStartTime().format(formatter));
+                }else {
+                    sb.append(", ").append(date.getStartTime().format(formatter));
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    private String getMailDatesForGroup(List<EventDate> dates){
+        StringBuilder sb= new StringBuilder();
+        LocalDate start=LocalDate.now().plusDays(6);
+        LocalDate end=LocalDate.now().plusDays(15);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.uuuu HH:mm:ss", Locale.GERMAN);
+        for(EventDate date:dates){
+            if(date.getStartTime().toLocalDate().isBefore(end) && date.getStartTime().toLocalDate().isAfter(start)){
+                if(sb.isEmpty()){
+                    sb.append(date.getStartTime().format(formatter)).append("(").append(date.getDurationInMinutes()).append(" Minuten)");
+                }else {
+                    sb.append(", ").append(date.getStartTime().format(formatter)).append("(").append(date.getDurationInMinutes()).append(" Minuten)");
+                }
+            }
+        }
+        return sb.toString();
     }
 }

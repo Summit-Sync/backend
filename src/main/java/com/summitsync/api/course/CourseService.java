@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -205,6 +207,10 @@ public class CourseService {
     public Course publish(Course course, boolean published) {
         course.setVisible(published);
         return this.repository.save(course);
+    }
+
+    public List<Course>getAllCoursesWithMissingTrainerBetweenDates(LocalDate startDate, LocalDate endDate){
+        return this.repository.findCoursesWithMoreNumberOfTrainersThanAssociatedAndDateIn(startDate, endDate);
     }
 
     public boolean updateDatesList(List<EventDate>oldDates, List<EventDate>newDates){

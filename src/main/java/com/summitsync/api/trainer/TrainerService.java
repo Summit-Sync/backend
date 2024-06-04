@@ -1,6 +1,8 @@
 package com.summitsync.api.trainer;
 
+import com.summitsync.api.course.Course;
 import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
+import com.summitsync.api.group.Group;
 import com.summitsync.api.keycloak.KeycloakRestService;
 import com.summitsync.api.keycloak.dto.KeycloakResetPasswordRequest;
 import com.summitsync.api.qualification.Qualification;
@@ -13,10 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -123,5 +123,45 @@ public class TrainerService {
         }
 
         return result;
+    }
+
+    public List<Trainer>getAllTrainer(){
+        return this.trainerRepository.findAll();
+    }
+
+    public Map<Trainer, List<Course>>findTrainersWithCoursesFulfillingQualificationRequirementMissingTrainersAndBetweenDates(LocalDate startDate, LocalDate endDate){
+        List<Object[]> results = trainerRepository.findTrainersWithAllCourses(startDate, endDate);
+
+        Map<Trainer, List<Course>> map = new HashMap<>();
+        for (Object[] result : results) {
+            Trainer trainer = (Trainer) result[0];
+            Course course = (Course) result[1];
+
+            if (!map.containsKey(trainer)) {
+                map.put(trainer, new ArrayList<>());
+            }
+
+            map.get(trainer).add(course);
+        }
+
+        return map;
+    }
+
+    public Map<Trainer, List<Group>>findTrainersWithGroupsFulfillingQualificationRequirementMissingTrainersAndBetweenDates(LocalDate startDate, LocalDate endDate){
+        List<Object[]> results = trainerRepository.findTrainersWithAllCourses(startDate, endDate);
+
+        Map<Trainer, List<Group>> map = new HashMap<>();
+        for (Object[] result : results) {
+            Trainer trainer = (Trainer) result[0];
+            Group group = (Group) result[1];
+
+            if (!map.containsKey(trainer)) {
+                map.put(trainer, new ArrayList<>());
+            }
+
+            map.get(trainer).add(group);
+        }
+
+        return map;
     }
 }
