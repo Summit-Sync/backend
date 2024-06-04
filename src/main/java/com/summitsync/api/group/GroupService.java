@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -121,6 +122,10 @@ public class GroupService {
         Group canceledGroup = this.repository.save(group);
         mailService.sendGroupCancelMail(canceledGroup, jwt);
         return canceledGroup;
+    }
+
+    public List<Group>getGroupsWithMissingTrainersBetweenDates(LocalDate startDate, LocalDate endDate){
+        return this.repository.findGroupsWithMoreParticipantsPerTrainerThanTrainersAndDateIn(startDate, endDate);
     }
 
     public boolean updateDatesList(List<EventDate>oldDates, List<EventDate>newDates){
