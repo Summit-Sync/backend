@@ -8,7 +8,9 @@ import lombok.Setter;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @RedisHash("Session")
 @Getter
@@ -23,11 +25,11 @@ public class Session {
     private int refreshExpiresIn;
     private String refreshToken;
     private String idToken;
-    private LocalDateTime created;
-    private LocalDateTime updated;
+    private ZonedDateTime created;
+    private ZonedDateTime updated;
     private String role;
     @TimeToLive
     public Long getTimeToLive() {
-        return (long) this.expiresIn;
+        return (long) this.refreshExpiresIn + 10;
     }
 }

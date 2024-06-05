@@ -17,7 +17,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Base64;
 
 @Service
@@ -147,7 +149,7 @@ public class SessionService {
         session.setRefreshExpiresIn(accessTokenResponseDto.getRefreshExpiresIn());
         session.setRefreshToken(accessTokenResponseDto.getRefreshToken());
         session.setIdToken(accessTokenResponseDto.getIdToken());
-        session.setUpdated(LocalDateTime.now());
+        session.setUpdated(Instant.now().atZone(ZoneOffset.UTC));
 
         return this.sessionRepository.save(session);
 

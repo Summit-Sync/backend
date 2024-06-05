@@ -7,8 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 @Controller
 @RequestMapping("/auth")
@@ -18,9 +20,13 @@ public class BffController {
     private final SessionRepository sessionRepository;
     private final SessionService sessionService;
 
-    private long getDurationRemaining(LocalDateTime created, long expiresIn) {
-        var now = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-        var sessionExpiresAt = created.toEpochSecond(ZoneOffset.UTC) + expiresIn;
+    private long getDurationRemaining(ZonedDateTime created, long expiresIn) {
+        assert created.getZone().equals(ZoneOffset.UTC);
+        if (!created.getZone().equals(ZoneOffset.UTC)) {
+            throw new RuntimeException("Zone is not UTC");
+        }
+        var now = Instant.now().getEpochSecond();
+        var sessionExpiresAt = created.toEpochSecond() + expiresIn;
         return Math.max(0, sessionExpiresAt - now);
     }
 
@@ -29,9 +35,10 @@ public class BffController {
         var sessionOptional = this.sessionRepository.findById(sessionId);
         var session = sessionOptional.orElseThrow(InvalidSessionException::new);
         var created = session.getCreated();
+        var updated = session.getUpdated();
 
         var refreshRemaining = this.getDurationRemaining(created, session.getRefreshExpiresIn());
-        var accessTokenRemaining = this.getDurationRemaining(created, session.getExpiresIn());
+        var accessTokenRemaining = this.getDurationRemaining(updated, session.getExpiresIn());
 
         if (refreshRemaining <= 10) {
             throw new InvalidSessionException();
@@ -40,11 +47,12 @@ public class BffController {
         if (accessTokenRemaining <= 10) {
             var accessTokenResponse = this.sessionService.refreshToken(session.getRefreshToken());
             session = this.sessionService.updateSession(session, accessTokenResponse);
+            accessTokenRemaining = this.getDurationRemaining(session.getUpdated(), session.getExpiresIn());
         }
 
         var body = new BffAccessTokenResponse(session.getAccessToken(),
-                refreshRemaining,
-                accessTokenRemaining,
+                Instant.now().atZone(ZoneOffset.UTC).plusSeconds(accessTokenRemaining),
+                Instant.now().atZone(ZoneOffset.UTC).plusSeconds(refreshRemaining),
                 session.getRole());
         return new ResponseEntity<>(body, HttpStatus.OK);
    }

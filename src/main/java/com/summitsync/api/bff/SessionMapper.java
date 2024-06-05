@@ -1,6 +1,8 @@
 package com.summitsync.api.bff;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 public class SessionMapper {
     public static Session mapAccessTokenResponseDtoToSession(String sessionId, AccessTokenResponseDto accessTokenResponseDto, String role) {
@@ -10,8 +12,8 @@ public class SessionMapper {
                 .expiresIn(accessTokenResponseDto.getExpiresIn())
                 .refreshExpiresIn(accessTokenResponseDto.getRefreshExpiresIn())
                 .idToken(accessTokenResponseDto.getIdToken())
-                .created(LocalDateTime.now())
-                .updated(LocalDateTime.now())
+                .created(Instant.now().atZone(ZoneOffset.UTC))
+                .updated(Instant.now().atZone(ZoneOffset.UTC))
                 .refreshToken(accessTokenResponseDto.getRefreshToken())
                 .role(role)
                 .build();
