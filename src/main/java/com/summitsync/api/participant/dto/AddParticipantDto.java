@@ -12,4 +12,5 @@ public class AddParticipantDto {
     String firstName;
     StatusGetDto status;
     String email;
+    String phone;
 }

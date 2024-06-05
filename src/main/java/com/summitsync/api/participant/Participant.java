@@ -26,4 +26,5 @@ public class Participant {
     private List<Course> coursesWaitList;
     @OneToOne(fetch = FetchType.LAZY)
     private Status status;
+    private String phone;
 }

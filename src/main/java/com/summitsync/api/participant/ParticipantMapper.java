@@ -7,6 +7,7 @@ import com.summitsync.api.participant.dto.AddParticipantDto;
 import com.summitsync.api.participant.dto.ParticipantDto;
 import com.summitsync.api.status.StatusMapper;
 import com.summitsync.api.status.dto.StatusPostDto;
+import com.summitsync.api.trainer.dto.AddTrainerDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,17 +18,32 @@ import java.util.Map;
 public class ParticipantMapper {
     private final KeycloakRestService keycloakRestService;
     private final StatusMapper statusMapper;
-    public KeycloakAddUserRequest mapAddParticipantDtoToKeycloakAddUserRequest(AddParticipantDto addParticipantDto) {
+    public KeycloakAddUserRequest mapAddParticipantDtoToKeycloakAddUserRequestUpdate(AddParticipantDto addParticipantDto, String oldEmail) {
+        var req = KeycloakAddUserRequest.builder()
+                .firstName(addParticipantDto.getFirstName())
+                .lastName(addParticipantDto.getName())
+                .enabled(true);
 
-        var username = addParticipantDto.getFirstName() + "." + addParticipantDto.getName();
+        if (!oldEmail.equalsIgnoreCase(addParticipantDto.getEmail())) {
+            req.email(addParticipantDto.getEmail());
+        }
 
-        return KeycloakAddUserRequest.builder()
+        return req.build();
+    }
+    public KeycloakAddUserRequest mapAddParticipantDtoToKeycloakAddUserRequest(AddParticipantDto addParticipantDto, String username) {
+
+        var req = KeycloakAddUserRequest.builder()
                 .firstName(addParticipantDto.getFirstName())
                 .lastName(addParticipantDto.getName())
                 .enabled(true)
-                .username(username)
-                .email(addParticipantDto.getEmail())
-                .build();
+                .email(addParticipantDto.getEmail());
+
+        if (username != null) {
+            req.username(username);
+        }
+
+        return req.build();
+
     }
 
     public ParticipantDto mapKeycloakUserToParticipantDto(KeycloakUser keycloakUser, Participant participant) {
@@ -37,6 +53,7 @@ public class ParticipantMapper {
                 .firstName(keycloakUser.getFirstName())
                 .name(keycloakUser.getLastName())
                 .status(statusMapper.mapStatusToStatusGetDto(participant.getStatus()))
+                .phone(participant.getPhone())
                 .build();
     }
 
@@ -52,6 +69,7 @@ public class ParticipantMapper {
                 .firstName(participant.getFirstName())
                 .name(participant.getName())
                 .status(participant.getStatus())
+                .phone(participant.getPhone())
                 .build();
     }
 }

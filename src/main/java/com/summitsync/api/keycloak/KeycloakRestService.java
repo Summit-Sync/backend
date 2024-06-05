@@ -8,6 +8,8 @@ import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
 import com.summitsync.api.keycloak.dto.KeycloakAddUserRequest;
 import com.summitsync.api.keycloak.dto.KeycloakResetPasswordRequest;
 import com.summitsync.api.keycloak.dto.KeycloakUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,7 @@ import java.util.*;
 
 @Service
 public class KeycloakRestService {
+    private static final Logger log = LoggerFactory.getLogger(KeycloakRestService.class);
     @Value("${summitsync.keycloak.rest-endpoint}")
     private String apiBase;
 
@@ -32,6 +35,8 @@ public class KeycloakRestService {
     private String systemAccountClientId;
     @Value("${summitsync.keycloak.system-user-password}")
     private String systemAccountPassword;
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final RestClient restClient;
     private Optional<String> accessToken = Optional.empty();
@@ -66,8 +71,7 @@ public class KeycloakRestService {
     }
 
     private <B> RestClient.ResponseSpec rawRequest(HttpMethod method, String uri, String jwt, B body) {
-        System.out.println(uri);
-        System.out.println(jwt);
+        log.debug("New keycloak request to uri: {} ({})", uri, method);
         var preparedRequest =  this.restClient.method(method)
                 .uri(uri)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -103,6 +107,7 @@ public class KeycloakRestService {
     }
 
     public KeycloakUser addAndRetrieveUser(KeycloakAddUserRequest addUserRequest, String jwt) {
+        log.debug("adding and retrieving user with name: {}", addUserRequest.getFirstName());
         var uri = UriComponentsBuilder.fromUriString(apiBase).pathSegment("users").toUriString();
 
         var response = this.rawRequest(HttpMethod.POST, uri, jwt, addUserRequest).toBodilessEntity();
@@ -125,6 +130,7 @@ public class KeycloakRestService {
     }
 
     public void deleteUser(String subjectId, String jwt) {
+        log.debug("deleting user with userid {}", subjectId);
         var uri = UriComponentsBuilder.fromUriString(apiBase).pathSegment("users", subjectId).toUriString();
 
         var response = this.rawRequest(HttpMethod.DELETE, uri, jwt, null).toBodilessEntity();
@@ -135,6 +141,7 @@ public class KeycloakRestService {
     }
 
     public KeycloakUser updateUser(String subjectId, KeycloakAddUserRequest keycloakAddUserRequest, String jwt) {
+        log.debug("updating user with userid {}", subjectId);
         var uri = UriComponentsBuilder.fromUriString(apiBase).pathSegment("users", subjectId).toUriString();
 
         var response = this.rawRequest(HttpMethod.PUT, uri, jwt, keycloakAddUserRequest).toBodilessEntity();

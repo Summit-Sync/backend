@@ -43,7 +43,7 @@ public class ParticipantService {
         var status = this.statusService.saveStatus(newStatus);
 
         var keycloakAddUserResponse = this.keycloakRestService.addAndRetrieveUser(
-                this.participantMapper.mapAddParticipantDtoToKeycloakAddUserRequest(addParticipantDto),
+                this.participantMapper.mapAddParticipantDtoToKeycloakAddUserRequest(addParticipantDto, String.format("%s.%s", addParticipantDto.getFirstName(), addParticipantDto.getName())),
                 jwt
         );
 
@@ -51,6 +51,7 @@ public class ParticipantService {
         participant.setSubjectId(keycloakAddUserResponse.getId());
         participant.setCourses(new HashSet<>());
         participant.setStatus(status);
+        participant.setPhone(addParticipantDto.getPhone());
 
         var dbParticipant = this.participantRepository.save(participant);
 
@@ -74,10 +75,14 @@ public class ParticipantService {
             participant.setStatus(dbStatus);
         }
 
+        if (participantDto.getPhone() != null && !participantDto.getPhone().equals(participant.getPhone())) {
+            participant.setPhone(participantDto.getPhone());
+        }
+        var keycloakUser = this.keycloakRestService.getUser(participant.getSubjectId(), jwt);
         var addTrainer = this.participantMapper.mapParticipantDtoToAddDto(participantDto);
-        var keycloakAddRequest = this.participantMapper.mapAddParticipantDtoToKeycloakAddUserRequest(addTrainer);
+        var keycloakAddRequest = this.participantMapper.mapAddParticipantDtoToKeycloakAddUserRequestUpdate(addTrainer, keycloakUser.getEmail());
 
-        var keycloakUser = this.keycloakRestService.updateUser(participant.getSubjectId(), keycloakAddRequest, jwt);
+        this.keycloakRestService.updateUser(participant.getSubjectId(), keycloakAddRequest, jwt);
         return this.participantRepository.save(participant);
     }
 }

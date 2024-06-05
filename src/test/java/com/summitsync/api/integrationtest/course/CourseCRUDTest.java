@@ -1,5 +1,6 @@
 package com.summitsync.api.integrationtest.course;
 
+import com.jayway.jsonpath.JsonPath;
 import com.summitsync.api.MockMVCApiKey;
 import com.summitsync.api.TestSummitSyncApplication;
 import com.summitsync.api.integrationtest.testcontainers.AbstractIntegrationTest;
@@ -29,15 +30,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CourseCRUDTest extends AbstractIntegrationTest {
 
-    String participantFirstName = RandomStringUtils.randomAlphabetic(8);
-    String participantName = RandomStringUtils.randomAlphabetic(8);
-    String waitListParticipantFirstName = RandomStringUtils.randomAlphabetic(8);
-    String waitListParticipantName = RandomStringUtils.randomAlphabetic(8);
+    String participantFirstName = RandomStringUtils.randomAlphabetic(15);
+    String participantName = RandomStringUtils.randomAlphabetic(15);
+    String waitListParticipantFirstName = RandomStringUtils.randomAlphabetic(15);
+    String waitListParticipantName = RandomStringUtils.randomAlphabetic(15);
 
-    String participantFirstName2 = RandomStringUtils.randomAlphabetic(8);
-    String participantName2 = RandomStringUtils.randomAlphabetic(8);
-    String waitListParticipantFirstName2 = RandomStringUtils.randomAlphabetic(8);
-    String waitListParticipantName2 = RandomStringUtils.randomAlphabetic(8);
+    String participantFirstName2 = RandomStringUtils.randomAlphabetic(15);
+    String participantName2 = RandomStringUtils.randomAlphabetic(15);
+    String waitListParticipantFirstName2 = RandomStringUtils.randomAlphabetic(15);
+    String waitListParticipantName2 = RandomStringUtils.randomAlphabetic(15);
+
+    int waitList1Id;
+    int participant1Id;
 
     private long qualiId1;
     private long qualiId2;
@@ -92,11 +96,6 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
     @Test
     @Order(1)
     void testCreateCourseHappyPath() throws Exception {
-        var participantFirstName = RandomStringUtils.randomAlphabetic(8);
-        var participantName = RandomStringUtils.randomAlphabetic(8);
-
-        var waitListParticipantFirstName = RandomStringUtils.randomAlphabetic(8);
-        var waitListParticipantName = RandomStringUtils.randomAlphabetic(8);
         var content = String.format("""
 {
    "acronym":"kv",
@@ -127,7 +126,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
    {"id": 0, "name": "%s", "firstName": "%s", "email": "%s@%s.com", "status": {"text": "text"}}
    ],
    "participants": [
-   {"id": 0, "name": "%s", "firstName": "%s", "email": "%s@%s.com", "status": {"text": "text"}}
+   {"id": 0, "name": "%s", "firstName": "%s", "email": "%s@%s.com", "status": {"text": "text"}, "phone": "123"}
    ],
    "trainers": [%d]
 }
@@ -145,7 +144,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 participantFirstName,
                 this.trainerId2);
 
-                this.mockMvc.perform(post("/api/v1/course")
+                var result = this.mockMvc.perform(post("/api/v1/course")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                         .andExpect(status().is(200))
@@ -159,8 +158,14 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                         .andExpect(jsonPath("waitList.length()").value(1))
                         .andExpect(jsonPath("participants.length()").value(1))
                         .andExpect(jsonPath("participants[0].name").value(participantName))
-                        .andExpect(jsonPath("waitList[0].firstName").value(waitListParticipantFirstName));
+                        .andExpect(jsonPath("participants[0].phone").value("123"))
+                        .andExpect(jsonPath("waitList[0].firstName").value(waitListParticipantFirstName))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
 
+                this.waitList1Id = JsonPath.read(result, "$.waitList[0].id");
+                this.participant1Id = JsonPath.read(result, "$.participants[0].id");
             }
             @Test
             @Order(2)
@@ -173,17 +178,13 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 .content(content))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("trainers[?(@.firstName == 'Integration')].firstName").value("Integration"))
+                .andExpect(jsonPath("participants[0].phone").value(123))
                 .andExpect(jsonPath("trainers.length()").value(2));
     }
 
     @Test
     @Order(3)
     void testUpdateCourse() throws Exception {
-        var participantFirstName = RandomStringUtils.randomAlphabetic(8);
-        var participantName = RandomStringUtils.randomAlphabetic(8);
-
-        var waitListParticipantFirstName = RandomStringUtils.randomAlphabetic(8);
-        var waitListParticipantName = RandomStringUtils.randomAlphabetic(8);
         var content = String.format("""
 {
    "acronym":"kj",
@@ -208,12 +209,12 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
    "title":"kvTitle",
    "visible":false,
    "waitList": [
-   {"id": 1, "name": "%s", "firstName": "%s", "email": "%s@%s.com", "status": {"text": "text"}},
+   {"id": %d, "name": "%s", "firstName": "%s", "email": "%s@%s.com", "status": {"text": "text"}},
    {"id": 0, "name": "%s", "firstName": "%s", "email": "%s@%s.com", "status": {"text": "text"}}
    ],
    "participants": [
-   {"id": 1, "name": "%s", "firstName": "%s", "email": "%s@%s.com", "status": {"text": "text"}},
-   {"id": 0, "name": "%s", "firstName": "%s", "email": "%s@%s.com", "status": {"text": "text"}}
+   {"id": %d, "name": "%s", "firstName": "%s", "email": "%s@%s.com", "status": {"text": "text"}, "phone": "12345"},
+   {"id": 0, "name": "%s", "firstName": "%s", "email": "%s@%s.com", "status": {"text": "text"}, "phone": "123"}
    ],
    "trainers": [%d,%d]
 }
@@ -221,18 +222,20 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 this.locationId1,
                 this.qualiId1,
                 this.qualiId2,
+                this.waitList1Id,
                 waitListParticipantName + "UPDATED",
                 waitListParticipantFirstName,
-                waitListParticipantName,
+                waitListParticipantName + "UPDATED",
                 waitListParticipantFirstName,
-                participantName,
-                participantFirstName,
-                participantName,
-                participantFirstName,
                 waitListParticipantName2,
                 waitListParticipantFirstName2,
                 waitListParticipantName2,
                 waitListParticipantFirstName2,
+                this.participant1Id,
+                participantName,
+                participantFirstName,
+                participantName,
+                participantFirstName,
                 participantName2,
                 participantFirstName2,
                 participantName2,
@@ -257,6 +260,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("duration").value(35))
                 .andExpect(jsonPath("trainers[?(@.firstName == 'Integration')].firstName").value("Integration"))
                 .andExpect(jsonPath("trainers[?(@.firstName == 'Integration2')].firstName").value("Integration2"))
+                .andExpect(jsonPath(String.format("participants[?(@.firstName == '%s')].phone", participantFirstName)).value("12345"))
                 .andExpect(jsonPath("waitList.length()").value(2))
                 .andExpect(jsonPath("participants.length()").value(2))
                 .andExpect(jsonPath("trainers.length()").value(2))
@@ -320,6 +324,7 @@ public class CourseCRUDTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$[0].trainers.length()").value(2))
                 .andExpect(jsonPath("$[0].waitList.length()").value(2))
                 .andExpect(jsonPath("$[0].participants.length()").value(2))
+                .andExpect(jsonPath(String.format("$[0].participants[?(@.firstName == '%s')].phone", participantFirstName)).value("12345"))
                 .andExpect(jsonPath("$[0].requiredQualifications.length()").value(2))
                 .andExpect(jsonPath("$[0].dates.length()").value(1))
                 .andExpect(jsonPath("$[0].prices.length()").value(1));

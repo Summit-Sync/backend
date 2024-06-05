@@ -15,4 +15,5 @@ public class ParticipantDto {
     String firstName;
     StatusGetDto status;
     String email;
+    String phone;
 }
