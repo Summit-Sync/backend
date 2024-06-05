@@ -6,20 +6,15 @@ import com.summitsync.api.group.Group;
 import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.trainerapplication.TrainerApplication;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
 @Table(name = "SS_Trainer")
 public class Trainer {
@@ -27,7 +22,7 @@ public class Trainer {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long trainerId;
     private String subjectId;
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "ss_trainer_qualification_join",
             joinColumns = @JoinColumn(name = "trainerid"),
@@ -42,4 +37,17 @@ public class Trainer {
     private List<Group> groups;
     @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TrainerApplication> trainerApplications;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Trainer trainer = (Trainer) o;
+        return subjectId.equals(trainer.subjectId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(subjectId);
+    }
 }

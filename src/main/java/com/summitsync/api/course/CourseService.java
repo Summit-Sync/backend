@@ -2,22 +2,21 @@ package com.summitsync.api.course;
 
 import com.summitsync.api.course.dto.CourseGetDTO;
 import com.summitsync.api.date.EventDate;
+import com.summitsync.api.date.EventDateService;
 import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
 import com.summitsync.api.mail.MailService;
 import com.summitsync.api.participant.Participant;
 import com.summitsync.api.qualification.Qualification;
+import com.summitsync.api.qualification.QualificationService;
 import com.summitsync.api.trainer.Trainer;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +26,26 @@ public class CourseService {
     private final CourseRepository repository;
     private final CourseMapper mapper;
     private final MailService mailService;
+    private final EventDateService eventDateService;
+    private final QualificationService qualificationService;
 
+    @Transactional
     public Course create(Course course) {
         course.setCourseNumber(this.generateCourseNumber(course.getAcronym()));
+        List<EventDate>eventDateList=course.getDates();
+        course.setDates(new ArrayList<>());
+        for(EventDate e: eventDateList){
+            EventDate eventDate = new EventDate();
+            eventDate.setDurationInMinutes(e.getDurationInMinutes());
+            eventDate.setStartTime(e.getStartTime());
+            var dbDate = this.eventDateService.create(eventDate);
+            course.getDates().add(dbDate);
+        }
+        List<Qualification>qualificationList=course.getRequiredQualifications();
+        course.setRequiredQualifications(new ArrayList<>());
+        for(Qualification q: qualificationList){
+            course.getRequiredQualifications().add(qualificationService.findById(q.getQualificationId()));
+        }
         return this.repository.save(course);
     }
 
@@ -68,11 +84,11 @@ public class CourseService {
         if (!courseToUpdate.getAcronym().equals(course.getAcronym())) {
             courseToUpdate.setCourseNumber(this.generateCourseNumber(courseToUpdate.getAcronym()));
         }
-        Course updatedCourse = this.repository.save(courseToUpdate);
+        courseToUpdate = this.repository.save(courseToUpdate);
         if(updatedDateList){
             mailService.sendCourseChangeMail(courseToUpdate, jwt);
         }
-        return updatedCourse;
+        return courseToUpdate;
     }
 
     public Course deleteById(long id) {
@@ -209,8 +225,8 @@ public class CourseService {
         return this.repository.save(course);
     }
 
-    public List<Course>getAllCoursesWithMissingTrainerBetweenDates(LocalDate startDate, LocalDate endDate){
-        return this.repository.findCoursesWithMoreNumberOfTrainersThanAssociatedAndDateIn(startDate, endDate);
+    public List<Course>getAllCoursesWithMissingTrainer(){
+        return this.repository.findAllWithMissingTrainers();
     }
 
     public boolean updateDatesList(List<EventDate>oldDates, List<EventDate>newDates){

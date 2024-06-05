@@ -34,7 +34,7 @@ public class Group {
     private int duration;
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private Contact contact;
-    @OneToMany(cascade=CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
     private List<EventDate> dates;
     private int numberParticipants;
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)

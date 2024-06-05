@@ -15,6 +15,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -59,12 +61,44 @@ public class ScheduledServices {
 
     @Scheduled(cron = "0 0 * * * MON")
     public void sendMailForMissingTrainers(){
-        LocalDate startDate=LocalDate.now().plusDays(7);
-        LocalDate endDate=LocalDate.now().plusDays(14);
-        Map<Trainer,List<Course>>courseMap=trainerService.findTrainersWithCoursesFulfillingQualificationRequirementMissingTrainersAndBetweenDates(startDate, endDate);
-        Map<Trainer, List<Group>>groupMap=trainerService.findTrainersWithGroupsFulfillingQualificationRequirementMissingTrainersAndBetweenDates(startDate, endDate);
+        Map<Trainer,List<Course>>courseMap=createCourseMap();
+        Map<Trainer, List<Group>>groupMap=createGroupMap();
         List<Trainer>trainerList=trainerService.getAllTrainer();
         mailService.sendOpenTrainerSpotTrainerMail(trainerList, courseMap, groupMap, keyCloakRestService.getJwt());
+    }
+
+    public Map<Trainer, List<Course>>createCourseMap(){
+        Map<Trainer, List<Course>>courseMap=new HashMap<>();
+        List<Trainer>trainerList= trainerService.getAllTrainer();
+        List<Course>courseList=courseService.getAllCoursesWithMissingTrainer();
+        for(Trainer t: trainerList){
+            List<Course>validCourses=new ArrayList<>();
+            validCourses=courseList.stream()
+                    .filter(this::courseTakesPlaceNextWeek).toList();
+            validCourses=validCourses.stream().filter(course -> isQualificationRequirementFulfilled(course.getRequiredQualifications(),t))
+                    .toList();
+            if(validCourses.size()>0){
+                courseMap.put(t,validCourses);
+            }
+        }
+        return courseMap;
+    }
+
+    public Map<Trainer,List<Group>>createGroupMap(){
+        Map<Trainer,List<Group>>groupMap=new HashMap<>();
+        List<Trainer>trainerList= trainerService.getAllTrainer();
+        List<Group>groupList=groupService.getAllGroupsWithMissingTrainers();
+        for(Trainer t: trainerList){
+            List<Group>validGroups=new ArrayList<>();
+            validGroups=groupList.stream()
+                    .filter(this::groupTakesPlaceNextWeek).toList();
+            validGroups=validGroups.stream().filter(group -> isQualificationRequirementFulfilled(group.getQualifications(),t))
+                    .toList();
+            if(validGroups.size()>0){
+                groupMap.put(t,validGroups);
+            }
+        }
+        return groupMap;
     }
 
     private boolean isQualificationRequirementFulfilled(List<Qualification> requiredQualifications, Trainer trainer){
@@ -74,6 +108,25 @@ public class ScheduledServices {
             }
         }
         return true;
+    }
+
+    private boolean courseTakesPlaceNextWeek(Course course){
+        return takesPlaceNextWeek(course.getDates());
+    }
+
+    private boolean groupTakesPlaceNextWeek(Group group){
+        return takesPlaceNextWeek(group.getDates());
+    }
+
+    private boolean takesPlaceNextWeek(List<EventDate>dateList){
+        LocalDate start=LocalDate.now().plusDays(6);
+        LocalDate end= LocalDate.now().plusDays(15);
+        for(EventDate date:dateList){
+            if(date.getStartTime().toLocalDate().isBefore(end) && date.getStartTime().toLocalDate().isAfter(start)){
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean trainerHasQualification(Qualification qualification, Trainer trainer){

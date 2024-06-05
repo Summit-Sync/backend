@@ -1,13 +1,16 @@
 package com.summitsync.api.group;
 
 import com.summitsync.api.date.EventDate;
-import com.summitsync.api.grouptemplate.GroupTemplateService;
+import com.summitsync.api.date.EventDateService;
 import com.summitsync.api.mail.MailService;
+import com.summitsync.api.qualification.Qualification;
+import com.summitsync.api.qualification.QualificationService;
 import com.summitsync.api.trainer.Trainer;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -21,8 +24,24 @@ public class GroupService {
     private final MailService mailService;
     private final Logger log = LoggerFactory.getLogger(GroupService.class);
 
+    private final EventDateService eventDateService;
+
+    private final QualificationService qualificationService;
+
+    @Transactional
     public Group create(Group group) {
         group.setGroupNumber(generateGroupNumber(group.getAcronym()));
+        List<EventDate>eventDateList=group.getDates();
+        group.setDates(new ArrayList<>());
+        for(EventDate e: eventDateList){
+            group.getDates().add(eventDateService.create(e));
+        }
+
+        List<Qualification>qualificationList=group.getQualifications();
+        group.setQualifications(new ArrayList<>());
+        for(Qualification q: qualificationList){
+            group.getQualifications().add(qualificationService.findById(q.getQualificationId()));
+        }
         return this.repository.save(group);
     }
 
@@ -124,14 +143,14 @@ public class GroupService {
         return canceledGroup;
     }
 
-    public List<Group>getGroupsWithMissingTrainersBetweenDates(LocalDate startDate, LocalDate endDate){
-        return this.repository.findGroupsWithMoreParticipantsPerTrainerThanTrainersAndDateIn(startDate, endDate);
-    }
-
     public boolean updateDatesList(List<EventDate>oldDates, List<EventDate>newDates){
         boolean removedDates=removeUnusedOrUpdatedDates(oldDates, newDates);
         boolean addedNewDates=addNewDates(oldDates,newDates);
         return removedDates||addedNewDates;
+    }
+
+    public List<Group>getAllGroupsWithMissingTrainers(){
+        return this.repository.findAllWithMissingTrainers();
     }
 
     private boolean addNewDates(List<EventDate> oldDates, List<EventDate>newDates){
