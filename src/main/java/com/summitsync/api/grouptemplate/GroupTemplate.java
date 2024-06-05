@@ -28,12 +28,12 @@ public class GroupTemplate {
     private String description;
     private int numberOfDates;
     private int duration;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private Location location;
     private String meetingPoint;
     private BigDecimal trainerPricerPerHour;
     private BigDecimal pricePerParticipant;
-    @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "ss_grouptemplate_trainer_join",
             joinColumns = @JoinColumn(name = "groupTemplateId"),

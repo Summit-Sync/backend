@@ -39,7 +39,7 @@ public class CourseTemplate {
             inverseJoinColumns = @JoinColumn(name = "courseTemplatePriceId")
     )
     private List<Price> prices;
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "ss_coursetemplate_qualifications",
             joinColumns = @JoinColumn(name = "courseTemplateId"),
