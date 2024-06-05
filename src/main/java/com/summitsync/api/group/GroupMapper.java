@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -75,16 +76,12 @@ public class GroupMapper {
 
     }
     public Group mapGroupPostDTOToGroup(GroupPostDTO dto) {
-        var dates = new ArrayList<EventDate>();
-        for (var d : dto.getDates()) {
-           var newEventDate = EventDate.builder()
-                   .startTime(d)
-                   .durationInMinutes(dto.getDuration())
-                   .build();
-
-           var savedEventDate = this.eventDateService.create(newEventDate);
-           dates.add(savedEventDate);
-        }
+        List<EventDate> dates = dto.getDates().stream().map(d ->{
+            EventDate eventDate=new EventDate();
+            eventDate.setStartTime(d);
+            eventDate.setDurationInMinutes(dto.getDuration());
+            return eventDate;
+        }).toList();
 
         return Group.builder()
                 .cancelled(false)

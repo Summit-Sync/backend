@@ -33,7 +33,7 @@ public class Course {
     private String courseNumber;
     private String acronym;
     private String description;
-    @OneToMany(cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<EventDate> dates;
     private int duration;
     private int numberParticipants;

@@ -70,16 +70,13 @@ public class CourseMapper {
     }
 
     public Course mapCoursePostDTOToCourse(CoursePostDTO dto, JwtAuthenticationToken jwt) {
-        var dates = new ArrayList<EventDate>();
-        if (dto.getDates() != null) {
-            for (var date: dto.getDates()) {
-                var eventDate = new EventDate();
-                eventDate.setDurationInMinutes(dto.getDuration());
-                eventDate.setStartTime(date);
-                var dbDate = this.eventDateService.create(eventDate);
-                dates.add(dbDate);
-            }
-        }
+        List<EventDate> dates = dto.getDates().stream().map(d ->{
+            EventDate eventDate=new EventDate();
+            eventDate.setStartTime(d);
+            eventDate.setDurationInMinutes(dto.getDuration());
+            return eventDate;
+        }).toList();
+
 
         List<Participant> participants = new ArrayList<>();
         List<Participant> waitList = new ArrayList<>();

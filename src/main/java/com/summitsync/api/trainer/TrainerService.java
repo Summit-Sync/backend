@@ -128,40 +128,4 @@ public class TrainerService {
     public List<Trainer>getAllTrainer(){
         return this.trainerRepository.findAll();
     }
-
-    public Map<Trainer, List<Course>>findTrainersWithCoursesFulfillingQualificationRequirementMissingTrainersAndBetweenDates(LocalDate startDate, LocalDate endDate){
-        List<Object[]> results = trainerRepository.findTrainersWithAllCourses(startDate, endDate);
-
-        Map<Trainer, List<Course>> map = new HashMap<>();
-        for (Object[] result : results) {
-            Trainer trainer = (Trainer) result[0];
-            Course course = (Course) result[1];
-
-            if (!map.containsKey(trainer)) {
-                map.put(trainer, new ArrayList<>());
-            }
-
-            map.get(trainer).add(course);
-        }
-
-        return map;
-    }
-
-    public Map<Trainer, List<Group>>findTrainersWithGroupsFulfillingQualificationRequirementMissingTrainersAndBetweenDates(LocalDate startDate, LocalDate endDate){
-        List<Object[]> results = trainerRepository.findTrainersWithAllCourses(startDate, endDate);
-
-        Map<Trainer, List<Group>> map = new HashMap<>();
-        for (Object[] result : results) {
-            Trainer trainer = (Trainer) result[0];
-            Group group = (Group) result[1];
-
-            if (!map.containsKey(trainer)) {
-                map.put(trainer, new ArrayList<>());
-            }
-
-            map.get(trainer).add(group);
-        }
-
-        return map;
-    }
 }
