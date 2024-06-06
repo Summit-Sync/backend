@@ -24,6 +24,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
@@ -33,12 +34,13 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class CalendarService {
-    private final Calendar calendar;
+    private Calendar calendar;
     private static final String CREDENTIALS_FILE_PATH = "classpath:service-account.json";
     @Value("${summitsync.calendar.calendar-url}")
     private String calendarUrl;
     @Value("${summitsync.calendar.enabled}")
     private boolean enabled;
+    private boolean initError = false;
     private final Logger log = LoggerFactory.getLogger(CalendarService.class);
     private static final GsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
@@ -48,16 +50,30 @@ public class CalendarService {
     public CalendarService(ResourceLoader resourceLoader, @Lazy CourseService courseService, @Lazy GroupService groupService) throws IOException, GeneralSecurityException {
         this.courseService = courseService;
         this.groupService = groupService;
-        var resource = resourceLoader.getResource(CREDENTIALS_FILE_PATH).getInputStream();
-        var credentials = ServiceAccountCredentials.fromStream(resource)
+        var resource = resourceLoader.getResource(CREDENTIALS_FILE_PATH);
+        if (!resource.exists()) {
+            log.warn("Unable to load credentials from {}. Disabling calendar", CREDENTIALS_FILE_PATH);
+            this.initError = true;
+            return;
+        }
+        var credentials = ServiceAccountCredentials.fromStream(resource.getInputStream())
                 .createScoped(Collections.singleton("https://www.googleapis.com/auth/calendar"));
+
         var requestInitializer = new HttpCredentialsAdapter(credentials);
         this.calendar = new Calendar.Builder(GoogleNetHttpTransport.newTrustedTransport(), JSON_FACTORY, requestInitializer)
                 .setApplicationName("Summit Sync")
                 .build();
     }
 
+    private boolean isEnabled() {
+        return this.enabled && !this.initError;
+    }
+
     public void updateEvent(String id, String summary, String description, String location) throws IOException {
+        if (!this.isEnabled()) {
+            logDisabled();
+            return;
+        }
         log.info("Updating event with id {}", id);
 
 
@@ -73,7 +89,7 @@ public class CalendarService {
 
     public void createEvent(String id, String summary, String description, LocalDateTime startTime, LocalDateTime endTime, String location, String colorId) throws IOException {
         log.info("Creating a new calendar event from {} to {}", startTime, endTime);
-        if (!this.enabled) {
+        if (!this.isEnabled()) {
             logDisabled();
             return;
         }
@@ -94,7 +110,7 @@ public class CalendarService {
     }
 
     public void deleteEvent(String id) throws IOException {
-        if (!this.enabled) {
+        if (!this.isEnabled()) {
             logDisabled();
             return;
         }
@@ -119,6 +135,9 @@ public class CalendarService {
     }
 
     private void getEvent(String id) throws IOException {
+        if (!this.isEnabled()) {
+            return;
+        }
         this.calendar.events().get(this.calendarUrl, id).execute();
     }
 
@@ -134,7 +153,7 @@ public class CalendarService {
 
     @Transactional
     public void checkIntegrity() {
-        if (!this.enabled) {
+        if (!this.isEnabled()) {
             return;
         }
 
