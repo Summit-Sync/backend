@@ -18,6 +18,6 @@ public class Status {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     long statusId;
     String text;
-    @OneToOne(mappedBy = "status", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "status", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private CourseTrainer courseTrainer;
 }

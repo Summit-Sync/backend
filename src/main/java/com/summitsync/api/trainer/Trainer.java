@@ -31,11 +31,11 @@ public class Trainer {
     private List<Qualification> qualifications = new ArrayList<>();
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "trainers")
     private List<Course> courses;
-    @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "trainer", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<CourseTrainer> courseTrainers;
-    @ManyToMany(mappedBy = "trainers", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "trainers", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<Group> groups;
-    @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "trainer", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<TrainerApplication> trainerApplications;
 
     @Override

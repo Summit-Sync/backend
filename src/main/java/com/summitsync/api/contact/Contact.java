@@ -21,6 +21,6 @@ public class Contact {
     private String lastName;
     private String email;
     private String telephone;
-    @OneToOne(mappedBy = "contact", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "contact", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private Group group;
 }
