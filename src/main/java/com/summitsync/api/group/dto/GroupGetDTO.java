@@ -19,7 +19,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class GroupGetDTO {
     long id;
-    boolean cancelled;
+    boolean canceled;
     String groupNumber;
     String acronym;
     String title;
