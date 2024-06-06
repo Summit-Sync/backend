@@ -157,5 +157,4 @@ public class CourseController {
 
         return ResponseEntity.ok(this.mapper.mapCourseToCourseGetDTO(updatedCourse, jwt.getToken().getTokenValue()));
     }
-
 }
