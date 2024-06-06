@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,22 +21,28 @@ public class TrainerMapper {
     private final QualificationMapper qualificationMapper;
     private final KeycloakRestService keycloakRestService;
 
-    public KeycloakAddUserRequest mapAddTrainerDtoToKeycloakAddUserRequest(AddTrainerDto addTrainerDto) {
+    public KeycloakAddUserRequest mapAddTrainerDtoToKeycloakAddUserRequest(AddTrainerDto addTrainerDto, boolean updatePassword) {
         var groups = new ArrayList<String>();
         groups.add("trainer");
 
         Map<String, Object> attributesMap = new HashMap<>();
         attributesMap.put("phone", addTrainerDto.getPhone());
 
-        return KeycloakAddUserRequest.builder()
+
+        var req = KeycloakAddUserRequest.builder()
                 .firstName(addTrainerDto.getFirstName())
                 .lastName(addTrainerDto.getLastName())
                 .enabled(true)
                 .username(addTrainerDto.getUsername())
                 .groups(groups)
                 .email(addTrainerDto.getEmail())
-                .attributes(attributesMap)
-                .build();
+                .attributes(attributesMap);
+
+        if (updatePassword) {
+            req.requiredActions(Collections.singletonList("UPDATE_PASSWORD"));
+        }
+
+        return req.build();
     }
 
     public TrainerDto mapKeycloakUserToTrainerDto(KeycloakUser keycloakUser, Trainer trainer) {

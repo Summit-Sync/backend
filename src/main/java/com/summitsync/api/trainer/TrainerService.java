@@ -54,7 +54,7 @@ public class TrainerService {
 
     public TrainerDto newTrainer(AddTrainerDto addTrainerDto, String jwt) {
         var keycloakAddUserResponse = this.keycloakRestService.addAndRetrieveUser(
-                this.trainerMapper.mapAddTrainerDtoToKeycloakAddUserRequest(addTrainerDto),
+                this.trainerMapper.mapAddTrainerDtoToKeycloakAddUserRequest(addTrainerDto, true),
                 jwt
         );
 

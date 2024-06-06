@@ -1,5 +1,6 @@
 package com.summitsync.api.keycloak.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,4 +17,6 @@ public class KeycloakAddUserRequest {
     List<String> groups;
     String email;
     Map<String, Object> attributes;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    List<String> requiredActions;
 }
