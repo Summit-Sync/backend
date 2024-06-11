@@ -37,11 +37,11 @@ public class Course implements CalendarEvent {
     private String courseNumber;
     private String acronym;
     private String description;
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "course")
     private List<EventDate> dates;
     private int duration;
     private int numberParticipants;
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinTable(
             name = "ss_course_participants_join",
             joinColumns = @JoinColumn(name = "courseId"),

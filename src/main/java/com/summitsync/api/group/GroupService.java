@@ -35,11 +35,6 @@ public class GroupService {
     @Transactional
     public Group create(Group group) {
         group.setGroupNumber(generateGroupNumber(group.getAcronym()));
-        List<EventDate>eventDateList=group.getDates();
-        group.setDates(new ArrayList<>());
-        for(EventDate e: eventDateList){
-            group.getDates().add(eventDateService.create(e));
-        }
 
         List<Qualification>qualificationList=group.getQualifications();
         group.setQualifications(new ArrayList<>());
@@ -48,6 +43,19 @@ public class GroupService {
         }
 
         var dbGroup = this.repository.save(group);
+
+        List<EventDate>eventDateList=group.getDates();
+        group.setDates(new ArrayList<>());
+        var dates = new ArrayList<EventDate>();
+        for(EventDate e: eventDateList){
+            EventDate eventDate = new EventDate();
+            eventDate.setDurationInMinutes(e.getDurationInMinutes());
+            eventDate.setStartTime(e.getStartTime());
+            eventDate.setGroup(dbGroup);
+            var dbDate = this.eventDateService.create(eventDate);
+            dates.add(dbDate);
+        }
+        dbGroup.setDates(dates);
         try {
             dbGroup.createEvents(this.calendarService, this.keycloakRestService);
         } catch (IOException e) {
@@ -62,6 +70,7 @@ public class GroupService {
         return String.format("%03d", ret);
     }
 
+    @Transactional
     public Group update(Group groupToUpdate, Group group, String jwt) {
         groupToUpdate.setCancelled(group.isCancelled());
         groupToUpdate.setAcronym(group.getAcronym());
@@ -83,7 +92,20 @@ public class GroupService {
             log.warn("Failed to modify calendar events for group {}", group.getAcronym(), e);
         }
 
-        boolean updatedDates = updateDatesList(groupToUpdate.getDates(), group.getDates());
+
+        var oldDates = new ArrayList<>(groupToUpdate.getDates());
+        var newDates = new ArrayList<>(group.getDates());
+        var updatedSavedDate = new ArrayList<EventDate>();
+        boolean updatedDates=updateDatesList(oldDates, newDates);
+
+        for (var date: oldDates) {
+            if (date.getEventDateId() == 0) {
+                date = this.eventDateService.create(date);
+                date.setGroup(groupToUpdate);
+            }
+            updatedSavedDate.add(date);
+        }
+        groupToUpdate.setDates(updatedSavedDate);
         groupToUpdate.setNumberParticipants(group.getNumberParticipants());
         groupToUpdate.setLocation(group.getLocation());
         groupToUpdate.setMeetingPoint(group.getMeetingPoint());
@@ -203,6 +225,7 @@ public class GroupService {
             if(checkIfDateIsUnusedOrUpdated(oldDate, newDates)){
                 removedOldDate=true;
                 iterator.remove();
+                this.eventDateService.deleteById(oldDate.getEventDateId());
             }
         }
         return removedOldDate;

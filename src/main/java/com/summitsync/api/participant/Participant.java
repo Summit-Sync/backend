@@ -4,6 +4,7 @@ import com.summitsync.api.course.Course;
 import com.summitsync.api.status.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,17 +15,20 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Builder
 @Table(name = "SS_Participant")
 public class Participant {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long participantId;
-    private String subjectId;
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "participants")
     private Set<Course> courses;
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "waitList")
     private List<Course> coursesWaitList;
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private Status status;
     private String phone;
+    private String name;
+    private String firstName;
+    private String email;
 }

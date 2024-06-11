@@ -13,20 +13,25 @@ import org.springframework.web.bind.annotation.*;
 public class ParticipantController {
 
     private final ParticipantService participantService;
+    private final ParticipantMapper participantMapper;
 
     @PostMapping
     public ParticipantDto newParticipant(@RequestBody AddParticipantDto addParticipantDto, JwtAuthenticationToken jwt) {
-        return this.participantService.newParticipant(addParticipantDto, jwt.getToken().getTokenValue());
+        var participant = this.participantService.newParticipant(addParticipantDto);
+
+        return this.participantMapper.mapParticipantToParticipantDto(participant);
     }
 
     @GetMapping("/{participantId}")
     public ParticipantDto getParticipantById(@PathVariable long participantId, JwtAuthenticationToken jwt) {
-        return this.participantService.getParticipant(participantId, jwt.getToken().getTokenValue());
+        var participant =  this.participantService.findById(participantId);
+
+        return this.participantMapper.mapParticipantToParticipantDto(participant);
     }
 
     @DeleteMapping("/{participantId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteDataById(@PathVariable long participantId, JwtAuthenticationToken jwt) {
-        this.participantService.deleteParticipantById(participantId, jwt.getToken().getTokenValue());
+    public void deleteDataById(@PathVariable long participantId) {
+        this.participantService.deleteParticipantById(participantId);
     }
 }

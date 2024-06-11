@@ -5,8 +5,6 @@ import com.summitsync.api.course.Course;
 import com.summitsync.api.date.EventDate;
 import com.summitsync.api.group.Group;
 import com.summitsync.api.participant.Participant;
-import com.summitsync.api.participant.ParticipantMapper;
-import com.summitsync.api.participant.dto.ParticipantDto;
 import com.summitsync.api.trainer.Trainer;
 import com.summitsync.api.trainer.TrainerMapper;
 import com.summitsync.api.trainer.dto.TrainerDto;
@@ -37,7 +35,6 @@ public class MailServiceImpl implements MailService {
     @Value("${summitsync.mail.enabled}")
     private boolean enabled;
     private final TrainerMapper trainerMapper;
-    private final ParticipantMapper participantMapper;
     private static final String CANCEL_MAIL_COURSE_PARTICIPANT = """
             Hallo %s,
 
@@ -49,8 +46,7 @@ public class MailServiceImpl implements MailService {
             Wir entschuldigen uns für die entstandenen Unannehmlichkeiten und hoffen dich bald wieder im Unterwegs Kletterzentrum Bremen begrüßen zu dürfen.
 
             Wir freuen uns auf dich!
-            Dein Kletterzentrums Team""";
-    private static final String CANCEL_MAIL_COURSE_TRAINER = """
+            Dein Kletterzentrums Team"""; private static final String CANCEL_MAIL_COURSE_TRAINER = """
             Hallo %s %s,
 
             Leider muss dein Kurs %s am %s um %s ausfallen.
@@ -221,7 +217,7 @@ public class MailServiceImpl implements MailService {
         String startDate = start.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 
         sendCourseCancelMailForTrainers(course.getTrainers(), jwt, startDate, startTime, course.getAcronym());
-        sendCourseCancelMailForParticipants(course.getParticipants(),jwt, startDate, startTime, course.getAcronym());
+        sendCourseCancelMailForParticipants(course.getParticipants(), startDate, startTime, course.getAcronym());
     }
 
     @Override
@@ -231,7 +227,7 @@ public class MailServiceImpl implements MailService {
         String startDate = start.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 
         sendCourseChangeMailForTrainers(course.getTrainers(),jwt, startDate, startTime, course.getAcronym());
-        sendCourseChangeMailForParticipants(course.getParticipants(), jwt, startDate, startTime, course.getAcronym());
+        sendCourseChangeMailForParticipants(course.getParticipants(), startDate, startTime, course.getAcronym());
     }
 
     @Override
@@ -241,7 +237,7 @@ public class MailServiceImpl implements MailService {
         String startDate = start.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 
         sendCourseReminderMailForTrainers(course.getTrainers(), jwt, startDate, startTime, course.getAcronym());
-        sendCourseReminderMailForParticipants(course.getParticipants(), jwt, startDate, startTime, course.getAcronym());
+        sendCourseReminderMailForParticipants(course.getParticipants(), startDate, startTime, course.getAcronym());
     }
 
     @Override
@@ -349,9 +345,9 @@ public class MailServiceImpl implements MailService {
             sendMail(detail);
         }
     }
-    private void sendCourseReminderMailForParticipants(List<Participant> participantList, String jwt, String startDate, String startTime, String acronym) {
+    private void sendCourseReminderMailForParticipants(List<Participant> participantList, String startDate, String startTime, String acronym) {
         for (Participant p: participantList) {
-            MailDetail detail = generateParticipantMailDetails(p, jwt, REMINDER_MAIL_SUBJECT_COURSE, acronym, startDate, startTime, REMINDER_MAIL_COURSE_PARTICIPANT);
+            MailDetail detail = generateParticipantMailDetails(p, REMINDER_MAIL_SUBJECT_COURSE, acronym, startDate, startTime, REMINDER_MAIL_COURSE_PARTICIPANT);
             sendMail(detail);
         }
     }
@@ -362,9 +358,9 @@ public class MailServiceImpl implements MailService {
         }
     }
 
-    private void sendCourseCancelMailForParticipants(List<Participant>participantList, String jwt, String startDate, String startTime, String acronym){
+    private void sendCourseCancelMailForParticipants(List<Participant>participantList, String startDate, String startTime, String acronym){
         for (Participant p: participantList) {
-            MailDetail detail = generateParticipantMailDetails(p, jwt, CANCEL_MAIL_SUBJECT_COURSE, acronym, startDate, startTime, CANCEL_MAIL_COURSE_PARTICIPANT);
+            MailDetail detail = generateParticipantMailDetails(p, CANCEL_MAIL_SUBJECT_COURSE, acronym, startDate, startTime, CANCEL_MAIL_COURSE_PARTICIPANT);
             sendMail(detail);
         }
     }
@@ -375,19 +371,18 @@ public class MailServiceImpl implements MailService {
             sendMail(detail);
         }
     }
-    private void sendCourseChangeMailForParticipants(List<Participant>participantList, String jwt, String startDate, String startTime, String acronym) {
+    private void sendCourseChangeMailForParticipants(List<Participant>participantList, String startDate, String startTime, String acronym) {
         for (Participant p: participantList) {
-            MailDetail detail = generateParticipantMailDetails(p, jwt, UPDATE_MAIL_SUBJECT_COURSE, acronym, startDate, startTime, UPDATE_MAIL_COURSE_PARTICIPANT);
+            MailDetail detail = generateParticipantMailDetails(p, UPDATE_MAIL_SUBJECT_COURSE, acronym, startDate, startTime, UPDATE_MAIL_COURSE_PARTICIPANT);
             sendMail(detail);
         }
     }
 
-    private MailDetail generateParticipantMailDetails(Participant p, String jwt, String updateMailSubjectCourse, String acronym, String startDate, String startTime, String updateMailCourseParticipant) {
+    private MailDetail generateParticipantMailDetails(Participant p, String updateMailSubjectCourse, String acronym, String startDate, String startTime, String updateMailCourseParticipant) {
         MailDetail detail = new MailDetail();
-        ParticipantDto participantDto = participantMapper.mapParticipantToParticipantDto(p, jwt);
-        detail.setRecipient(participantDto.getEmail());
+        detail.setRecipient(p.getEmail());
         detail.setSubject(String.format(updateMailSubjectCourse, acronym, startDate, startTime));
-        detail.setMsgBody(String.format(updateMailCourseParticipant, participantDto.getName(), acronym, startDate, startTime));
+        detail.setMsgBody(String.format(updateMailCourseParticipant, p.getName(), acronym, startDate, startTime));
         return detail;
     }
 

@@ -8,6 +8,7 @@ import com.summitsync.api.exceptionhandler.ResourceNotFoundException;
 import com.summitsync.api.keycloak.KeycloakRestService;
 import com.summitsync.api.mail.MailService;
 import com.summitsync.api.participant.Participant;
+import com.summitsync.api.participant.ParticipantService;
 import com.summitsync.api.qualification.Qualification;
 import com.summitsync.api.qualification.QualificationService;
 import com.summitsync.api.trainer.Trainer;
@@ -33,19 +34,11 @@ public class CourseService {
     private final QualificationService qualificationService;
     private final CalendarService calendarService;
     private final KeycloakRestService keycloakRestService;
+    private final ParticipantService participantService;
 
     @Transactional
     public Course create(Course course) {
         course.setCourseNumber(this.generateCourseNumber(course.getAcronym()));
-        List<EventDate>eventDateList=course.getDates();
-        course.setDates(new ArrayList<>());
-        for(EventDate e: eventDateList){
-            EventDate eventDate = new EventDate();
-            eventDate.setDurationInMinutes(e.getDurationInMinutes());
-            eventDate.setStartTime(e.getStartTime());
-            var dbDate = this.eventDateService.create(eventDate);
-            course.getDates().add(dbDate);
-        }
         List<Qualification>qualificationList=course.getRequiredQualifications();
         course.setRequiredQualifications(new ArrayList<>());
         for(Qualification q: qualificationList){
@@ -53,6 +46,17 @@ public class CourseService {
         }
 
         var dbCourse = this.repository.save(course);
+        List<EventDate>eventDateList=course.getDates();
+        var dates = new ArrayList<EventDate>();
+        for(EventDate e: eventDateList){
+            EventDate eventDate = new EventDate();
+            eventDate.setDurationInMinutes(e.getDurationInMinutes());
+            eventDate.setStartTime(e.getStartTime());
+            eventDate.setCourse(dbCourse);
+            var dbDate = this.eventDateService.create(eventDate);
+            dates.add(dbDate);
+        }
+        course.setDates(dates);
 
         try {
             dbCourse.createEvents(this.calendarService, this.keycloakRestService);
@@ -68,13 +72,22 @@ public class CourseService {
         return String.format("%03d", ret);
     }
 
+    private void deleteParticipants(List<Participant> participants) {
+        participants.forEach(participant -> this.participantService.deleteParticipantById(participant.getParticipantId()));
+    }
+
+    @Transactional
     public Course update(Course courseToUpdate, Course course, boolean cancelled, boolean finished, String jwt) {
+        var oldParticipants = course.getParticipants();
         var participants = new ArrayList<>(course.getParticipants());
         courseToUpdate.setParticipants(participants);
+        deleteParticipants(oldParticipants);
         var trainers = new ArrayList<>(course.getTrainers());
         courseToUpdate.setTrainers(trainers);
+        var oldWaitList = course.getWaitList();
         var waitList = new ArrayList<>(course.getWaitList());
         courseToUpdate.setWaitList(waitList);
+        deleteParticipants(oldWaitList);
         courseToUpdate.setVisible(course.isVisible());
         courseToUpdate.setCancelled(course.isCancelled());
         courseToUpdate.setFinished(course.isFinished());
@@ -91,7 +104,20 @@ public class CourseService {
             log.warn("Failed to modify calendar events for group {}", course.getAcronym(), e);
         }
 
-        boolean updatedDateList=updateDatesList(courseToUpdate.getDates(),course.getDates());
+        var oldDates = new ArrayList<>(courseToUpdate.getDates());
+        var newDates = new ArrayList<>(course.getDates());
+        var updatedSavedDate = new ArrayList<EventDate>();
+        boolean updatedDateList=updateDatesList(oldDates, newDates);
+
+        for (var date: oldDates) {
+            if (date.getEventDateId() == 0) {
+                date = this.eventDateService.create(date);
+                date.setCourse(courseToUpdate);
+            }
+            updatedSavedDate.add(date);
+        }
+
+        courseToUpdate.setDates(updatedSavedDate);
         courseToUpdate.setDuration(course.getDuration());
         courseToUpdate.setNumberParticipants(course.getNumberParticipants());
         courseToUpdate.setNumberWaitlist(course.getNumberWaitlist());
@@ -284,6 +310,7 @@ public class CourseService {
             EventDate oldDate = iterator.next();
             if(checkIfDateIsUnusedOrUpdated(oldDate, newDates)){
                 removedOldDate=true;
+                this.eventDateService.deleteById(oldDate.getEventDateId());
                 iterator.remove();
             }
         }

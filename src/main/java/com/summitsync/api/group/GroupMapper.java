@@ -77,7 +77,7 @@ public class GroupMapper {
     }
     public Group mapGroupPostDTOToGroup(GroupPostDTO dto) {
         List<EventDate> dates = dto.getDates().stream().map(d ->{
-            EventDate eventDate=new EventDate();
+            EventDate eventDate = new EventDate();
             eventDate.setStartTime(d);
             eventDate.setDurationInMinutes(dto.getDuration());
             return eventDate;

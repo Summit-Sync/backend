@@ -5,6 +5,7 @@ import com.summitsync.api.date.EventDate;
 import com.summitsync.api.date.dto.EventDatePostDto;
 import com.summitsync.api.location.Location;
 import com.summitsync.api.participant.Participant;
+import com.summitsync.api.participant.dto.AddParticipantDto;
 import com.summitsync.api.participant.dto.ParticipantDto;
 import com.summitsync.api.price.dto.PricePostDto;
 import com.summitsync.api.qualification.Qualification;
@@ -57,9 +58,9 @@ public class CoursePostDTO {
     private String notes;
     @NotBlank(message = "Title cannot be empty.")
     private String title;
-    private List<ParticipantDto> participants;
+    private List<AddParticipantDto> participants;
     private List<Long> trainers;
-    private List<ParticipantDto> waitList;
+    private List<AddParticipantDto> waitList;
 }
 
 // PostCourseDTO: visible (boolean), acronym (string), description (String), dates (Date als string), duration(int),

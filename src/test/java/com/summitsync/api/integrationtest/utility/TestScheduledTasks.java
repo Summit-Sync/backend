@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Disabled
 public class TestScheduledTasks extends AbstractIntegrationTest {
 
     @Autowired

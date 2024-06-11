@@ -4,7 +4,6 @@ import com.summitsync.api.calendar.CalendarEventDateSet;
 import com.summitsync.api.course.dto.CourseGetDTO;
 import com.summitsync.api.course.dto.CoursePostDTO;
 import com.summitsync.api.date.EventDate;
-import com.summitsync.api.date.EventDateService;
 import com.summitsync.api.location.LocationMapper;
 import com.summitsync.api.location.LocationService;
 import com.summitsync.api.participant.Participant;
@@ -23,9 +22,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,7 +34,6 @@ public class CourseMapper {
     private final QualificationMapper qualificationMapper;
     private final TrainerService trainerService;
     private final TrainerMapper trainerMapper;
-    private final EventDateService eventDateService;
     private final LocationService locationService;
     private final QualificationService qualificationService;
     private final PriceMapper priceMapper;
@@ -56,8 +52,8 @@ public class CourseMapper {
                 .dates(course.getDates().stream().map(EventDate::getStartTime).toList())
                 .duration(course.getDuration())
                 .numberParticipants(course.getNumberParticipants())
-                .participants(course.getParticipants().stream().map(participant -> this.participantMapper.mapParticipantToParticipantDto(participant, jwt)).toList())
-                .waitList(course.getWaitList().stream().map(participant -> this.participantMapper.mapParticipantToParticipantDto(participant, jwt)).toList())
+                .participants(course.getParticipants().stream().map(this.participantMapper::mapParticipantToParticipantDto).toList())
+                .waitList(course.getWaitList().stream().map(this.participantMapper::mapParticipantToParticipantDto).toList())
                 .numberWaitlist(course.getNumberWaitlist())
                 .prices(course.getCoursePrices().stream().map(this.priceMapper::mapPriceToPriceDto).toList())
                 .location(this.locationMapper.mapLocationToGetLocationDto(course.getLocation()))
@@ -70,7 +66,7 @@ public class CourseMapper {
                 .build();
     }
 
-    public Course mapCoursePostDTOToCourse(CoursePostDTO dto, JwtAuthenticationToken jwt) {
+    public Course mapCoursePostDTOToCourse(CoursePostDTO dto) {
         List<EventDate> dates = dto.getDates().stream().map(d ->{
             EventDate eventDate=new EventDate();
             eventDate.setStartTime(d);
@@ -84,21 +80,13 @@ public class CourseMapper {
         List<Trainer> trainers = new ArrayList<>();
         if (dto.getParticipants() != null) {
             for (var participant : dto.getParticipants()) {
-                if (participant.getId() == 0) {
-                    var added = this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
-                    participant.setId(added.getId());
-                }
-                participants.add(this.participantService.getParticipantAndUpdate(participant, jwt.getToken().getTokenValue()));
+                participants.add(this.participantService.newParticipant(participant));
             }
         }
 
         if (dto.getWaitList() != null) {
             for (var participant : dto.getWaitList()) {
-                if (participant.getId() == 0) {
-                    var added = this.participantService.newParticipant(this.participantMapper.mapParticipantDtoToAddDto(participant), jwt.getToken().getTokenValue());
-                    participant.setId(added.getId());
-                }
-                waitList.add(this.participantService.getParticipantAndUpdate(participant, jwt.getToken().getTokenValue()));
+                waitList.add(this.participantService.newParticipant(participant));
             }
         }
 
@@ -144,6 +132,7 @@ public class CourseMapper {
 
     public static List<CalendarEventDateSet> mapEventDatesListToCalendarEventDateSetList(List<EventDate> eventDates) {
         return eventDates.stream()
+                .filter(eventDate -> eventDate.getStartTime() != null && eventDate.getDurationInMinutes() != 0)
                 .map(CourseMapper::mapEventDateToCalendarEventDateSetList)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
