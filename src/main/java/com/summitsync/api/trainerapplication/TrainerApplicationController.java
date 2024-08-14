@@ -9,6 +9,7 @@ import com.summitsync.api.group.GroupMapper;
 import com.summitsync.api.group.GroupService;
 import com.summitsync.api.group.dto.GroupGetDTO;
 import com.summitsync.api.trainer.Trainer;
+import com.summitsync.api.trainer.TrainerRepository;
 import com.summitsync.api.trainer.TrainerService;
 import com.summitsync.api.trainerapplication.dto.TrainerApplicationDto;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import java.util.List;
 public class TrainerApplicationController {
 
     private final TrainerService trainerService;
+    private final TrainerRepository trainerRepository;
     private final GroupService groupService;
     private final CourseService courseService;
     private final TrainerApplicationService service;
@@ -41,16 +43,22 @@ public class TrainerApplicationController {
     }
 
     @PutMapping("/{trainerId}/course/{courseId}")
-    public ResponseEntity<TrainerApplicationDto> applyToCourse(@PathVariable long trainerId, @PathVariable long courseId, JwtAuthenticationToken jwt) {
-        Trainer trainer = this.trainerService.findById(trainerId);
+    public ResponseEntity<TrainerApplicationDto> applyToCourse(@PathVariable String trainerId, @PathVariable long courseId, JwtAuthenticationToken jwt) {
+        Trainer trainer = this.trainerService.findBySubjectId(trainerId);
         Course course = this.courseService.get(courseId);
         TrainerApplication application = this.service.applyToCourse(trainer, course);
         return ResponseEntity.ok(this.mapper.mapTrainerApplicationToTrainerApplicationDto(application, jwt));
     }
 
     @GetMapping("/{trainerId}/course")
-    public ResponseEntity<List<CourseGetDTO>> getAppliedCourses(@PathVariable long trainerId, JwtAuthenticationToken jwt) {
-        Trainer trainer = this.trainerService.findById(trainerId);
+    public ResponseEntity<List<CourseGetDTO>> getAppliedCourses(@PathVariable String trainerId, JwtAuthenticationToken jwt) {
+        var dbTrainer = this.trainerRepository.findBySubjectId(trainerId);
+        if (dbTrainer.isEmpty()) {
+            return ResponseEntity.ok(new ArrayList<>());
+        }
+
+        var trainer = dbTrainer.get();
+
         List<TrainerApplication> applications = this.service.getCourseApplications(trainer);
         List<CourseGetDTO> response = new ArrayList<>();
         for (TrainerApplication application : applications) {

@@ -14,4 +14,5 @@ public class BffAccessTokenResponse {
     ZonedDateTime expiresAt;
     ZonedDateTime refreshTokenExpiresAt;
     String role;
+    String subjectId;
 }

@@ -42,6 +42,16 @@ public class TrainerService {
         return this.qualificationService;
     }
 
+    public Trainer findBySubjectId(String subjectId) {
+        var trainer = this.trainerRepository.findBySubjectId(subjectId);
+
+        if (trainer.isEmpty()) {
+            throw new ResourceNotFoundException("trainer with subjectid " + subjectId + "could not be found");
+        }
+
+        return trainer.get();
+    }
+
     public Trainer findById(long id) {
         var trainer = this.trainerRepository.findById(id);
 

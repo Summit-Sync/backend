@@ -2,8 +2,11 @@ package com.summitsync.api.bff;
 
 import com.summitsync.api.exceptionhandler.InvalidSessionException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,11 +17,17 @@ import java.time.ZonedDateTime;
 
 @Controller
 @RequestMapping("/auth")
-@RequiredArgsConstructor
 public class BffController {
 
     private final SessionRepository sessionRepository;
     private final SessionService sessionService;
+    private final JwtDecoder jwtDecoder;
+
+    BffController(SessionRepository sessionRepository, SessionService sessionService,  @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") final String issuerUri) {
+        this.sessionService = sessionService;
+        this.sessionRepository = sessionRepository;
+        this.jwtDecoder = NimbusJwtDecoder.withIssuerLocation(issuerUri).build();
+    }
 
     private long getDurationRemaining(ZonedDateTime created, long expiresIn) {
         assert created.getZone().equals(ZoneOffset.UTC);
@@ -50,10 +59,15 @@ public class BffController {
             accessTokenRemaining = this.getDurationRemaining(session.getUpdated(), session.getExpiresIn());
         }
 
+        var idToken = session.getIdToken();
+        var sub = this.jwtDecoder.decode(idToken).getClaim("sub");
+
         var body = new BffAccessTokenResponse(session.getAccessToken(),
                 Instant.now().atZone(ZoneOffset.UTC).plusSeconds(accessTokenRemaining),
                 Instant.now().atZone(ZoneOffset.UTC).plusSeconds(refreshRemaining),
-                session.getRole());
+                session.getRole(),
+                (String) sub
+        );
         return new ResponseEntity<>(body, HttpStatus.OK);
    }
 }
